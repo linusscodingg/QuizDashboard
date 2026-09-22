@@ -15,6 +15,7 @@ assert.match(login, /id="resetBtn"/);
 assert.doesNotMatch(login, /id="guestBtn"/);
 assert.match(login, /firebase-login\.js/);
 assert.match(login, /firebase-config\.js/);
+assert.match(login, /https:\/\/apis\.google\.com/);
 assert.match(loginScript, /signInWithEmailAndPassword/);
 assert.match(loginScript, /createUserWithEmailAndPassword/);
 assert.match(loginScript, /sendPasswordResetEmail/);
