@@ -5,10 +5,11 @@ Die Dateien im Repository allein ändern keine Einstellungen in Firebase oder Gi
 ## Firebase
 
 - [ ] In **Firestore Database → Regeln** den Inhalt von `firestore.rules` einfügen und veröffentlichen.
-- [ ] Im Firestore-Regel-Simulator prüfen: nicht angemeldet = abgelehnt; angemeldeter fremder Benutzer = abgelehnt; verifizierter Eigentümer = erlaubt.
+- [ ] Im Firestore-Regel-Simulator prüfen: nicht angemeldet = abgelehnt; angemeldeter fremder Benutzer = abgelehnt; über GitHub angemeldeter Eigentümer = erlaubt.
+- [ ] Für `leaderboard/<uid>` prüfen: nicht angemeldet = Lesen abgelehnt; angemeldeter GitHub-Nutzer = Lesen erlaubt; Schreiben und Löschen nur für die eigene UID.
+- [ ] Unter **Authentication → Anmeldemethode** nur **GitHub** aktivieren und **E-Mail/Passwort** deaktivieren.
 - [ ] In **Authentication → Einstellungen → Autorisierte Domains** nur benötigte Domains zulassen, insbesondere `linusscodingg.github.io` und gegebenenfalls `localhost` für Entwicklung.
 - [ ] In der GitHub OAuth App exakt die in Firebase angezeigte **Authorization callback URL** eintragen und keine zusätzlichen OAuth-Berechtigungen anfordern.
-- [ ] In **Authentication → Einstellungen → Passwortrichtlinie** mindestens 10 Zeichen verlangen.
 - [ ] In der Google Cloud Console unter **APIs & Services → Credentials** kontrollieren, dass der Firebase-Browser-Key nur für die benötigten Firebase-APIs eingeschränkt ist. Keine Gemini-, Maps- oder andere kostenpflichtige API an diesen öffentlichen Schlüssel hängen.
 - [ ] **Firebase App Check** für die Web-App einrichten und danach die Durchsetzung für Cloud Firestore aktivieren. Vor der Durchsetzung zuerst die Metriken prüfen, damit echte Nutzer nicht ausgesperrt werden.
 - [ ] Quoten und Nutzung regelmässig kontrollieren. Ein Gratisangebot ist keine dauerhafte Preisgarantie des Anbieters.

@@ -11,6 +11,8 @@ const inlineScripts = [...dashboardHtml.matchAll(/<script(?:\s[^>]*)?>([\s\S]*?)
   .filter(script => script.trim());
 
 assert.equal(inlineScripts.length, 1, "Dashboard should contain one inline application script");
+assert.match(dashboardHtml, /\[hidden\]\s*\{\s*display:\s*none\s*!important;/, "Hidden account controls must stay hidden despite button display styles");
+assert.doesNotMatch(dashboardHtml, /cloudEmail|cloudPassword|cloudLoginBtn|cloudRegisterBtn/, "Dashboard must not expose the removed email/password login");
 
 class FakeElement {
   constructor(id) {
@@ -39,10 +41,9 @@ const ids = [
   "completedTotal", "averagePercent", "averageGrade", "attemptTotal", "subjects",
   "player", "quizFrame", "playerTitle", "closePlayer", "exportBtn", "importBtn",
   "importInput", "toast", "playerStatus"
-  , "cloudTitle", "cloudStatus", "cloudLoginToggle", "cloudLogoutBtn", "cloudPanel",
-  "cloudEmail", "cloudPassword", "cloudLoginBtn", "cloudRegisterBtn", "cloudError",
-  "cloudDeleteToggle", "cloudDeletePanel", "deletePassword", "cloudDeleteConfirm",
-  "cloudDeleteCancel", "cloudDeleteError", "deletePasswordField"
+  , "cloudTitle", "cloudStatus", "cloudLogoutBtn", "cloudDeleteToggle",
+  "cloudDeletePanel", "cloudDeleteConfirm", "cloudDeleteCancel", "cloudDeleteError"
+  , "leaderboardName", "leaderboardToggle", "leaderboardRemove", "leaderboardStatus", "leaderboardSubjects"
 ];
 const elements = Object.fromEntries(ids.map(id => [id, new FakeElement(id)]));
 const openQuizButton = new FakeElement("openQuiz");
@@ -96,7 +97,7 @@ openQuizButton.click();
 assert.equal(elements.player.hidden, false);
 assert.match(elements.quizFrame.src, /quizzes\/CNS1\/W2_IPv6_Part2\.html$/);
 
-function report(attemptId, score) {
+function report(attemptId, score, reviewItems) {
   windowListeners.message({
     source: elements.quizFrame.contentWindow,
     data: {
@@ -104,7 +105,7 @@ function report(attemptId, score) {
       version: 1,
       type: "quiz-completed",
       quizId: "cns1-w2-ipv6-part2",
-      attempt: { attemptId, completedAt: "2026-09-21T12:00:00.000Z", score, maximumScore: 100 }
+      attempt: { attemptId, completedAt: "2026-09-21T12:00:00.000Z", score, maximumScore: 100, ...(reviewItems === undefined ? {} : { reviewItems }) }
     }
   });
 }
@@ -135,11 +136,16 @@ assert.equal(elements.averagePercent.textContent, "85 %");
 assert.equal(elements.averageGrade.textContent, "5.3");
 assert.match(elements.subjects.innerHTML, /Sehr gut verstanden/);
 
-report("attempt-2", 40);
+report("attempt-2", 40, [{
+  status: "wrong", prompt: "Welche Antwort stimmt?", yourAnswer: "Falsch", correctAnswer: "Richtig",
+  explanation: "Die richtige Antwort folgt aus der Definition.", points: 0, maximum: 5
+}]);
 assert.equal(String(elements.attemptTotal.textContent), "2");
 assert.equal(elements.averagePercent.textContent, "85 %", "Best attempt must remain decisive");
 assert.match(elements.subjects.innerHTML, /Ø Lernnote<\/span><strong>4\.2/);
 assert.match(elements.subjects.innerHTML, /Beste Lernnote<\/span><strong>5\.3/);
+assert.match(elements.subjects.innerHTML, /Fehler ansehen \(1\)/);
+assert.match(elements.subjects.innerHTML, /Deine Antwort:<\/b> Falsch/);
 
 for (const quiz of catalog.quizzes) {
   const quizHtml = fs.readFileSync(path.resolve(dashboardDirectory, quiz.path), "utf8");
@@ -158,6 +164,8 @@ for (const quiz of catalog.quizzes) {
   assert.match(quizHtml, /Richtige Antwort – nicht gewählt|Correct answer – not selected/);
   assert.match(quizHtml, /Falsch gewählt|Incorrectly selected/);
   assert.match(quizHtml, /if \(isDone\([^)]*\)\) return;/);
+  assert.match(quizHtml, /function buildReviewItems\(\)/);
+  assert.match(quizHtml, /reviewItems:\s*buildReviewItems\(\)/);
   assert.match(quizHtml, /Neues Quiz starten|Start new quiz/);
   assert.match(quizHtml, /Bereits abgeschlossene Versuche bleiben im Dashboard erhalten|Earlier completed attempts remain in the dashboard/);
   assert.doesNotMatch(quizHtml, /id="solutionBtn"/);

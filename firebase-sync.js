@@ -1,12 +1,11 @@
 (async () => {
 const { initializeApp } = await import("https://www.gstatic.com/firebasejs/12.19.0/firebase-app.js");
 const {
-  createUserWithEmailAndPassword, deleteUser, EmailAuthProvider, getAuth, GithubAuthProvider,
-  onAuthStateChanged, reauthenticateWithCredential, reauthenticateWithPopup,
-  sendEmailVerification, signInWithEmailAndPassword, signOut
+  deleteUser, getAuth, GithubAuthProvider, onAuthStateChanged,
+  reauthenticateWithPopup, signOut
 } = await import("https://www.gstatic.com/firebasejs/12.19.0/firebase-auth.js");
 const {
-  deleteDoc, doc, getDoc, getFirestore, serverTimestamp, setDoc
+  collection, deleteDoc, doc, getDoc, getDocs, getFirestore, serverTimestamp, setDoc
 } = await import("https://www.gstatic.com/firebasejs/12.19.0/firebase-firestore.js");
 const firebaseConfig = window.FIREBASE_CONFIG;
 
@@ -19,12 +18,12 @@ function dashboardDocument(userId) {
   return doc(database, "users", userId, "dashboard", "state");
 }
 
-function usesGithub(user) {
-  return Boolean(user?.providerData?.some(provider => provider.providerId === "github.com"));
+function leaderboardDocument(userId) {
+  return doc(database, "leaderboard", userId);
 }
 
-function isTrustedUser(user) {
-  return Boolean(user?.emailVerified || usesGithub(user));
+function usesGithub(user) {
+  return Boolean(user?.providerData?.some(provider => provider.providerId === "github.com"));
 }
 
 const cloud = {
@@ -33,28 +32,6 @@ const cloud = {
     authListeners.add(listener);
     listener(cloud.currentUser);
     return () => authListeners.delete(listener);
-  },
-  async register(email, password) {
-    if (password.length < 10) throw Object.assign(new Error("Password too short"), { code: "auth/weak-password" });
-    const credential = await createUserWithEmailAndPassword(auth, email, password);
-    try {
-      await sendEmailVerification(credential.user);
-    } finally {
-      await signOut(auth);
-    }
-    throw Object.assign(new Error("Email verification required"), { code: "auth/email-verification-sent" });
-  },
-  async login(email, password) {
-    const credential = await signInWithEmailAndPassword(auth, email, password);
-    if (!credential.user.emailVerified) {
-      try {
-        await sendEmailVerification(credential.user);
-      } finally {
-        await signOut(auth);
-      }
-      throw Object.assign(new Error("Email verification required"), { code: "auth/email-not-verified" });
-    }
-    return credential;
   },
   async logout() {
     return signOut(auth);
@@ -73,16 +50,31 @@ const cloud = {
       updatedAt: serverTimestamp()
     });
   },
-  async deleteAccountAndData(password) {
+  async loadLeaderboard() {
+    if (!cloud.currentUser) return [];
+    const snapshot = await getDocs(collection(database, "leaderboard"));
+    return snapshot.docs.map(entry => ({ userId: entry.id, ...entry.data() }));
+  },
+  async publishLeaderboard(displayName, subjects) {
+    if (!cloud.currentUser) return;
+    await setDoc(leaderboardDocument(cloud.currentUser.uid), {
+      version: 1,
+      displayName,
+      subjects: JSON.parse(JSON.stringify(subjects)),
+      updatedAt: serverTimestamp()
+    });
+  },
+  async removeLeaderboard() {
+    if (!cloud.currentUser) return;
+    await deleteDoc(leaderboardDocument(cloud.currentUser.uid));
+  },
+  async deleteAccountAndData() {
     const user = cloud.currentUser;
     if (!user) throw Object.assign(new Error("No signed-in user"), { code: "auth/requires-recent-login" });
-    if (usesGithub(user)) {
-      await reauthenticateWithPopup(user, new GithubAuthProvider());
-    } else {
-      if (!user.email || !password) throw Object.assign(new Error("Password required"), { code: "auth/missing-password" });
-      await reauthenticateWithCredential(user, EmailAuthProvider.credential(user.email, password));
-    }
+    if (!usesGithub(user)) throw Object.assign(new Error("GitHub account required"), { code: "auth/operation-not-allowed" });
+    await reauthenticateWithPopup(user, new GithubAuthProvider());
     await deleteDoc(dashboardDocument(user.uid));
+    await deleteDoc(leaderboardDocument(user.uid));
     await deleteUser(user);
   }
 };
@@ -90,17 +82,14 @@ const cloud = {
 window.quizCloud = cloud;
 
 onAuthStateChanged(auth, async user => {
-  if (user && !isTrustedUser(user)) {
+  if (user && !usesGithub(user)) {
     await signOut(auth);
     return;
   }
   cloud.currentUser = user;
   if (!user) {
-    const isLocalFile = window.location.protocol === "file:";
-    if (!isLocalFile) {
-      window.location.replace("login.html");
-      return;
-    }
+    window.location.replace("login.html");
+    return;
   }
   authListeners.forEach(listener => listener(user));
 });

@@ -1,10 +1,10 @@
 # Quiz-Dashboard
 
-Dieses Verzeichnis enthält das vollständige Quiz-System. Auf der veröffentlichten Website ist ein bestätigtes Firebase-Konto erforderlich; der Lernfortschritt wird zwischen Geräten synchronisiert und zusätzlich lokal zwischengespeichert. Die offiziellen Vorlesungsunterlagen bleiben in den jeweiligen Fachordnern und werden nicht dupliziert.
+Dieses Verzeichnis enthält das vollständige Quiz-System. Für die Nutzung ist eine Anmeldung mit GitHub über Firebase erforderlich; der Lernfortschritt wird zwischen Geräten synchronisiert und zusätzlich lokal zwischengespeichert. Die offiziellen Vorlesungsunterlagen bleiben in den jeweiligen Fachordnern und werden nicht dupliziert.
 
 ## Starten
 
-`index.html` in Edge oder Chrome öffnen. Das Dashboard lädt die Quiz über relative Pfade. Ohne Firebase oder Internetverbindung wird der Fortschritt weiterhin lokal im Browser gespeichert.
+Die veröffentlichte GitHub-Pages-Adresse in Edge oder Chrome öffnen. Für lokale Entwicklung muss die Website über einen lokalen Webserver statt direkt als Datei geöffnet werden, weil die GitHub-Anmeldung in einer direkten `file://`-Ansicht nicht funktioniert.
 
 ## Struktur
 
@@ -28,18 +28,22 @@ QuizDashboard/
 
 Neue Quiz werden in `quizzes/<FACH>/` gespeichert und zusätzlich in `quiz-catalog.js` registriert. Der lokale Verlauf und unfertige Zwischenstände werden im Browser gespeichert. Nach einer Anmeldung wird derselbe Dashboard-Datensatz zusätzlich unter `users/<uid>/dashboard/state` in Cloud Firestore gespeichert. Lokaler und entfernter Stand werden beim Login zusammengeführt.
 
+Neue abgeschlossene Versuche speichern zusätzlich die falsch oder teilweise richtig beantworteten Aufgaben mit eigener Antwort, richtiger Antwort und Erklärung. Diese Details lassen sich in der Versuchshistorie über **Fehler ansehen** öffnen. Bei älteren Versuchen können Details nur nachgetragen werden, wenn der dazugehörige abgeschlossene Quizstand noch lokal vorhanden ist.
+
+Der freiwillige **Lernvergleich** veröffentlicht ausschliesslich einen frei gewählten Anzeigenamen und aggregierte Noten. Pro Quiz zeigt er Bestnote, Durchschnitt aller Versuche und Anzahl Versuche. Pro Fach zeigt der Bestleistungs-Durchschnitt den Mittelwert der jeweiligen Quiz-Bestnoten; der Gesamt-Durchschnitt umfasst alle Versuche einschliesslich Wiederholungen. Private Antworten und Fehler bleiben im persönlichen Dashboard.
+
 ## Firebase
 
 Das Firebase-Projekt ist in `firebase-config.js` konfiguriert. In der Firebase Console müssen folgende Einstellungen aktiv sein:
 
-1. `Authentication` → `Anmeldemethode` → `E-Mail/Passwort` und `GitHub` aktivieren. In der GitHub OAuth App muss die von Firebase angezeigte Callback-URL eingetragen sein.
-2. Cloud Firestore erstellen und die mitgelieferte Datei `firestore.rules` veröffentlichen. Sie erlaubt nur verifizierten Benutzern den eigenen Datensatz `users/<uid>/dashboard/state`.
+1. `Authentication` → `Anmeldemethode` → ausschliesslich `GitHub` aktivieren. `E-Mail/Passwort` deaktivieren. In der GitHub OAuth App muss die von Firebase angezeigte Callback-URL eingetragen sein.
+2. Cloud Firestore erstellen und die mitgelieferte Datei `firestore.rules` veröffentlichen. Sie schützt den privaten Datensatz `users/<uid>/dashboard/state`; die freiwilligen Zusammenfassungen unter `leaderboard/<uid>` sind nur für angemeldete GitHub-Nutzer lesbar und nur vom jeweiligen Eigentümer änderbar.
 3. Vor der Veröffentlichung über GitHub Pages unter `Authentication` → `Einstellungen` → `Autorisierte Domains` die Domain `linusscodingg.github.io` ergänzen.
 4. In der Google Cloud Console prüfen, dass der Firebase-Browser-Key nur für die notwendigen Firebase-APIs zugelassen ist. Keine anderen kostenpflichtigen Google-APIs an denselben öffentlichen Schlüssel hängen.
 
-`login.html` stellt GitHub-Anmeldung sowie Anmeldung, Registrierung und Passwort-Reset per E-Mail bereit. Nicht angemeldete Online-Besucher werden vom Dashboard automatisch dorthin weitergeleitet.
+`login.html` stellt ausschliesslich die GitHub-Anmeldung bereit. Nicht angemeldete Besucher werden vom Dashboard automatisch dorthin weitergeleitet.
 
-Die Firebase-Webkonfiguration ist öffentlich und enthält keinen Admin-Schlüssel. Die Zugriffskontrolle erfolgt durch Firebase Authentication, bestätigte E-Mail-Adressen und die Firestore Security Rules. Service-Account- oder Admin-Schlüssel dürfen nicht in dieses Repository aufgenommen werden. Zusätzliche Hinweise stehen in `SECURITY.md`.
+Die Firebase-Webkonfiguration ist öffentlich und enthält keinen Admin-Schlüssel. Die Zugriffskontrolle erfolgt durch die GitHub-Anmeldung über Firebase Authentication und die Firestore Security Rules. Service-Account- oder Admin-Schlüssel dürfen nicht in dieses Repository aufgenommen werden. Zusätzliche Hinweise stehen in `SECURITY.md`.
 
 Nach Änderungen an `firestore.rules` müssen die Regeln separat über die Firebase Console oder Firebase CLI veröffentlicht werden. Ein GitHub-Push allein aktualisiert die aktiven Datenbankregeln nicht.
 

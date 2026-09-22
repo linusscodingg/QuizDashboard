@@ -855,6 +855,36 @@
       updateHeader();
     }
 
+    function buildReviewItems() {
+      const label = value => value === undefined || value === null || value === "" ? "No answer" : String(value);
+      const answerText = (question, correct) => {
+        if (question.type === "text") return correct ? label(question.solution) : label(state.answers[question.id]);
+        if (question.type === "order") {
+          const order = correct ? question.correct : (state.order[question.id] || question.initial || []);
+          return order.length ? order.map(index => question.items[index]).join(" → ") : "No answer";
+        }
+        if (question.type === "categorize") {
+          const values = correct ? question.correct : (state.answers[question.id] || []);
+          return question.statements.map((statement, index) => `${statement} → ${question.categories[Number(values[index])] || "No answer"}`).join("\n");
+        }
+        const values = correct ? (Array.isArray(question.correct) ? question.correct : [question.correct]) : (state.answers[question.id] || []);
+        return values.length ? values.map(index => question.options[index]).join(" · ") : "No answer";
+      };
+      return questions.map(question => {
+        const result = resultFor(question.id) || { status: "skipped", points: 0 };
+        if (result.status === "correct") return null;
+        return {
+          status: result.status,
+          prompt: question.prompt,
+          yourAnswer: answerText(question, false),
+          correctAnswer: answerText(question, true),
+          explanation: question.type === "text" ? "" : question.solution,
+          points: result.points || 0,
+          maximum: question.points
+        };
+      }).filter(Boolean);
+    }
+
     function resultPayload(score, percentage, concepts, resultClass) {
       return {
         subject: "SWS1", lecture: "Lecture 02 – Secure Development Lifecycle",
@@ -870,7 +900,8 @@
       const message = { source: "quiz-dashboard", version: 1, type: "quiz-completed", quizId: DASHBOARD_QUIZ_ID, attempt: {
         attemptId: payload.attemptId, completedAt: payload.date, score: payload.totalScore, maximumScore: payload.maximumScore,
         percentage: payload.percentage, grade: payload.grade, understanding: payload.understanding,
-        strongConcepts: payload.strongConcepts, uncertainConcepts: payload.partiallyUnderstoodConcepts, weakConcepts: payload.weakConcepts
+        strongConcepts: payload.strongConcepts, uncertainConcepts: payload.partiallyUnderstoodConcepts, weakConcepts: payload.weakConcepts,
+        reviewItems: buildReviewItems()
       }};
       if (window.parent && window.parent !== window) window.parent.postMessage(message, "*");
       if (window.opener && !window.opener.closed) window.opener.postMessage(message, "*");

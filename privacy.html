@@ -30,16 +30,17 @@
     <p>Verantwortlich für dieses private Lernprojekt ist der Inhaber des GitHub-Kontos <strong>linusscodingg</strong>. Kontakt ist über das <a href="https://github.com/linusscodingg/QuizDashboard/issues">GitHub-Repository</a> möglich. Für eine breitere öffentliche Nutzung sollte hier zusätzlich eine direkte Kontaktadresse des Betreibers ergänzt werden.</p>
 
     <h2>2. Welche Daten verarbeitet werden</h2>
-    <p>Für die Nutzung der veröffentlichten Website ist ein bestätigtes Firebase-Konto erforderlich. Dabei werden folgende Daten verarbeitet:</p>
+    <p>Für die Nutzung der veröffentlichten Website ist eine Anmeldung mit GitHub über Firebase Authentication erforderlich. Dabei werden folgende Daten verarbeitet:</p>
     <ul>
-      <li>E-Mail-Adresse, Firebase-Nutzer-ID, gewählte Anmeldemethode und technische Anmeldedaten;</li>
+      <li>Firebase-Nutzer-ID sowie die von GitHub für die Anmeldung bereitgestellten Profildaten, beispielsweise Benutzername, Profilbild und – sofern verfügbar – E-Mail-Adresse;</li>
       <li>Quizversuche, Punktzahlen, Zwischenstände und Zeitpunkte der Synchronisation;</li>
+      <li>bei freiwilliger Teilnahme am Lernvergleich: frei gewählter Anzeigename sowie zusammengefasste Best- und Durchschnittsnoten pro Fach und Quiz;</li>
       <li>technisch notwendige Verbindungs- und Sicherheitsdaten wie IP-Adresse, Browserinformationen und Serverprotokolle bei GitHub und Google/Firebase.</li>
     </ul>
-    <p>Das Passwort wird nicht vom Quiz-Dashboard gespeichert. Die Anmeldung wird direkt durch Firebase Authentication verarbeitet. Bei der GitHub-Anmeldung werden die von GitHub für die Anmeldung bereitgestellten Profildaten verarbeitet; das Dashboard fordert keinen Zugriff auf private Repositories an.</p>
+    <p>Das Dashboard erhält und speichert kein GitHub-Passwort. Die Anmeldung wird über GitHub und Firebase Authentication verarbeitet; das Dashboard fordert keinen Zugriff auf private Repositories an.</p>
 
     <h2>3. Zweck</h2>
-    <p>Die Daten werden verwendet, um das Dashboard bereitzustellen, den persönlichen Lernfortschritt zwischen Geräten zu synchronisieren, Konten zu schützen und technische Angriffe oder Fehler zu erkennen. Es findet keine Werbung, Profilbildung zu Marketingzwecken oder Weitergabe zu Werbezwecken statt.</p>
+    <p>Die Daten werden verwendet, um das Dashboard bereitzustellen, den persönlichen Lernfortschritt zwischen Geräten zu synchronisieren, den freiwilligen Lernvergleich zwischen angemeldeten Nutzern anzubieten, Konten zu schützen und technische Angriffe oder Fehler zu erkennen. Es findet keine Werbung, Profilbildung zu Marketingzwecken oder Weitergabe zu Werbezwecken statt.</p>
 
     <h2>4. Eingesetzte Dienste und Übermittlung ins Ausland</h2>
     <p>Die Website wird über <a href="https://pages.github.com/">GitHub Pages</a> bereitgestellt. Anmeldung und Cloud-Speicherung erfolgen über <a href="https://firebase.google.com/">Google Firebase</a>. Dabei können Daten durch GitHub, Inc. und Google LLC beziehungsweise deren verbundene Unternehmen auch ausserhalb der Schweiz verarbeitet werden. Es gelten ergänzend die <a href="https://docs.github.com/en/site-policy/privacy-policies/github-general-privacy-statement">Datenschutzhinweise von GitHub</a> und die <a href="https://policies.google.com/privacy">Datenschutzhinweise von Google</a>.</p>
@@ -48,10 +49,10 @@
     <p>Das Dashboard verwendet lokalen Browser-Speicher als Zwischenspeicher für den Quizfortschritt. Firebase Authentication kann technisch notwendige Browser-Speicherungen für die angemeldete Sitzung verwenden. Es werden keine Analyse-, Werbe- oder Marketing-Cookies eingesetzt.</p>
 
     <h2>6. Speicherdauer und Löschung</h2>
-    <p>Lokale Daten bleiben gespeichert, bis der Browser-Speicher gelöscht oder eine Sicherung zurückgesetzt wird. Cloud-Daten bleiben bis zur Löschung des Kontos gespeichert. Angemeldete Nutzer können im Dashboard über „Konto löschen“ das Firebase-Konto und den zugehörigen Cloud-Fortschritt löschen. Vorher kann über „Sicherung exportieren“ eine lokale Kopie erstellt werden.</p>
+    <p>Lokale Daten bleiben gespeichert, bis der Browser-Speicher gelöscht oder eine Sicherung zurückgesetzt wird. Cloud-Daten bleiben bis zur Löschung des Kontos gespeichert. Der freiwillige Eintrag im Lernvergleich kann jederzeit über „Nicht mehr anzeigen“ separat entfernt werden. Angemeldete Nutzer können über „Konto löschen“ das Firebase-Konto, den Cloud-Fortschritt und den Eintrag im Lernvergleich löschen. Vorher kann über „Sicherung exportieren“ eine lokale Kopie erstellt werden.</p>
 
     <h2>7. Sicherheit</h2>
-    <p>Cloud-Daten werden durch Firebase Authentication und Firestore Security Rules auf das jeweils angemeldete und bestätigte Konto beschränkt. Trotz angemessener Massnahmen kann keine Internetübertragung vollständig risikofrei garantiert werden.</p>
+    <p>Private Quizdaten werden durch Firebase Authentication und Firestore Security Rules auf das jeweils angemeldete GitHub-Konto beschränkt. Im freiwilligen Lernvergleich sind nur Anzeigename und aggregierte Noten für andere angemeldete GitHub-Nutzer lesbar; E-Mail-Adresse, einzelne Antworten und Fehler werden dort nicht veröffentlicht. Trotz angemessener Massnahmen kann keine Internetübertragung vollständig risikofrei garantiert werden.</p>
 
     <h2>8. Rechte</h2>
     <p>Betroffene Personen können Auskunft, Berichtigung oder Löschung ihrer personenbezogenen Daten verlangen. Dafür ist der oben genannte Kontakt zu verwenden. Änderungen an dieser Erklärung werden auf dieser Seite veröffentlicht.</p>

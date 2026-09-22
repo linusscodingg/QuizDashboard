@@ -716,6 +716,32 @@
       updateHeader();
     }
 
+    function buildReviewItems() {
+      const label = value => value === undefined || value === null || value === "" ? "Keine Antwort" : String(value);
+      const answerText = (q, correct) => {
+        if (q.type === "text") return correct ? label(q.solution) : label(state.answers[q.id]);
+        if (q.type === "order") {
+          const order = correct ? q.correct : (state.order[q.id] || q.initial || []);
+          return order.length ? order.map(index => q.items[index]).join(" → ") : "Keine Antwort";
+        }
+        const values = correct ? (Array.isArray(q.correct) ? q.correct : [q.correct]) : (state.answers[q.id] || []);
+        return values.length ? values.map(index => q.options[index]).join(" · ") : "Keine Antwort";
+      };
+      return questions.map(q => {
+        const result = resultFor(q.id) || { status: "skipped", points: 0 };
+        if (result.status === "correct") return null;
+        return {
+          status: result.status,
+          prompt: q.prompt,
+          yourAnswer: answerText(q, false),
+          correctAnswer: answerText(q, true),
+          explanation: q.type === "text" ? "" : q.solution,
+          points: result.points || 0,
+          maximum: q.points
+        };
+      }).filter(Boolean);
+    }
+
     function reportResultToDashboard(score, pct, concepts, cls) {
       const message = {
         source: "quiz-dashboard",
@@ -732,7 +758,8 @@
           understanding: cls.status,
           strongConcepts: concepts.strong,
           uncertainConcepts: concepts.mixed,
-          weakConcepts: concepts.weak
+          weakConcepts: concepts.weak,
+          reviewItems: buildReviewItems()
         }
       };
       if (window.parent && window.parent !== window) window.parent.postMessage(message, "*");

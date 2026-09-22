@@ -2,16 +2,20 @@ rules_version = '2';
 
 service cloud.firestore {
   match /databases/{database}/documents {
-    function isVerifiedOwner(userId) {
+    function isGithubOwner(userId) {
       return request.auth != null
         && request.auth.uid == userId
-        && (request.auth.token.email_verified == true
-          || request.auth.token.firebase.sign_in_provider == "github.com");
+        && request.auth.token.firebase.sign_in_provider == "github.com";
+    }
+
+    function isGithubUser() {
+      return request.auth != null
+        && request.auth.token.firebase.sign_in_provider == "github.com";
     }
 
     match /users/{userId}/dashboard/{documentId} {
-      allow read: if isVerifiedOwner(userId) && documentId == "state";
-      allow create, update: if isVerifiedOwner(userId)
+      allow read: if isGithubOwner(userId) && documentId == "state";
+      allow create, update: if isGithubOwner(userId)
         && documentId == "state"
         && request.resource.data.keys().hasOnly(["version", "data", "updatedAt"])
         && request.resource.data.version == 1
@@ -21,7 +25,22 @@ service cloud.firestore {
         && request.resource.data.data.attempts is map
         && request.resource.data.data.progress is map
         && request.resource.data.updatedAt == request.time;
-      allow delete: if isVerifiedOwner(userId) && documentId == "state";
+      allow delete: if isGithubOwner(userId) && documentId == "state";
+    }
+
+    match /leaderboard/{userId} {
+      allow read: if isGithubUser();
+      allow create, update: if isGithubOwner(userId)
+        && request.resource.data.keys().hasAll(["version", "displayName", "subjects", "updatedAt"])
+        && request.resource.data.keys().hasOnly(["version", "displayName", "subjects", "updatedAt"])
+        && request.resource.data.version == 1
+        && request.resource.data.displayName is string
+        && request.resource.data.displayName.size() >= 1
+        && request.resource.data.displayName.size() <= 30
+        && request.resource.data.subjects is map
+        && request.resource.data.subjects.keys().hasOnly(["CNS1", "DHEAL", "SWS1", "ITRECHT"])
+        && request.resource.data.updatedAt == request.time;
+      allow delete: if isGithubOwner(userId);
     }
 
     match /{document=**} {

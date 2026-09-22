@@ -44,6 +44,7 @@
     }
     button, input { font: inherit; }
     button { cursor: pointer; }
+    [hidden] { display: none !important; }
     button:focus-visible, summary:focus-visible, input:focus-visible { outline: 3px solid rgba(32, 183, 212, .35); outline-offset: 3px; }
 
     .shell { width: min(1220px, calc(100% - 32px)); margin: 0 auto; padding: 28px 0 56px; }
@@ -222,10 +223,38 @@
     }
     .attempt strong { color: var(--ink); }
     .attempt-meta { color: var(--muted); }
+    .attempt-review { grid-column: 1 / -1; padding-top: 8px; border-top: 1px solid var(--line); }
+    .attempt-review summary { color: var(--blue); font-weight: 800; cursor: pointer; }
+    .review-list { display: grid; gap: 10px; margin-top: 10px; }
+    .review-item { padding: 12px; border-left: 4px solid #de6f24; border-radius: 9px; background: #fff; }
+    .review-item.wrong, .review-item.skipped { border-left-color: var(--red); }
+    .review-item h4 { margin: 0 0 7px; font-size: .92rem; }
+    .review-item p { margin: 5px 0 0; white-space: pre-wrap; }
+    .review-item b { color: var(--muted); }
+    .review-unavailable { grid-column: 1 / -1; color: var(--muted); font-size: .78rem; }
     .icon-button { padding: 5px 8px; color: var(--red); border: 0; border-radius: 8px; background: transparent; font-weight: 800; }
     .icon-button:hover { background: var(--red-bg); }
     .empty { padding: 24px; color: var(--muted); border: 1px dashed #b8ccd5; border-radius: 14px; text-align: center; }
     .empty strong { display: block; margin-bottom: 3px; color: var(--ink); }
+    .leaderboard { margin-top: 22px; padding: 20px; border: 1px solid var(--line); border-radius: 20px; background: rgba(255,255,255,.92); box-shadow: 0 10px 28px rgba(18,65,88,.07); }
+    .leaderboard-head { display: flex; flex-wrap: wrap; gap: 16px; align-items: flex-end; justify-content: space-between; }
+    .leaderboard h2 { margin: 0; }
+    .leaderboard-intro { max-width: 720px; margin: 5px 0 0; color: var(--muted); font-size: .86rem; }
+    .leaderboard-controls { display: flex; flex-wrap: wrap; gap: 8px; align-items: end; }
+    .leaderboard-controls label { color: var(--muted); font-size: .76rem; font-weight: 750; }
+    .leaderboard-controls input { display: block; min-height: 38px; margin-top: 3px; padding: 7px 10px; border: 1px solid var(--line); border-radius: 9px; }
+    .leaderboard-status { margin: 10px 0 0; color: var(--muted); font-size: .8rem; }
+    .leaderboard-subjects { display: grid; gap: 12px; margin-top: 16px; }
+    .leaderboard-subject { overflow: hidden; border: 1px solid var(--line); border-radius: 14px; }
+    .leaderboard-subject h3 { margin: 0; padding: 11px 13px; background: var(--wash); font-size: 1rem; }
+    .leader-row { display: grid; grid-template-columns: minmax(140px, 1fr) repeat(3, auto); gap: 12px 22px; align-items: center; padding: 11px 13px; border-top: 1px solid var(--line); }
+    .leader-row:first-of-type { border-top: 0; }
+    .leader-name { font-weight: 850; }
+    .leader-metric span { display: block; color: var(--muted); font-size: .68rem; font-weight: 750; text-transform: uppercase; }
+    .leader-metric strong { display: block; }
+    .leader-details { grid-column: 1 / -1; }
+    .leader-details summary { width: fit-content; color: var(--blue); font-size: .8rem; font-weight: 750; cursor: pointer; }
+    .leader-quiz { display: grid; grid-template-columns: minmax(180px,1fr) auto auto auto; gap: 10px; margin-top: 7px; padding: 8px 10px; border-radius: 8px; background: #f7fbfc; font-size: .8rem; }
 
     .player[hidden] { display: none; }
     .player { position: fixed; inset: 0; z-index: 20; display: grid; grid-template-rows: auto 1fr; background: #e9f3f7; }
@@ -255,6 +284,8 @@
       .history { grid-column: 1; }
       .attempt { grid-template-columns: 1fr auto; }
       .attempt-meta { grid-column: 1; }
+      .leader-row, .leader-quiz { grid-template-columns: 1fr 1fr; }
+      .leader-name, .leader-details, .leader-quiz strong { grid-column: 1 / -1; }
       .player-bar span { display: none; }
       .cloud-panel { grid-template-columns: 1fr; }
     }
@@ -277,18 +308,9 @@
 
     <section class="cloud-bar" aria-label="Cloud-Synchronisation">
       <div class="cloud-state"><strong id="cloudTitle">Lokal gespeichert</strong><span id="cloudStatus">Firebase wird vorbereitet …</span></div>
-      <button class="button small" id="cloudLoginToggle" type="button">Anmelden</button>
       <button class="button small danger" id="cloudLogoutBtn" type="button" hidden>Abmelden</button>
       <button class="button small danger" id="cloudDeleteToggle" type="button" hidden>Konto löschen</button>
-      <div class="cloud-panel" id="cloudPanel" hidden>
-        <div class="field"><label for="cloudEmail">E-Mail-Adresse</label><input id="cloudEmail" type="email" autocomplete="email" placeholder="name@example.com"></div>
-        <div class="field"><label for="cloudPassword">Passwort</label><input id="cloudPassword" type="password" autocomplete="current-password" minlength="6" placeholder="Mindestens 6 Zeichen"></div>
-        <button class="button small" id="cloudLoginBtn" type="button">Anmelden</button>
-        <button class="button small secondary" id="cloudRegisterBtn" type="button">Konto erstellen</button>
-        <p class="cloud-error" id="cloudError" hidden></p>
-      </div>
       <div class="cloud-panel delete-panel" id="cloudDeletePanel" hidden>
-        <div class="field" id="deletePasswordField"><label for="deletePassword">Zur Bestätigung aktuelles Passwort</label><input id="deletePassword" type="password" autocomplete="current-password" minlength="6"></div>
         <button class="button small danger" id="cloudDeleteConfirm" type="button">Cloud-Daten und Konto endgültig löschen</button>
         <button class="button small" id="cloudDeleteCancel" type="button">Abbrechen</button>
         <p class="cloud-error" id="cloudDeleteError" hidden></p>
@@ -312,6 +334,21 @@
     </aside>
 
     <div class="subjects" id="subjects"></div>
+    <section class="leaderboard" aria-labelledby="leaderboardTitle">
+      <div class="leaderboard-head">
+        <div>
+          <h2 id="leaderboardTitle">Lernvergleich</h2>
+          <p class="leaderboard-intro">Vergleiche freiwillig aggregierte Lernnoten. Quiz-Bestnote = bester Versuch; Quiz-Ø und Fach-Gesamt-Ø enthalten alle Wiederholungen. Der Vergleich dient nur der Lernmotivation und ist keine manipulationssichere Rangliste.</p>
+        </div>
+        <div class="leaderboard-controls">
+          <label for="leaderboardName">Anzeigename<input id="leaderboardName" maxlength="30" autocomplete="nickname" placeholder="Dein Anzeigename"></label>
+          <button class="button small" id="leaderboardToggle" type="button">Mich anzeigen</button>
+          <button class="button small danger" id="leaderboardRemove" type="button" hidden>Nicht mehr anzeigen</button>
+        </div>
+      </div>
+      <p class="leaderboard-status" id="leaderboardStatus">Rangliste wird geladen …</p>
+      <div class="leaderboard-subjects" id="leaderboardSubjects"></div>
+    </section>
     <p class="footnote">Die Lernnote dient deiner Motivation und Selbsteinschätzung. Sie ist keine offizielle Bewertung. · <a href="privacy.html">Datenschutzerklärung</a></p>
   </main>
 
@@ -341,6 +378,8 @@
       let cloudSaveTimer = null;
       let cloudUser = null;
       let cloudInitialised = false;
+      let leaderboardEntries = [];
+      let leaderboardEnabled = false;
       let store = loadStore();
 
       function emptyStore() { return { version: 1, attempts: {}, progress: {} }; }
@@ -413,6 +452,12 @@
         cloudSaveTimer = setTimeout(async () => {
           try {
             await window.quizCloud.save(store);
+            if (leaderboardEnabled) {
+              const displayName = document.getElementById("leaderboardName").value.trim();
+              const subjects = buildLeaderboardSubjects();
+              await window.quizCloud.publishLeaderboard(displayName, subjects);
+              updateOwnLeaderboardEntry(displayName, subjects);
+            }
             setCloudStatus(`Mit Firebase synchronisiert · ${new Date().toLocaleTimeString("de-CH", { hour: "2-digit", minute: "2-digit" })}`);
           } catch (error) {
             setCloudStatus("Cloud-Speicherung fehlgeschlagen – lokal weiterhin sicher gespeichert.", true);
@@ -426,50 +471,14 @@
         element.style.color = isError ? "var(--red)" : "";
       }
 
-      function friendlyAuthError(error) {
+      function friendlyDeleteError(error) {
         const messages = {
-          "auth/email-already-in-use": "Für diese E-Mail-Adresse existiert bereits ein Konto.",
-          "auth/invalid-credential": "E-Mail-Adresse oder Passwort ist nicht korrekt.",
-          "auth/invalid-email": "Die E-Mail-Adresse ist ungültig.",
-          "auth/invalid-api-key": "Der Firebase-API-Key ist ungültig. Kopiere die aktuelle Web-App-Konfiguration erneut aus den Firebase-Projekteinstellungen.",
-          "auth/weak-password": "Das Passwort ist zu schwach. Verwende mindestens 6 Zeichen.",
-          "auth/missing-password": "Gib ein Passwort ein.",
-          "auth/network-request-failed": "Firebase ist momentan nicht erreichbar. Prüfe deine Internetverbindung.",
-          "auth/too-many-requests": "Zu viele Versuche. Warte kurz und probiere es erneut.",
-          "auth/operation-not-allowed": "Diese Anmeldemethode ist in Firebase noch nicht aktiviert.",
-          "auth/operation-not-supported-in-this-environment": "Firebase-Anmeldung funktioniert nicht beim direkten Öffnen als Datei.",
-          "auth/unauthorized-domain": "Diese Domain ist in Firebase nicht als autorisierte Domain eingetragen.",
-          "auth/configuration-not-found": "Für diese Anmeldemethode fehlt noch die Firebase-Konfiguration.",
-          "auth/email-verification-sent": "Konto erstellt. Bestätige den Link in deiner E-Mail und melde dich danach an.",
-          "auth/email-not-verified": "Bestätige zuerst deine E-Mail-Adresse. Ein neuer Bestätigungslink wurde versendet.",
-          "auth/wrong-password": "Das Passwort ist nicht korrekt.",
-          "auth/requires-recent-login": "Melde dich neu an und versuche die Kontolöschung nochmals.",
+          "auth/requires-recent-login": "Die Anmeldung ist zu lange her. Melde dich ab, erneut mit GitHub an und versuche es nochmals.",
           "auth/popup-closed-by-user": "Die GitHub-Bestätigung wurde abgebrochen.",
-          "auth/popup-blocked": "Das GitHub-Fenster wurde vom Browser blockiert."
+          "auth/popup-blocked": "Das GitHub-Fenster wurde vom Browser blockiert.",
+          "auth/network-request-failed": "Firebase ist momentan nicht erreichbar. Prüfe deine Internetverbindung."
         };
-        return messages[error?.code] || `Die Anmeldung ist fehlgeschlagen${error?.code ? ` (${error.code})` : ""}. Prüfe deine Angaben und die Firebase-Konfiguration.`;
-      }
-
-      function showCloudError(message) {
-        const error = document.getElementById("cloudError");
-        error.textContent = message;
-        error.hidden = !message;
-      }
-
-      async function runAuthAction(action) {
-        const email = document.getElementById("cloudEmail").value.trim();
-        const password = document.getElementById("cloudPassword").value;
-        if (!email || !password) return showCloudError("Gib deine E-Mail-Adresse und dein Passwort ein.");
-        showCloudError("");
-        setCloudStatus("Anmeldung läuft …");
-        try {
-          await action(email, password);
-          document.getElementById("cloudPassword").value = "";
-          document.getElementById("cloudPanel").hidden = true;
-        } catch (error) {
-          showCloudError(friendlyAuthError(error));
-          setCloudStatus("Nicht angemeldet – Cloud-Synchronisation ist nicht aktiv.", true);
-        }
+        return messages[error?.code] || "Das Konto konnte momentan nicht gelöscht werden.";
       }
 
       function initCloud() {
@@ -478,22 +487,18 @@
         window.quizCloud.onAuthChange(async user => {
           cloudUser = user;
           const title = document.getElementById("cloudTitle");
-          const loginToggle = document.getElementById("cloudLoginToggle");
           const logout = document.getElementById("cloudLogoutBtn");
           const deleteToggle = document.getElementById("cloudDeleteToggle");
           if (!user) {
             title.textContent = "Lokal gespeichert";
-            loginToggle.hidden = false;
             logout.hidden = true;
             deleteToggle.hidden = true;
-            setCloudStatus("Melde dich an, um den Fortschritt zwischen Geräten zu synchronisieren.");
+            setCloudStatus("Nicht mit GitHub angemeldet.");
             return;
           }
           title.textContent = user.email || "Firebase-Konto";
-          loginToggle.hidden = true;
           logout.hidden = false;
           deleteToggle.hidden = false;
-          document.getElementById("cloudPanel").hidden = true;
           setCloudStatus("Cloudstand wird geladen …");
           try {
             const remote = await window.quizCloud.load();
@@ -505,6 +510,7 @@
           } catch (error) {
             setCloudStatus("Cloud konnte nicht geladen werden – lokaler Fortschritt bleibt erhalten.", true);
           }
+          await loadLeaderboard(user);
         });
       }
 
@@ -602,6 +608,7 @@
                 <div><strong>${formatPoints(attempt.score)} / ${formatPoints(attempt.maximumScore)} Punkte</strong> · ${attempt.percentage} % · Note ${Number(attempt.grade).toFixed(1)}${attempt.attemptId === best.attemptId ? " · Bestwert" : ""}</div>
                 <span class="attempt-meta">${formatDate(attempt.completedAt)}</span>
                 <button class="icon-button" type="button" data-delete-attempt="${escapeHtml(attempt.attemptId)}" data-quiz-id="${escapeHtml(quiz.id)}" aria-label="Versuch ${index + 1} löschen">Löschen</button>
+                ${renderAttemptReview(attempt)}
               </div>`).join("")}</div>
           </details>` : "";
 
@@ -623,6 +630,21 @@
             <div class="quiz-actions"><button class="button" style="color:#fff;background:var(--status-color)" type="button" data-open-quiz="${escapeHtml(quiz.id)}">${progress ? "Quiz fortsetzen" : best ? "Quiz wiederholen" : "Quiz starten"}</button></div>
             ${history}
           </article>`;
+      }
+
+      function renderAttemptReview(attempt) {
+        if (attempt.reviewItems === null) return '<span class="review-unavailable">Für diesen älteren Versuch wurden noch keine Antwortdetails gespeichert.</span>';
+        if (!attempt.reviewItems.length) return '<span class="review-unavailable">Keine falschen Antworten in diesem Versuch.</span>';
+        return `<details class="attempt-review">
+          <summary>Fehler ansehen (${attempt.reviewItems.length})</summary>
+          <div class="review-list">${attempt.reviewItems.map((item, index) => `
+            <article class="review-item ${escapeHtml(item.status)}">
+              <h4>${index + 1}. ${escapeHtml(item.prompt)} · ${formatPoints(item.points)} / ${formatPoints(item.maximum)} Punkte</h4>
+              <p><b>Deine Antwort:</b> ${escapeHtml(item.yourAnswer)}</p>
+              <p><b>Richtige Antwort:</b> ${escapeHtml(item.correctAnswer)}</p>
+              ${item.explanation ? `<p><b>Erklärung:</b> ${escapeHtml(item.explanation)}</p>` : ""}
+            </article>`).join("")}</div>
+        </details>`;
       }
 
       function formatDate(value) {
@@ -672,8 +694,158 @@
           understanding: level.label,
           strongConcepts: Array.isArray(raw.strongConcepts) ? raw.strongConcepts.map(String) : [],
           uncertainConcepts: Array.isArray(raw.uncertainConcepts) ? raw.uncertainConcepts.map(String) : [],
-          weakConcepts: Array.isArray(raw.weakConcepts) ? raw.weakConcepts.map(String) : []
+          weakConcepts: Array.isArray(raw.weakConcepts) ? raw.weakConcepts.map(String) : [],
+          reviewItems: normaliseReviewItems(raw.reviewItems)
         };
+      }
+
+      function buildLeaderboardSubjects() {
+        const subjects = {};
+        catalog.subjects.forEach(subject => {
+          const quizSummaries = {};
+          const allGrades = [];
+          catalog.quizzes.filter(quiz => quiz.subject === subject.id).forEach(quiz => {
+            const attempts = attemptsFor(quiz.id);
+            if (!attempts.length) return;
+            const grades = attempts.map(attempt => Number(attempt.grade)).filter(Number.isFinite);
+            if (!grades.length) return;
+            grades.forEach(value => allGrades.push(value));
+            quizSummaries[quiz.id] = {
+              bestGrade: Number(Math.max(...grades).toFixed(2)),
+              averageGrade: Number((grades.reduce((sum, value) => sum + value, 0) / grades.length).toFixed(2)),
+              attempts: grades.length
+            };
+          });
+          const quizzes = Object.values(quizSummaries);
+          if (!quizzes.length) return;
+          subjects[subject.id] = {
+            bestAverageGrade: Number((quizzes.reduce((sum, quiz) => sum + quiz.bestGrade, 0) / quizzes.length).toFixed(2)),
+            averageGrade: Number((allGrades.reduce((sum, value) => sum + value, 0) / allGrades.length).toFixed(2)),
+            quizCount: quizzes.length,
+            attemptCount: allGrades.length,
+            quizzes: quizSummaries
+          };
+        });
+        return subjects;
+      }
+
+      function normaliseLeaderboardEntry(raw) {
+        if (!raw || typeof raw !== "object" || !raw.userId) return null;
+        const displayName = String(raw.displayName || "GitHub-Nutzer").trim().slice(0, 30) || "GitHub-Nutzer";
+        const subjects = {};
+        const rawSubjects = raw.subjects && typeof raw.subjects === "object" ? raw.subjects : {};
+        catalog.subjects.forEach(subject => {
+          const rawQuizzes = rawSubjects[subject.id]?.quizzes;
+          if (!rawQuizzes || typeof rawQuizzes !== "object") return;
+          const quizzes = {};
+          catalog.quizzes.filter(quiz => quiz.subject === subject.id).forEach(quiz => {
+            const item = rawQuizzes[quiz.id];
+            if (!item || typeof item !== "object") return;
+            const attempts = clamp(Math.floor(Number(item.attempts) || 0), 0, 10000);
+            if (!attempts) return;
+            quizzes[quiz.id] = {
+              bestGrade: clamp(Number(item.bestGrade) || 1, 1, 6),
+              averageGrade: clamp(Number(item.averageGrade) || 1, 1, 6),
+              attempts
+            };
+          });
+          const quizValues = Object.values(quizzes);
+          if (!quizValues.length) return;
+          const attemptCount = quizValues.reduce((sum, quiz) => sum + quiz.attempts, 0);
+          subjects[subject.id] = {
+            bestAverageGrade: quizValues.reduce((sum, quiz) => sum + quiz.bestGrade, 0) / quizValues.length,
+            averageGrade: quizValues.reduce((sum, quiz) => sum + quiz.averageGrade * quiz.attempts, 0) / attemptCount,
+            quizCount: quizValues.length,
+            attemptCount,
+            quizzes
+          };
+        });
+        return { userId: String(raw.userId), displayName, subjects };
+      }
+
+      function updateOwnLeaderboardEntry(displayName, subjects) {
+        if (!cloudUser) return;
+        const entry = normaliseLeaderboardEntry({ userId: cloudUser.uid, displayName, subjects });
+        leaderboardEntries = leaderboardEntries.filter(item => item.userId !== cloudUser.uid);
+        if (entry) leaderboardEntries.push(entry);
+        renderLeaderboard();
+      }
+
+      async function loadLeaderboard(user) {
+        const status = document.getElementById("leaderboardStatus");
+        try {
+          const rawEntries = await window.quizCloud.loadLeaderboard();
+          leaderboardEntries = rawEntries.map(normaliseLeaderboardEntry).filter(Boolean);
+          const ownEntry = leaderboardEntries.find(entry => entry.userId === user.uid);
+          leaderboardEnabled = Boolean(ownEntry);
+          document.getElementById("leaderboardName").value = ownEntry?.displayName
+            || String(user.displayName || user.providerData?.find(provider => provider.providerId === "github.com")?.displayName || "GitHub-Nutzer").slice(0, 30);
+          if (leaderboardEnabled) {
+            const subjects = buildLeaderboardSubjects();
+            await window.quizCloud.publishLeaderboard(ownEntry.displayName, subjects);
+            updateOwnLeaderboardEntry(ownEntry.displayName, subjects);
+          }
+          renderLeaderboard();
+        } catch (_) {
+          status.textContent = "Der Lernvergleich konnte momentan nicht geladen werden.";
+        }
+      }
+
+      function renderLeaderboard() {
+        const root = document.getElementById("leaderboardSubjects");
+        const status = document.getElementById("leaderboardStatus");
+        const toggle = document.getElementById("leaderboardToggle");
+        const remove = document.getElementById("leaderboardRemove");
+        toggle.textContent = leaderboardEnabled ? "Anzeigename aktualisieren" : "Mich anzeigen";
+        remove.hidden = !leaderboardEnabled;
+        status.textContent = leaderboardEnabled
+          ? "Du nimmst freiwillig teil. Sichtbar sind nur dein Anzeigename und zusammengefasste Lernnoten."
+          : "Du bist nicht sichtbar. Du kannst die Ergebnisse anderer angemeldeter Teilnehmer trotzdem ansehen.";
+        const sections = catalog.subjects.map(subject => {
+          const rows = leaderboardEntries
+            .filter(entry => entry.subjects[subject.id])
+            .sort((a, b) => b.subjects[subject.id].bestAverageGrade - a.subjects[subject.id].bestAverageGrade
+              || b.subjects[subject.id].averageGrade - a.subjects[subject.id].averageGrade);
+          if (!rows.length) return "";
+          return `<article class="leaderboard-subject">
+            <h3>${escapeHtml(subject.name)}</h3>
+            ${rows.map(entry => {
+              const data = entry.subjects[subject.id];
+              const quizzes = catalog.quizzes.filter(quiz => quiz.subject === subject.id && data.quizzes[quiz.id]);
+              return `<div class="leader-row">
+                <div class="leader-name">${escapeHtml(entry.displayName)}${entry.userId === cloudUser?.uid ? " · Du" : ""}</div>
+                <div class="leader-metric"><span>Bestleistungs-Ø</span><strong>${data.bestAverageGrade.toFixed(1)}</strong></div>
+                <div class="leader-metric"><span>Gesamt-Ø</span><strong>${data.averageGrade.toFixed(1)}</strong></div>
+                <div class="leader-metric"><span>Versuche</span><strong>${data.attemptCount}</strong></div>
+                <details class="leader-details"><summary>${data.quizCount} ${data.quizCount === 1 ? "Quiz" : "Quiz"} anzeigen</summary>
+                  ${quizzes.map(quiz => {
+                    const quizData = data.quizzes[quiz.id];
+                    return `<div class="leader-quiz"><strong>${escapeHtml(quiz.title)}</strong><span>Bestnote ${quizData.bestGrade.toFixed(1)}</span><span>Ø ${quizData.averageGrade.toFixed(1)}</span><span>${quizData.attempts} ${quizData.attempts === 1 ? "Versuch" : "Versuche"}</span></div>`;
+                  }).join("")}
+                </details>
+              </div>`;
+            }).join("")}
+          </article>`;
+        }).join("");
+        root.innerHTML = sections || '<div class="empty"><strong>Noch keine sichtbaren Ergebnisse</strong>Die Rangliste füllt sich, sobald jemand freiwillig teilnimmt.</div>';
+      }
+
+      function normaliseReviewItems(raw) {
+        if (!Array.isArray(raw)) return null;
+        const allowedStatuses = new Set(["wrong", "partial", "skipped"]);
+        return raw.slice(0, 50).map(item => {
+          if (!item || typeof item !== "object" || !allowedStatuses.has(item.status)) return null;
+          const maximum = Math.max(0, Number(item.maximum) || 0);
+          return {
+            status: item.status,
+            prompt: String(item.prompt || "Aufgabe").slice(0, 1500),
+            yourAnswer: String(item.yourAnswer || "Keine Antwort").slice(0, 4000),
+            correctAnswer: String(item.correctAnswer || "Nicht angegeben").slice(0, 4000),
+            explanation: String(item.explanation || "").slice(0, 6000),
+            points: clamp(Number(item.points) || 0, 0, maximum),
+            maximum
+          };
+        }).filter(Boolean);
       }
 
       function normaliseProgress(raw, quiz) {
@@ -781,14 +953,43 @@
       document.getElementById("exportBtn").addEventListener("click", exportBackup);
       document.getElementById("importBtn").addEventListener("click", () => document.getElementById("importInput").click());
       document.getElementById("importInput").addEventListener("change", event => event.target.files[0] && importBackup(event.target.files[0]));
-      document.getElementById("cloudLoginToggle").addEventListener("click", () => {
-        const panel = document.getElementById("cloudPanel");
-        panel.hidden = !panel.hidden;
-        showCloudError("");
-        if (!panel.hidden) document.getElementById("cloudEmail").focus();
+      document.getElementById("leaderboardToggle").addEventListener("click", async () => {
+        const name = document.getElementById("leaderboardName").value.trim();
+        const button = document.getElementById("leaderboardToggle");
+        if (!cloudUser) return showToast("Melde dich zuerst mit GitHub an.");
+        if (!name) return showToast("Gib einen Anzeigenamen ein.");
+        if (name.length > 30) return showToast("Der Anzeigename darf höchstens 30 Zeichen lang sein.");
+        button.disabled = true;
+        try {
+          const subjects = buildLeaderboardSubjects();
+          await window.quizCloud.publishLeaderboard(name, subjects);
+          leaderboardEnabled = true;
+          updateOwnLeaderboardEntry(name, subjects);
+          showToast("Deine zusammengefassten Lernnoten sind jetzt im Lernvergleich sichtbar.");
+        } catch (_) {
+          showToast("Der Lernvergleich konnte nicht aktualisiert werden.");
+        } finally {
+          button.disabled = false;
+        }
       });
-      document.getElementById("cloudLoginBtn").addEventListener("click", () => runAuthAction((email, password) => window.quizCloud.login(email, password)));
-      document.getElementById("cloudRegisterBtn").addEventListener("click", () => runAuthAction((email, password) => window.quizCloud.register(email, password)));
+      document.getElementById("leaderboardRemove").addEventListener("click", async () => {
+        if (!confirm("Deinen Eintrag aus dem Lernvergleich entfernen? Deine privaten Quizresultate bleiben erhalten.")) return;
+        const button = document.getElementById("leaderboardRemove");
+        button.disabled = true;
+        leaderboardEnabled = false;
+        try {
+          await window.quizCloud.removeLeaderboard();
+          leaderboardEntries = leaderboardEntries.filter(entry => entry.userId !== cloudUser?.uid);
+          renderLeaderboard();
+          showToast("Du wirst nicht mehr im Lernvergleich angezeigt.");
+        } catch (_) {
+          leaderboardEnabled = true;
+          renderLeaderboard();
+          showToast("Der Eintrag konnte momentan nicht entfernt werden.");
+        } finally {
+          button.disabled = false;
+        }
+      });
       document.getElementById("cloudLogoutBtn").addEventListener("click", async () => {
         try {
           await window.quizCloud.logout();
@@ -798,38 +999,23 @@
         }
       });
       document.getElementById("cloudDeleteToggle").addEventListener("click", () => {
-        const githubAccount = cloudUser?.providerData?.some(provider => provider.providerId === "github.com");
-        document.getElementById("deletePasswordField").hidden = githubAccount;
-        document.getElementById("deletePassword").value = "";
         document.getElementById("cloudDeletePanel").hidden = false;
-        if (!githubAccount) document.getElementById("deletePassword").focus();
       });
       document.getElementById("cloudDeleteCancel").addEventListener("click", () => {
-        document.getElementById("deletePassword").value = "";
         document.getElementById("cloudDeletePanel").hidden = true;
       });
       document.getElementById("cloudDeleteConfirm").addEventListener("click", async () => {
-        const password = document.getElementById("deletePassword").value;
-        const githubAccount = cloudUser?.providerData?.some(provider => provider.providerId === "github.com");
         const error = document.getElementById("cloudDeleteError");
-        if (!githubAccount && !password) {
-          error.textContent = "Gib dein aktuelles Passwort ein.";
-          error.hidden = false;
-          return;
-        }
         if (!window.confirm("Wirklich Konto und gesamten Cloud-Fortschritt endgültig löschen? Eine lokale Sicherung solltest du vorher exportieren.")) return;
         error.hidden = true;
         try {
-          await window.quizCloud.deleteAccountAndData(password);
+          await window.quizCloud.deleteAccountAndData();
           localStorage.removeItem(STORAGE_KEY);
           window.location.replace("login.html");
         } catch (deleteError) {
-          error.textContent = friendlyAuthError(deleteError);
+          error.textContent = friendlyDeleteError(deleteError);
           error.hidden = false;
         }
-      });
-      document.getElementById("cloudPassword").addEventListener("keydown", event => {
-        if (event.key === "Enter") document.getElementById("cloudLoginBtn").click();
       });
       document.addEventListener("keydown", event => { if (event.key === "Escape" && !player.hidden) closeQuiz(); });
 
