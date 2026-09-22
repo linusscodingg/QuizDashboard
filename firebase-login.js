@@ -36,15 +36,21 @@ function friendlyError(error) {
     "auth/email-already-in-use": "Für diese E-Mail-Adresse existiert bereits ein Konto.",
     "auth/invalid-credential": "E-Mail-Adresse oder Passwort ist nicht korrekt.",
     "auth/invalid-email": "Die E-Mail-Adresse ist ungültig.",
+    "auth/invalid-api-key": "Der Firebase-API-Key ist ungültig. Kopiere die aktuelle Web-App-Konfiguration erneut aus den Firebase-Projekteinstellungen.",
     "auth/weak-password": "Das Passwort ist zu schwach. Verwende für ein neues Konto mindestens 10 Zeichen.",
     "auth/missing-password": "Gib ein Passwort ein.",
     "auth/network-request-failed": "Firebase ist nicht erreichbar. Prüfe deine Internetverbindung.",
     "auth/too-many-requests": "Zu viele Versuche. Warte kurz und probiere es erneut.",
+    "auth/operation-not-allowed": "Diese Anmeldemethode ist in Firebase noch nicht aktiviert.",
+    "auth/operation-not-supported-in-this-environment": "Firebase-Anmeldung funktioniert nicht beim direkten Öffnen als Datei. Verwende die GitHub-Pages-Adresse oder einen lokalen Webserver.",
+    "auth/unauthorized-domain": "Diese Domain ist in Firebase nicht als autorisierte Domain eingetragen.",
+    "auth/configuration-not-found": "Für diese Anmeldemethode fehlt noch die Firebase-Konfiguration.",
+    "auth/user-disabled": "Dieses Konto wurde in Firebase deaktiviert.",
     "auth/popup-closed-by-user": "Die GitHub-Anmeldung wurde abgebrochen.",
     "auth/popup-blocked": "Das Anmeldefenster wurde vom Browser blockiert.",
     "auth/account-exists-with-different-credential": "Für diese E-Mail-Adresse existiert bereits eine andere Anmeldemethode. Melde dich zuerst damit an."
   };
-  return messages[error?.code] || "Die Aktion ist fehlgeschlagen. Prüfe deine Angaben und versuche es erneut.";
+  return messages[error?.code] || `Die Aktion ist fehlgeschlagen${error?.code ? ` (${error.code})` : ""}. Prüfe deine Angaben und versuche es erneut.`;
 }
 
 function isTrustedUser(user) {
@@ -98,6 +104,10 @@ githubButton.addEventListener("click", async () => {
     setBusy(false);
   }
 });
+
+if (window.location.protocol === "file:") {
+  showMessage("Lokale Dateiansicht: Firebase- und GitHub-Anmeldung funktionieren hier möglicherweise nicht. Teste die Anmeldung über GitHub Pages oder einen lokalen Webserver.", "info");
+}
 
 resetButton.addEventListener("click", async () => {
   const emailValue = email.value.trim();

@@ -1,5 +1,5 @@
 window.FIREBASE_CONFIG = Object.freeze({
-  apiKey: "AIzaSyDwSO0VJsjvCoGtaqYSQqEsoL3uq8ROb60",
+  apiKey: "AIzaSyDwSO0VjsjvCoGtaqYSQqEsoL3uq8ROb60",
   authDomain: "zhaw-quiz-dashboard.firebaseapp.com",
   projectId: "zhaw-quiz-dashboard",
   storageBucket: "zhaw-quiz-dashboard.firebasestorage.app",
