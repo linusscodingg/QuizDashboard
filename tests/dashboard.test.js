@@ -39,6 +39,10 @@ const ids = [
   "completedTotal", "averagePercent", "averageGrade", "attemptTotal", "subjects",
   "player", "quizFrame", "playerTitle", "closePlayer", "exportBtn", "importBtn",
   "importInput", "toast", "playerStatus"
+  , "cloudTitle", "cloudStatus", "cloudLoginToggle", "cloudLogoutBtn", "cloudPanel",
+  "cloudEmail", "cloudPassword", "cloudLoginBtn", "cloudRegisterBtn", "cloudError",
+  "cloudDeleteToggle", "cloudDeletePanel", "deletePassword", "cloudDeleteConfirm",
+  "cloudDeleteCancel", "cloudDeleteError", "deletePasswordField"
 ];
 const elements = Object.fromEntries(ids.map(id => [id, new FakeElement(id)]));
 const openQuizButton = new FakeElement("openQuiz");
@@ -96,7 +100,7 @@ function report(attemptId, score) {
   windowListeners.message({
     source: elements.quizFrame.contentWindow,
     data: {
-      source: "zhaw-quiz",
+      source: "quiz-dashboard",
       version: 1,
       type: "quiz-completed",
       quizId: "cns1-w2-ipv6-part2",
@@ -108,11 +112,11 @@ function report(attemptId, score) {
 windowListeners.message({
   source: elements.quizFrame.contentWindow,
   data: {
-    source: "zhaw-quiz", version: 1, type: "quiz-progress", quizId: "cns1-w2-ipv6-part2", manual: true,
+    source: "quiz-dashboard", version: 1, type: "quiz-progress", quizId: "cns1-w2-ipv6-part2", manual: true,
     progress: { attemptId: "attempt-1", currentTask: 4, completedCount: 3, totalQuestions: 13, score: 18, maximumScore: 100, updatedAt: "2026-09-21T11:00:00.000Z" }
   }
 });
-let storedDashboard = JSON.parse(storage.get("zhaw-quiz-dashboard-v1"));
+let storedDashboard = JSON.parse(storage.get("quiz-dashboard-v1"));
 assert.equal(storedDashboard.progress["cns1-w2-ipv6-part2"].completedCount, 3);
 assert.match(elements.subjects.innerHTML, /In Bearbeitung/);
 assert.match(elements.subjects.innerHTML, /Quiz fortsetzen/);
@@ -122,7 +126,7 @@ assert.equal(elements.completedTotal.textContent, "1 / 4");
 assert.equal(elements.averagePercent.textContent, "70 %");
 assert.equal(elements.averageGrade.textContent, "4.5");
 assert.equal(String(elements.attemptTotal.textContent), "1");
-storedDashboard = JSON.parse(storage.get("zhaw-quiz-dashboard-v1"));
+storedDashboard = JSON.parse(storage.get("quiz-dashboard-v1"));
 assert.equal(storedDashboard.progress["cns1-w2-ipv6-part2"], undefined);
 
 report("attempt-1", 85);
@@ -134,10 +138,12 @@ assert.match(elements.subjects.innerHTML, /Sehr gut verstanden/);
 report("attempt-2", 40);
 assert.equal(String(elements.attemptTotal.textContent), "2");
 assert.equal(elements.averagePercent.textContent, "85 %", "Best attempt must remain decisive");
+assert.match(elements.subjects.innerHTML, /Ø Lernnote<\/span><strong>4\.2/);
+assert.match(elements.subjects.innerHTML, /Beste Lernnote<\/span><strong>5\.3/);
 
 for (const quiz of catalog.quizzes) {
   const quizHtml = fs.readFileSync(path.resolve(dashboardDirectory, quiz.path), "utf8");
-  assert.match(quizHtml, /source:\s*"zhaw-quiz"/);
+  assert.match(quizHtml, /source:\s*"quiz-dashboard"/);
   assert.match(quizHtml, /quizId:\s*DASHBOARD_QUIZ_ID/);
   assert.match(quizHtml, /type:\s*"quiz-progress"/);
   assert.match(quizHtml, /Zwischenstand speichern|Save progress/);
@@ -145,15 +151,15 @@ for (const quiz of catalog.quizzes) {
   assert.ok(questionsLiteral, `Questions array should remain readable for ${quiz.id}`);
   const questions = vm.runInNewContext(questionsLiteral[1]);
   assert.equal(questions.reduce((sum, question) => sum + question.points, 0), quiz.maximumScore);
-  for (const question of questions.filter(question => question.options)) {
+  for (const question of questions.filter(question => question.options && ["single", "multi"].includes(question.type))) {
     assert.equal(question.optionExplanations?.length, question.options.length, `Every option needs an explanation: ${quiz.id}/${question.id}`);
   }
   assert.match(quizHtml, /state\.revealed\[[^\]]+\.id\] = true/);
   assert.match(quizHtml, /Richtige Antwort – nicht gewählt|Correct answer – not selected/);
   assert.match(quizHtml, /Falsch gewählt|Incorrectly selected/);
   assert.match(quizHtml, /if \(isDone\([^)]*\)\) return;/);
-  assert.match(quizHtml, /Quiz nochmals machen|Retake quiz/);
-  assert.match(quizHtml, /Frühere abgeschlossene Versuche bleiben im Dashboard erhalten|Earlier completed attempts remain in the dashboard/);
+  assert.match(quizHtml, /Neues Quiz starten|Start new quiz/);
+  assert.match(quizHtml, /Bereits abgeschlossene Versuche bleiben im Dashboard erhalten|Earlier completed attempts remain in the dashboard/);
   assert.doesNotMatch(quizHtml, /id="solutionBtn"/);
   assert.doesNotMatch(quizHtml, />Lösung anzeigen</);
 }

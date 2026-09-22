@@ -163,6 +163,52 @@ module.exports = {
       reference: "Slides 22–23", concepts: ["Early defect prevention", "Penetrate and patch"]
     },
     {
+      id: "classify-security-activities", type: "categorize", topic: "Classifying Security Activities", points: 12,
+      prompt: "Assign each practical action to the security activity it primarily belongs to. Each correct assignment is worth 1 point.",
+      hint: "The same security activity may be used more than once.",
+      options: [
+        "Security Requirements",
+        "Threat Modeling",
+        "Security Design/Controls",
+        "Secure Coding",
+        "Code Review",
+        "Penetration Testing",
+        "Security Operations",
+        "Security Risk Analysis"
+      ],
+      statements: [
+        "Identify potential attackers or attack groups (e.g., script kiddies, organized cyber criminals, nation states) that may be interested in attacking the system.",
+        "Once the system is operational, use a password-cracking tool every four weeks to check whether users are using weak passwords.",
+        "Before pushing code to the Git repository, use a source-code analyzer integrated into the IDE to analyze the code for security bugs.",
+        "Use a checklist with guidelines to prevent typical security-relevant programming mistakes in iOS apps.",
+        "Decide whether to use login codes sent by SMS or Google Authenticator as the second authentication factor.",
+        "Hire a company to find security defects in an e-shop web application by interacting with the running system.",
+        "Configure the compiler so that safeguards against exploiting buffer-overflow vulnerabilities are enabled.",
+        "Analyze the security architecture of a military communication system to identify security design flaws.",
+        "Based on a list of identified security design flaws, determine additional security properties that should be considered.",
+        "Employ a security-monitoring system to detect suspicious communication patterns, such as scanning traffic, between the control systems of a power plant.",
+        "Use a methodology to rate the criticality of vulnerabilities detected during a penetration test.",
+        "Depending on a specified security requirement, choose an appropriate access-control mechanism."
+      ],
+      correct: [1, 6, 4, 3, 2, 5, 2, 1, 0, 6, 7, 2],
+      explanations: [
+        "Threat Modeling considers realistic attackers, their capabilities, and the attacks they may attempt.",
+        "This is a recurring activity performed while the system is operational, so it belongs to Security Operations.",
+        "Automated static source-code analysis searches implementation code for security bugs and is a form of Code Review.",
+        "A secure-coding checklist helps developers avoid introducing security bugs while writing code.",
+        "Selecting the concrete mechanism that fulfills an authentication requirement is a Security Design/Controls decision.",
+        "Interacting with and attacking the running application to find vulnerabilities is Penetration Testing.",
+        "The lecture treats compiler and operating-system safeguards against buffer overflows as concrete Security Design/Controls measures.",
+        "Searching an architecture for conceptual security weaknesses is the central purpose of Threat Modeling.",
+        "Identified design flaws feed back into Security Requirements so that additional required security properties are specified.",
+        "Monitoring a deployed system for suspicious activity is part of Security Operations.",
+        "Rating the criticality of vulnerabilities is the purpose of Security Risk Analysis.",
+        "Choosing the concrete access-control mechanism that implements a requirement belongs to Security Design/Controls."
+      ],
+      solution: "The key distinction is between defining required security properties, analyzing threats and design flaws, selecting concrete controls, preventing implementation mistakes, reviewing source code, attacking the running system, protecting and monitoring operations, and rating risk.",
+      reference: "Slides 9–23", concepts: ["Security activity classification", "Security activities", "Lifecycle mapping"]
+    },
+    {
       id: "boss", type: "text", topic: "Boss Question – Applying an SDL", points: 12,
       prompt: "A team is iteratively developing a webshop with customer and administration areas. Outline a sensible security plan for the next iteration: name at least five security activities, explain their concrete contribution, and include at least one feedback loop between activities.",
       hint: "Consider requirements, the attacker view, controls, implementation, review, testing, operations, and risk.",

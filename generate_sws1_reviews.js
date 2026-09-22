@@ -11,8 +11,9 @@ const reviews = [
   {
     file: "W2_Secure_Development_Lifecycle.html",
     id: "sws1-w2-secure-development-lifecycle",
-    storage: "sws1-w2-secure-development-lifecycle-review-v1",
+    storage: "sws1-w2-secure-development-lifecycle-review-v2",
     week: 2,
+    maximumScore: 112,
     title: "Secure Development Lifecycle",
     subtitle: "Active understanding check on security activities, their lifecycle position, and how they complement each other",
     source: "W2_SecureDevelopmentLifecycle.pdf",
@@ -199,6 +200,7 @@ const reviews = [
     id: "sws1-w3-software-security-errors",
     storage: "sws1-w3-software-security-errors-review-v1",
     week: 3,
+    maximumScore: 100,
     title: "Software Security Errors",
     subtitle: "Active understanding check on the 7 (+1) Kingdoms and typical software security errors",
     source: "W3_SoftwareSecurityErrors.pdf",
@@ -446,7 +448,7 @@ function buildReview(review) {
     ["am Ende", "shown at the end"],
     ["Zwischenstand speichern", "Save progress"],
     ["Review abschliessen", "Finish review"],
-    ["Fortschritt zurücksetzen", "Reset progress"],
+    ["Neues Quiz starten", "Start new quiz"],
     ["Änderungen werden auch automatisch lokal gespeichert.", "Changes are also saved locally and automatically."],
     ["Die Note ist eine Selbsteinschätzung, keine offizielle Hochschulnote.", "The grade is a self-assessment, not an official university grade."],
     ["Richtig gewählt", "Correctly selected"],
@@ -478,14 +480,6 @@ function buildReview(review) {
     ["Grundsätzlich verstanden, aber mit Lücken", "Generally understood, but with gaps"],
     ["Noch nicht sicher verstanden", "Not yet understood with confidence"],
     ["Deutliche Wissenslücken", "Significant knowledge gaps"],
-    ["Später auffrischen", "Review later"],
-    ["Optional gezielt üben", "Optional targeted practice"],
-    ["Optional nochmals anschauen", "Optional focused review"],
-    ["Optional Grundlagen festigen", "Optional foundation practice"],
-    ["Du hast den Stoff sehr gut verstanden. Eine kurze spätere Recall-Runde kann das Wissen langfristig festigen.", "You understood the material very well. A short recall session later can strengthen long-term retention."],
-    ["Wenn du möchtest, kannst du die unsicheren Konzepte später mit neuen Aufgaben festigen.", "If you want, you can strengthen uncertain concepts later with new questions."],
-    ["Ein gezieltes Review kann dir helfen, schwache und teilweise verstandene Bereiche aus einem anderen Blickwinkel zu üben.", "A targeted review can help you practise weak and partially understood areas from a different angle."],
-    ["Es kann sich lohnen, zuerst die wichtigsten schwachen Konzepte nachzulesen und später ein fokussiertes Review zu versuchen.", "It may help to revisit the most important weak concepts first and then attempt a focused review."],
     ["Noch kein Bereich über 80 %.", "No area above 80% yet."],
     ["Keine gemischten Bereiche.", "No mixed areas."],
     ["Keine klar schwachen Bereiche.", "No clearly weak areas."],
@@ -497,14 +491,15 @@ function buildReview(review) {
     ["Stärken", "Strengths"],
     ["Unsicher", "Uncertain"],
     ["Wiederholen", "Review"],
-    ["Nächster freiwilliger Schritt:", "Optional next step:"],
-    ["Ergebnis als JSON exportieren", "Export result as JSON"],
-    ["Gezieltes Review vorbereiten (optional)", "Prepare targeted review (optional)"],
     ["Antworten ansehen", "Review answers"],
-    ["Quiz nochmals machen", "Retake quiz"],
     ["Bearbeite oder überspringe zuerst alle Aufgaben.", "Complete or skip all questions first."],
     ["Zwischenstand gespeichert", "Progress saved"],
-    ["Neuen Versuch starten? Der aktuelle Quizstand wird zurückgesetzt. Frühere abgeschlossene Versuche bleiben im Dashboard erhalten.", "Start a new attempt? The current quiz progress will be reset. Earlier completed attempts remain in the dashboard."],
+    ["Neues Quiz beginnen? Ein noch nicht abgeschlossener Zwischenstand wird verworfen. Bereits abgeschlossene Versuche bleiben im Dashboard erhalten.", "Start a new quiz? An unfinished saved state will be discarded. Earlier completed attempts remain in the dashboard."],
+    ["Richtig zugeordnet", "Correctly assigned"],
+    ["Deine Antwort:", "Your answer:"],
+    ["Noch nicht gewählt", "Not selected"],
+    ["Ordne zuerst jeder Aussage eine Aktivität zu.", "Assign an activity to every statement first."],
+    ["Zuordnungen stimmen.", "assignments are correct."],
     ["Streak:", "Streak:"],
     ["Folien", "Slides"],
     ["unbeantwortet", "unanswered"],
@@ -518,8 +513,10 @@ function buildReview(review) {
   ];
   for (const [german, english] of interfaceTranslations) html = html.replaceAll(german, english);
 
-  if (review.questions.reduce((sum, question) => sum + question.points, 0) !== 100) {
-    throw new Error(`${review.id} does not total 100 points`);
+  const totalPoints = review.questions.reduce((sum, question) => sum + question.points, 0);
+  html = html.replaceAll("0 / 100", `0 / ${totalPoints}`);
+  if (totalPoints !== review.maximumScore) {
+    throw new Error(`${review.id} totals ${totalPoints}, expected ${review.maximumScore}`);
   }
   return html;
 }

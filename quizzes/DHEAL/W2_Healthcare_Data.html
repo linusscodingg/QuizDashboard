@@ -85,6 +85,13 @@
     .order-row { display: grid; grid-template-columns: 36px 1fr auto auto; gap: 8px; align-items: center; padding: 10px; border: 1px solid var(--line); border-radius: 13px; background: #fbfdfd; }
     .order-row.answer-correct { border-color: #49a96b; background: #e8f8ee; }
     .order-row.answer-wrong { border-color: #dc7070; background: #fff0f0; }
+    .category-list { display: grid; gap: 12px; }
+    .category-row { padding: 14px; border: 1px solid var(--line); border-radius: 14px; background: #fbfdfd; }
+    .category-row.answer-correct { border-color: #49a96b; background: #e8f8ee; }
+    .category-row.answer-wrong { border-color: #dc7070; background: #fff0f0; }
+    .category-row label { display: block; margin-bottom: 9px; font-weight: 700; }
+    .category-row select { width: 100%; padding: 10px 12px; color: var(--ink); border: 1px solid var(--line); border-radius: 10px; background: #fff; }
+    .category-row small { display: block; margin-top: 8px; line-height: 1.4; }
     .rank { display: grid; place-items: center; width: 30px; height: 30px; color: #fff; border-radius: 50%; background: var(--teal); font-weight: 800; }
     .move { width: 34px; height: 34px; padding: 0; color: var(--teal); border: 1px solid var(--line); border-radius: 9px; background: #fff; font-weight: 900; }
     .actions { display: flex; flex-wrap: wrap; gap: 9px; margin-top: 22px; }
@@ -126,9 +133,6 @@
     .concept-box { padding: 16px; border: 1px solid var(--line); border-radius: 15px; }
     .concept-box h3 { margin: 0 0 8px; font-size: 1rem; }
     .concept-box ul { margin: 0; padding-left: 18px; }
-    .recommendation { margin-top: 16px; padding: 18px; border-left: 5px solid var(--teal); border-radius: 12px; background: var(--mint); }
-    .recommendation h3, .recommendation p { margin: 0; }
-    .recommendation p { margin-top: 6px; }
     .hidden { display: none !important; }
     @media (max-width: 830px) {
       .topbar { grid-template-columns: 1fr; }
@@ -173,7 +177,7 @@
         <div class="actions">
           <button class="btn secondary" id="saveBtn" type="button">Zwischenstand speichern</button>
           <button class="btn primary" id="finishBtn" type="button" disabled>Review abschliessen</button>
-          <button class="btn ghost" id="resetBtn" type="button">Fortschritt zurücksetzen</button>
+          <button class="btn ghost" id="newQuizBtn" type="button">Neues Quiz starten</button>
         </div>
         <p class="save-note" id="saveNotice" aria-live="polite">Änderungen werden auch automatisch lokal gespeichert.</p>
         <p class="source-note">Quelle: <strong>02.digital-health.healthcare-data_moodle.pdf</strong>, Folien 1–36. Die Note ist eine Selbsteinschätzung, keine offizielle Hochschulnote.</p>
@@ -467,6 +471,19 @@
           return `<div class="order-row ${reviewClass}"><span class="rank">${position + 1}</span><span>${escapeHtml(question.items[itemIndex])}${label ? `<small class="answer-label">${label}</small>` : ""}</span><button class="move" data-move="${position},-1" ${disabled || position === 0 ? "disabled" : ""} aria-label="Nach oben">↑</button><button class="move" data-move="${position},1" ${disabled || position === order.length - 1 ? "disabled" : ""} aria-label="Nach unten">↓</button></div>`;
         }).join("")}</div>`;
       }
+      if (question.type === "categorize") {
+        const selected = state.answers[question.id] || Array(question.statements.length).fill("");
+        return `<div class="category-list">${question.statements.map((statement, index) => {
+          const chosen = selected[index];
+          const correct = chosen !== "" && Number(chosen) === question.correct[index];
+          const reviewClass = isDone(question) ? (correct ? "answer-correct" : "answer-wrong") : "";
+          const resultLabel = !isDone(question) ? "" : correct
+            ? `✓ Richtig zugeordnet: ${escapeHtml(question.options[question.correct[index]])}`
+            : `✕ Deine Antwort: ${escapeHtml(chosen === "" ? "Noch nicht gewählt" : question.options[Number(chosen)])} · Richtig: ${escapeHtml(question.options[question.correct[index]])}`;
+          const explanation = isDone(question) ? `<small>${escapeHtml(question.explanations[index])}</small>` : "";
+          return `<div class="category-row ${reviewClass}"><label for="category-${index}">${index + 1}. ${escapeHtml(statement)}</label><select id="category-${index}" data-category-index="${index}" ${disabled}><option value="">Select your answer</option>${question.options.map((option, optionIndex) => `<option value="${optionIndex}" ${String(chosen) === String(optionIndex) ? "selected" : ""}>${escapeHtml(option)}</option>`).join("")}</select>${resultLabel ? `<small class="answer-label">${resultLabel}</small>` : ""}${explanation}</div>`;
+        }).join("")}</div>`;
+      }
       return `<textarea id="textAnswer" ${disabled} placeholder="Formuliere deine Antwort in eigenen Worten …">${escapeHtml(state.answers[question.id] || "")}</textarea>`;
     }
 
@@ -521,6 +538,11 @@
         [order[position], order[position + delta]] = [order[position + delta], order[position]];
         state.order[question.id] = order; saveState(); render();
       }));
+      document.querySelectorAll("[data-category-index]").forEach(select => select.addEventListener("change", () => {
+        const answers = [...(state.answers[question.id] || Array(question.statements.length).fill(""))];
+        answers[Number(select.dataset.categoryIndex)] = select.value;
+        state.answers[question.id] = answers; saveState();
+      }));
       document.getElementById("checkBtn")?.addEventListener("click", () => gradeAuto(question));
       document.getElementById("saveTextBtn")?.addEventListener("click", () => {
         const text = document.getElementById("textAnswer").value.trim();
@@ -561,6 +583,12 @@
         points = Math.round(question.points * hits / question.correct.length * 2) / 2;
         state.order[question.id] = order;
         if (points > 0 && points < question.points) note = `${hits} von ${question.correct.length} Positionen stimmen.`;
+      } else if (question.type === "categorize") {
+        const selected = state.answers[question.id] || Array(question.statements.length).fill("");
+        if (selected.some(value => value === "" || value === undefined)) return alert("Ordne zuerst jeder Aussage eine Aktivität zu.");
+        const hits = selected.filter((value, index) => Number(value) === question.correct[index]).length;
+        points = Math.round(question.points * hits / question.correct.length * 2) / 2;
+        if (points > 0 && points < question.points) note = `${hits} von ${question.correct.length} Zuordnungen stimmen.`;
       }
       const status = points === question.points ? "correct" : points > 0 ? "partial" : "wrong";
       state.results[question.id] = { status, points, note };
@@ -595,10 +623,10 @@
     }
 
     function classification(percentage) {
-      if (percentage >= 85) return { status: "Sehr gut verstanden", next: "Später auffrischen", recommendation: "Du hast den Stoff sehr gut verstanden. Eine kurze spätere Recall-Runde kann das Wissen langfristig festigen." };
-      if (percentage >= 70) return { status: "Grundsätzlich verstanden, aber mit Lücken", next: "Optional gezielt üben", recommendation: "Wenn du möchtest, kannst du die unsicheren Konzepte später mit neuen Aufgaben festigen." };
-      if (percentage >= 50) return { status: "Noch nicht sicher verstanden", next: "Optional nochmals anschauen", recommendation: "Ein gezieltes Review kann dir helfen, schwache und teilweise verstandene Bereiche aus einem anderen Blickwinkel zu üben." };
-      return { status: "Deutliche Wissenslücken", next: "Optional Grundlagen festigen", recommendation: "Es kann sich lohnen, zuerst die wichtigsten schwachen Konzepte nachzulesen und später ein fokussiertes Review zu versuchen." };
+      if (percentage >= 85) return { status: "Sehr gut verstanden" };
+      if (percentage >= 70) return { status: "Grundsätzlich verstanden, aber mit Lücken" };
+      if (percentage >= 50) return { status: "Noch nicht sicher verstanden" };
+      return { status: "Deutliche Wissenslücken" };
     }
     function list(items, emptyText) { return items.length ? `<ul>${items.map(item => `<li>${escapeHtml(item)}</li>`).join("")}</ul>` : `<p>${escapeHtml(emptyText)}</p>`; }
 
@@ -625,12 +653,9 @@
         <div class="result-hero"><p class="eyebrow">Ergebnis</p><h2>${escapeHtml(resultClass.status)}</h2><div class="result-big">${percentage} %</div><p>${formatPoints(score)} / ${maxPoints} Punkte · Selbsteinschätzungsnote ${grade(score)}</p></div>
         <div class="result-grid"><div class="result-tile"><strong>${counts.correct}</strong><span>voll richtig</span></div><div class="result-tile"><strong>${counts.partial}</strong><span>teilweise richtig</span></div><div class="result-tile"><strong>${counts.wrong}</strong><span>falsch / übersprungen</span></div></div>
         <div class="concepts"><div class="concept-box"><h3>Stärken</h3>${list(concepts.strong, "Noch kein Bereich über 80 %.")}</div><div class="concept-box"><h3>Unsicher</h3>${list(concepts.mixed, "Keine gemischten Bereiche.")}</div><div class="concept-box"><h3>Wiederholen</h3>${list(concepts.weak, "Keine klar schwachen Bereiche.")}</div></div>
-        <div class="recommendation"><h3>Nächster freiwilliger Schritt: ${escapeHtml(resultClass.next)}</h3><p>${escapeHtml(resultClass.recommendation)}</p></div>
-        <div class="actions"><button class="btn primary" id="exportBtn">Ergebnis als JSON exportieren</button>${percentage < 85 ? `<button class="btn secondary" id="targetBtn">Gezieltes Review vorbereiten (optional)</button>` : ""}<button class="btn ghost" id="backToQuiz">Antworten ansehen</button><button class="btn ghost" id="retakeBtn">Quiz nochmals machen</button></div>`;
-      document.getElementById("exportBtn").addEventListener("click", () => exportResult(false));
-      document.getElementById("targetBtn")?.addEventListener("click", () => exportResult(true));
+        <div class="actions"><button class="btn ghost" id="backToQuiz">Antworten ansehen</button><button class="btn ghost" id="retakeBtn">Neues Quiz starten</button></div>`;
       document.getElementById("backToQuiz").addEventListener("click", () => { state.completed = false; saveState(); render(); });
-      document.getElementById("retakeBtn").addEventListener("click", resetCurrentAttempt);
+      document.getElementById("retakeBtn").addEventListener("click", startNewQuiz);
       reportResultToDashboard(score, percentage, concepts, resultClass);
       updateHeader();
     }
@@ -640,7 +665,6 @@
         subject: "DHEAL", lecture: "Lecture 02 – Healthcare Data: From Clinical Care to AI-Ready Data",
         source: "02.digital-health.healthcare-data_moodle.pdf", date: state.completedAt || new Date().toISOString(), attemptId: state.attemptId,
         totalScore: score, maximumScore: maxPoints, percentage, grade: Number(grade(score)), understanding: resultClass.status,
-        recommendation: percentage >= 85 ? "future_recall_optional" : percentage >= 70 ? "targeted_practice_optional" : "foundation_practice_optional",
         questionResults: questions.map(question => ({ id: question.id, topic: question.topic, points: resultFor(question.id)?.points || 0, maximum: question.points, status: resultFor(question.id)?.status || "unanswered" })),
         weakConcepts: concepts.weak, partiallyUnderstoodConcepts: concepts.mixed, strongConcepts: concepts.strong
       };
@@ -648,7 +672,7 @@
 
     function reportResultToDashboard(score, percentage, concepts, resultClass) {
       const payload = resultPayload(score, percentage, concepts, resultClass);
-      const message = { source: "zhaw-quiz", version: 1, type: "quiz-completed", quizId: DASHBOARD_QUIZ_ID, attempt: {
+      const message = { source: "quiz-dashboard", version: 1, type: "quiz-completed", quizId: DASHBOARD_QUIZ_ID, attempt: {
         attemptId: payload.attemptId, completedAt: payload.date, score: payload.totalScore, maximumScore: payload.maximumScore,
         percentage: payload.percentage, grade: payload.grade, understanding: payload.understanding,
         strongConcepts: payload.strongConcepts, uncertainConcepts: payload.partiallyUnderstoodConcepts, weakConcepts: payload.weakConcepts
@@ -660,7 +684,7 @@
     function reportProgressToDashboard(manual = false) {
       if (state.completed) return;
       const message = {
-        source: "zhaw-quiz", version: 1, type: "quiz-progress", quizId: DASHBOARD_QUIZ_ID, manual,
+        source: "quiz-dashboard", version: 1, type: "quiz-progress", quizId: DASHBOARD_QUIZ_ID, manual,
         progress: {
           attemptId: state.attemptId,
           currentTask: state.current + 1,
@@ -685,22 +709,9 @@
     }
 
     function clearDashboardProgress() {
-      const message = { source: "zhaw-quiz", version: 1, type: "quiz-progress-reset", quizId: DASHBOARD_QUIZ_ID };
+      const message = { source: "quiz-dashboard", version: 1, type: "quiz-progress-reset", quizId: DASHBOARD_QUIZ_ID };
       if (window.parent && window.parent !== window) window.parent.postMessage(message, "*");
       if (window.opener && !window.opener.closed) window.opener.postMessage(message, "*");
-    }
-
-    function exportResult(targeted) {
-      const score = earned();
-      const percentage = Math.round(score / maxPoints * 100);
-      const payload = resultPayload(score, percentage, conceptAnalysis(), classification(percentage));
-      if (targeted) payload.request = "Create a new targeted HTML review with different questions for weak and partially understood concepts.";
-      const blob = new Blob([JSON.stringify(payload, null, 2)], { type: "application/json" });
-      const url = URL.createObjectURL(blob);
-      const link = document.createElement("a");
-      link.href = url;
-      link.download = targeted ? "DHEAL_Lecture02_targeted_review.json" : "DHEAL_Lecture02_result.json";
-      link.click(); URL.revokeObjectURL(url);
     }
 
     function render() {
@@ -710,14 +721,14 @@
 
     document.getElementById("saveBtn").addEventListener("click", saveProgressManually);
     document.getElementById("finishBtn").addEventListener("click", renderResult);
-    function resetCurrentAttempt() {
-      if (!confirm("Neuen Versuch starten? Der aktuelle Quizstand wird zurückgesetzt. Frühere abgeschlossene Versuche bleiben im Dashboard erhalten.")) return;
+    function startNewQuiz() {
+      if (!confirm("Neues Quiz beginnen? Ein noch nicht abgeschlossener Zwischenstand wird verworfen. Bereits abgeschlossene Versuche bleiben im Dashboard erhalten.")) return;
       localStorage.removeItem(STORAGE_KEY); clearDashboardProgress(); state = defaultState(); render();
     }
 
-    document.getElementById("resetBtn").addEventListener("click", resetCurrentAttempt);
+    document.getElementById("newQuizBtn").addEventListener("click", startNewQuiz);
 
-    const readyMessage = { source: "zhaw-quiz", version: 1, type: "quiz-ready", quizId: DASHBOARD_QUIZ_ID };
+    const readyMessage = { source: "quiz-dashboard", version: 1, type: "quiz-ready", quizId: DASHBOARD_QUIZ_ID };
     if (window.parent && window.parent !== window) window.parent.postMessage(readyMessage, "*");
     if (window.opener && !window.opener.closed) window.opener.postMessage(readyMessage, "*");
     render();

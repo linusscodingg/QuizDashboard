@@ -32,7 +32,7 @@ window.QUIZ_CATALOG = {
       title: "Secure Development Lifecycle",
       source: "W2_SecureDevelopmentLifecycle.pdf",
       path: "quizzes/SWS1/W2_Secure_Development_Lifecycle.html",
-      maximumScore: 100
+      maximumScore: 112
     },
     {
       id: "sws1-w3-software-security-errors",

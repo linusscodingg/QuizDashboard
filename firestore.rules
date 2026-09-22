@@ -1,0 +1,31 @@
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+    function isVerifiedOwner(userId) {
+      return request.auth != null
+        && request.auth.uid == userId
+        && (request.auth.token.email_verified == true
+          || request.auth.token.firebase.sign_in_provider == "github.com");
+    }
+
+    match /users/{userId}/dashboard/{documentId} {
+      allow read: if isVerifiedOwner(userId) && documentId == "state";
+      allow create, update: if isVerifiedOwner(userId)
+        && documentId == "state"
+        && request.resource.data.keys().hasOnly(["version", "data", "updatedAt"])
+        && request.resource.data.version == 1
+        && request.resource.data.data is map
+        && request.resource.data.data.keys().hasOnly(["version", "attempts", "progress"])
+        && request.resource.data.data.version == 1
+        && request.resource.data.data.attempts is map
+        && request.resource.data.data.progress is map
+        && request.resource.data.updatedAt == request.time;
+      allow delete: if isVerifiedOwner(userId) && documentId == "state";
+    }
+
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}

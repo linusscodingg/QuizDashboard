@@ -85,6 +85,13 @@
     .order-row { display: grid; grid-template-columns: 36px 1fr auto auto; gap: 8px; align-items: center; padding: 10px; border: 1px solid var(--line); border-radius: 13px; background: #fbfdfd; }
     .order-row.answer-correct { border-color: #49a96b; background: #e8f8ee; }
     .order-row.answer-wrong { border-color: #dc7070; background: #fff0f0; }
+    .category-list { display: grid; gap: 12px; }
+    .category-row { padding: 14px; border: 1px solid var(--line); border-radius: 14px; background: #fbfdfd; }
+    .category-row.answer-correct { border-color: #49a96b; background: #e8f8ee; }
+    .category-row.answer-wrong { border-color: #dc7070; background: #fff0f0; }
+    .category-row label { display: block; margin-bottom: 9px; font-weight: 700; }
+    .category-row select { width: 100%; padding: 10px 12px; color: var(--ink); border: 1px solid var(--line); border-radius: 10px; background: #fff; }
+    .category-row small { display: block; margin-top: 8px; line-height: 1.4; }
     .rank { display: grid; place-items: center; width: 30px; height: 30px; color: #fff; border-radius: 50%; background: var(--teal); font-weight: 800; }
     .move { width: 34px; height: 34px; padding: 0; color: var(--teal); border: 1px solid var(--line); border-radius: 9px; background: #fff; font-weight: 900; }
     .actions { display: flex; flex-wrap: wrap; gap: 9px; margin-top: 22px; }
@@ -126,9 +133,6 @@
     .concept-box { padding: 16px; border: 1px solid var(--line); border-radius: 15px; }
     .concept-box h3 { margin: 0 0 8px; font-size: 1rem; }
     .concept-box ul { margin: 0; padding-left: 18px; }
-    .recommendation { margin-top: 16px; padding: 18px; border-left: 5px solid var(--teal); border-radius: 12px; background: var(--mint); }
-    .recommendation h3, .recommendation p { margin: 0; }
-    .recommendation p { margin-top: 6px; }
     .hidden { display: none !important; }
     @media (max-width: 830px) {
       .topbar { grid-template-columns: 1fr; }
@@ -152,10 +156,10 @@
         <h1>Secure Development Lifecycle</h1>
         <p class="subtitle">Active understanding check on security activities, their lifecycle position, and how they complement each other</p>
       </div>
-      <div class="scorebox" aria-live="polite"><strong id="scoreText">0 / 100 points</strong><span id="percentText">0 % · no final grade yet</span></div>
+      <div class="scorebox" aria-live="polite"><strong id="scoreText">0 / 112 points</strong><span id="percentText">0 % · no final grade yet</span></div>
       <div class="progress-wrap">
         <div class="progress-track"><div class="progress-fill" id="progressFill"></div></div>
-        <div class="progress-labels"><span id="progressText">0 / 12 questions</span><span id="streakText">Streak: 0</span></div>
+        <div class="progress-labels"><span id="progressText">0 / 13 questions</span><span id="streakText">Streak: 0</span></div>
       </div>
     </header>
 
@@ -167,13 +171,13 @@
       <aside class="side-card">
         <h2>Question overview</h2>
         <div class="overview" id="overview"></div>
-        <div class="mini-stat"><span>Completed</span><strong id="doneSide">0 / 12</strong></div>
-        <div class="mini-stat"><span>Current score</span><strong id="pointsSide">0 / 100</strong></div>
+        <div class="mini-stat"><span>Completed</span><strong id="doneSide">0 / 13</strong></div>
+        <div class="mini-stat"><span>Current score</span><strong id="pointsSide">0 / 112</strong></div>
         <div class="mini-stat"><span>Self-assessment grade</span><strong id="gradeSide">shown at the end</strong></div>
         <div class="actions">
           <button class="btn secondary" id="saveBtn" type="button">Save progress</button>
           <button class="btn primary" id="finishBtn" type="button" disabled>Finish review</button>
-          <button class="btn ghost" id="resetBtn" type="button">Reset progress</button>
+          <button class="btn ghost" id="newQuizBtn" type="button">Start new quiz</button>
         </div>
         <p class="save-note" id="saveNotice" aria-live="polite">Changes are also saved locally and automatically.</p>
         <p class="source-note">Source: <strong>W2_SecureDevelopmentLifecycle.pdf</strong>, Slides 1–26. The grade is a self-assessment, not an official university grade.</p>
@@ -486,6 +490,73 @@
         ]
       },
       {
+        "id": "classify-security-activities",
+        "type": "categorize",
+        "topic": "Classifying Security Activities",
+        "points": 12,
+        "prompt": "Assign each practical action to the security activity it primarily belongs to. Each correct assignment is worth 1 point.",
+        "hint": "The same security activity may be used more than once.",
+        "options": [
+          "Security Requirements",
+          "Threat Modeling",
+          "Security Design/Controls",
+          "Secure Coding",
+          "Code Review",
+          "Penetration Testing",
+          "Security Operations",
+          "Security Risk Analysis"
+        ],
+        "statements": [
+          "Identify potential attackers or attack groups (e.g., script kiddies, organized cyber criminals, nation states) that may be interested in attacking the system.",
+          "Once the system is operational, use a password-cracking tool every four weeks to check whether users are using weak passwords.",
+          "Before pushing code to the Git repository, use a source-code analyzer integrated into the IDE to analyze the code for security bugs.",
+          "Use a checklist with guidelines to prevent typical security-relevant programming mistakes in iOS apps.",
+          "Decide whether to use login codes sent by SMS or Google Authenticator as the second authentication factor.",
+          "Hire a company to find security defects in an e-shop web application by interacting with the running system.",
+          "Configure the compiler so that safeguards against exploiting buffer-overflow vulnerabilities are enabled.",
+          "Analyze the security architecture of a military communication system to identify security design flaws.",
+          "Based on a list of identified security design flaws, determine additional security properties that should be considered.",
+          "Employ a security-monitoring system to detect suspicious communication patterns, such as scanning traffic, between the control systems of a power plant.",
+          "Use a methodology to rate the criticality of vulnerabilities detected during a penetration test.",
+          "Depending on a specified security requirement, choose an appropriate access-control mechanism."
+        ],
+        "correct": [
+          1,
+          6,
+          4,
+          3,
+          2,
+          5,
+          2,
+          1,
+          0,
+          6,
+          7,
+          2
+        ],
+        "explanations": [
+          "Threat Modeling considers realistic attackers, their capabilities, and the attacks they may attempt.",
+          "This is a recurring activity performed while the system is operational, so it belongs to Security Operations.",
+          "Automated static source-code analysis searches implementation code for security bugs and is a form of Code Review.",
+          "A secure-coding checklist helps developers avoid introducing security bugs while writing code.",
+          "Selecting the concrete mechanism that fulfills an authentication requirement is a Security Design/Controls decision.",
+          "Interacting with and attacking the running application to find vulnerabilities is Penetration Testing.",
+          "The lecture treats compiler and operating-system safeguards against buffer overflows as concrete Security Design/Controls measures.",
+          "Searching an architecture for conceptual security weaknesses is the central purpose of Threat Modeling.",
+          "Identified design flaws feed back into Security Requirements so that additional required security properties are specified.",
+          "Monitoring a deployed system for suspicious activity is part of Security Operations.",
+          "Rating the criticality of vulnerabilities is the purpose of Security Risk Analysis.",
+          "Choosing the concrete access-control mechanism that implements a requirement belongs to Security Design/Controls."
+        ],
+        "solution": "The key distinction is between defining required security properties, analyzing threats and design flaws, selecting concrete controls, preventing implementation mistakes, reviewing source code, attacking the running system, protecting and monitoring operations, and rating risk.",
+        "reference": "Slides 9–23",
+        "concepts": [
+          "Security activity classification",
+          "Security activities",
+          "Lifecycle mapping"
+        ]
+      },
+      {
         "id": "boss",
         "type": "text",
         "topic": "Boss Question – Applying an SDL",
@@ -502,7 +573,7 @@
       }
     ];
 
-    const STORAGE_KEY = "sws1-w2-secure-development-lifecycle-review-v1";
+    const STORAGE_KEY = "sws1-w2-secure-development-lifecycle-review-v2";
     const DASHBOARD_QUIZ_ID = "sws1-w2-secure-development-lifecycle";
     const maxPoints = questions.reduce((sum, question) => sum + question.points, 0);
     const defaultState = () => ({
@@ -595,6 +666,19 @@
           return `<div class="order-row ${reviewClass}"><span class="rank">${position + 1}</span><span>${escapeHtml(question.items[itemIndex])}${label ? `<small class="answer-label">${label}</small>` : ""}</span><button class="move" data-move="${position},-1" ${disabled || position === 0 ? "disabled" : ""} aria-label="Nach oben">↑</button><button class="move" data-move="${position},1" ${disabled || position === order.length - 1 ? "disabled" : ""} aria-label="Nach unten">↓</button></div>`;
         }).join("")}</div>`;
       }
+      if (question.type === "categorize") {
+        const selected = state.answers[question.id] || Array(question.statements.length).fill("");
+        return `<div class="category-list">${question.statements.map((statement, index) => {
+          const chosen = selected[index];
+          const correct = chosen !== "" && Number(chosen) === question.correct[index];
+          const reviewClass = isDone(question) ? (correct ? "answer-correct" : "answer-wrong") : "";
+          const resultLabel = !isDone(question) ? "" : correct
+            ? `✓ Correctly assigned: ${escapeHtml(question.options[question.correct[index]])}`
+            : `✕ Your answer: ${escapeHtml(chosen === "" ? "Not selected" : question.options[Number(chosen)])} · Correct: ${escapeHtml(question.options[question.correct[index]])}`;
+          const explanation = isDone(question) ? `<small>${escapeHtml(question.explanations[index])}</small>` : "";
+          return `<div class="category-row ${reviewClass}"><label for="category-${index}">${index + 1}. ${escapeHtml(statement)}</label><select id="category-${index}" data-category-index="${index}" ${disabled}><option value="">Select your answer</option>${question.options.map((option, optionIndex) => `<option value="${optionIndex}" ${String(chosen) === String(optionIndex) ? "selected" : ""}>${escapeHtml(option)}</option>`).join("")}</select>${resultLabel ? `<small class="answer-label">${resultLabel}</small>` : ""}${explanation}</div>`;
+        }).join("")}</div>`;
+      }
       return `<textarea id="textAnswer" ${disabled} placeholder="Write your answer in your own words …">${escapeHtml(state.answers[question.id] || "")}</textarea>`;
     }
 
@@ -649,6 +733,11 @@
         [order[position], order[position + delta]] = [order[position + delta], order[position]];
         state.order[question.id] = order; saveState(); render();
       }));
+      document.querySelectorAll("[data-category-index]").forEach(select => select.addEventListener("change", () => {
+        const answers = [...(state.answers[question.id] || Array(question.statements.length).fill(""))];
+        answers[Number(select.dataset.categoryIndex)] = select.value;
+        state.answers[question.id] = answers; saveState();
+      }));
       document.getElementById("checkBtn")?.addEventListener("click", () => gradeAuto(question));
       document.getElementById("saveTextBtn")?.addEventListener("click", () => {
         const text = document.getElementById("textAnswer").value.trim();
@@ -689,6 +778,12 @@
         points = Math.round(question.points * hits / question.correct.length * 2) / 2;
         state.order[question.id] = order;
         if (points > 0 && points < question.points) note = `${hits} of ${question.correct.length} positions are correct.`;
+      } else if (question.type === "categorize") {
+        const selected = state.answers[question.id] || Array(question.statements.length).fill("");
+        if (selected.some(value => value === "" || value === undefined)) return alert("Assign an activity to every statement first.");
+        const hits = selected.filter((value, index) => Number(value) === question.correct[index]).length;
+        points = Math.round(question.points * hits / question.correct.length * 2) / 2;
+        if (points > 0 && points < question.points) note = `${hits} of ${question.correct.length} assignments are correct.`;
       }
       const status = points === question.points ? "correct" : points > 0 ? "partial" : "wrong";
       state.results[question.id] = { status, points, note };
@@ -723,10 +818,10 @@
     }
 
     function classification(percentage) {
-      if (percentage >= 85) return { status: "Very well understood", next: "Review later", recommendation: "You understood the material very well. A short recall session later can strengthen long-term retention." };
-      if (percentage >= 70) return { status: "Generally understood, but with gaps", next: "Optional targeted practice", recommendation: "If you want, you can strengthen uncertain concepts later with new questions." };
-      if (percentage >= 50) return { status: "Not yet understood with confidence", next: "Optional focused review", recommendation: "A targeted review can help you practise weak and partially understood areas from a different angle." };
-      return { status: "Significant knowledge gaps", next: "Optional foundation practice", recommendation: "It may help to revisit the most important weak concepts first and then attempt a focused review." };
+      if (percentage >= 85) return { status: "Very well understood" };
+      if (percentage >= 70) return { status: "Generally understood, but with gaps" };
+      if (percentage >= 50) return { status: "Not yet understood with confidence" };
+      return { status: "Significant knowledge gaps" };
     }
     function list(items, emptyText) { return items.length ? `<ul>${items.map(item => `<li>${escapeHtml(item)}</li>`).join("")}</ul>` : `<p>${escapeHtml(emptyText)}</p>`; }
 
@@ -753,12 +848,9 @@
         <div class="result-hero"><p class="eyebrow">Result</p><h2>${escapeHtml(resultClass.status)}</h2><div class="result-big">${percentage} %</div><p>${formatPoints(score)} / ${maxPoints} points · Self-assessment grade ${grade(score)}</p></div>
         <div class="result-grid"><div class="result-tile"><strong>${counts.correct}</strong><span>fully correct</span></div><div class="result-tile"><strong>${counts.partial}</strong><span>partially correct</span></div><div class="result-tile"><strong>${counts.wrong}</strong><span>incorrect / skipped</span></div></div>
         <div class="concepts"><div class="concept-box"><h3>Strengths</h3>${list(concepts.strong, "No area above 80% yet.")}</div><div class="concept-box"><h3>Uncertain</h3>${list(concepts.mixed, "No mixed areas.")}</div><div class="concept-box"><h3>Review</h3>${list(concepts.weak, "No clearly weak areas.")}</div></div>
-        <div class="recommendation"><h3>Optional next step: ${escapeHtml(resultClass.next)}</h3><p>${escapeHtml(resultClass.recommendation)}</p></div>
-        <div class="actions"><button class="btn primary" id="exportBtn">Result als JSON exportieren</button>${percentage < 85 ? `<button class="btn secondary" id="targetBtn">Prepare targeted review (optional)</button>` : ""}<button class="btn ghost" id="backToQuiz">Review answers</button><button class="btn ghost" id="retakeBtn">Retake quiz</button></div>`;
-      document.getElementById("exportBtn").addEventListener("click", () => exportResult(false));
-      document.getElementById("targetBtn")?.addEventListener("click", () => exportResult(true));
+        <div class="actions"><button class="btn ghost" id="backToQuiz">Review answers</button><button class="btn ghost" id="retakeBtn">Start new quiz</button></div>`;
       document.getElementById("backToQuiz").addEventListener("click", () => { state.completed = false; saveState(); render(); });
-      document.getElementById("retakeBtn").addEventListener("click", resetCurrentAttempt);
+      document.getElementById("retakeBtn").addEventListener("click", startNewQuiz);
       reportResultToDashboard(score, percentage, concepts, resultClass);
       updateHeader();
     }
@@ -768,7 +860,6 @@
         subject: "SWS1", lecture: "Lecture 02 – Secure Development Lifecycle",
         source: "W2_SecureDevelopmentLifecycle.pdf", date: state.completedAt || new Date().toISOString(), attemptId: state.attemptId,
         totalScore: score, maximumScore: maxPoints, percentage, grade: Number(grade(score)), understanding: resultClass.status,
-        recommendation: percentage >= 85 ? "future_recall_optional" : percentage >= 70 ? "targeted_practice_optional" : "foundation_practice_optional",
         questionResults: questions.map(question => ({ id: question.id, topic: question.topic, points: resultFor(question.id)?.points || 0, maximum: question.points, status: resultFor(question.id)?.status || "unanswered" })),
         weakConcepts: concepts.weak, partiallyUnderstoodConcepts: concepts.mixed, strongConcepts: concepts.strong
       };
@@ -776,7 +867,7 @@
 
     function reportResultToDashboard(score, percentage, concepts, resultClass) {
       const payload = resultPayload(score, percentage, concepts, resultClass);
-      const message = { source: "zhaw-quiz", version: 1, type: "quiz-completed", quizId: DASHBOARD_QUIZ_ID, attempt: {
+      const message = { source: "quiz-dashboard", version: 1, type: "quiz-completed", quizId: DASHBOARD_QUIZ_ID, attempt: {
         attemptId: payload.attemptId, completedAt: payload.date, score: payload.totalScore, maximumScore: payload.maximumScore,
         percentage: payload.percentage, grade: payload.grade, understanding: payload.understanding,
         strongConcepts: payload.strongConcepts, uncertainConcepts: payload.partiallyUnderstoodConcepts, weakConcepts: payload.weakConcepts
@@ -788,7 +879,7 @@
     function reportProgressToDashboard(manual = false) {
       if (state.completed) return;
       const message = {
-        source: "zhaw-quiz", version: 1, type: "quiz-progress", quizId: DASHBOARD_QUIZ_ID, manual,
+        source: "quiz-dashboard", version: 1, type: "quiz-progress", quizId: DASHBOARD_QUIZ_ID, manual,
         progress: {
           attemptId: state.attemptId,
           currentTask: state.current + 1,
@@ -813,22 +904,9 @@
     }
 
     function clearDashboardProgress() {
-      const message = { source: "zhaw-quiz", version: 1, type: "quiz-progress-reset", quizId: DASHBOARD_QUIZ_ID };
+      const message = { source: "quiz-dashboard", version: 1, type: "quiz-progress-reset", quizId: DASHBOARD_QUIZ_ID };
       if (window.parent && window.parent !== window) window.parent.postMessage(message, "*");
       if (window.opener && !window.opener.closed) window.opener.postMessage(message, "*");
-    }
-
-    function exportResult(targeted) {
-      const score = earned();
-      const percentage = Math.round(score / maxPoints * 100);
-      const payload = resultPayload(score, percentage, conceptAnalysis(), classification(percentage));
-      if (targeted) payload.request = "Create a new targeted HTML review with different questions for weak and partially understood concepts.";
-      const blob = new Blob([JSON.stringify(payload, null, 2)], { type: "application/json" });
-      const url = URL.createObjectURL(blob);
-      const link = document.createElement("a");
-      link.href = url;
-      link.download = targeted ? "SWS1_W2_SecureDevelopmentLifecycle_targeted_review.json" : "SWS1_W2_SecureDevelopmentLifecycle_result.json";
-      link.click(); URL.revokeObjectURL(url);
     }
 
     function render() {
@@ -838,14 +916,14 @@
 
     document.getElementById("saveBtn").addEventListener("click", saveProgressManually);
     document.getElementById("finishBtn").addEventListener("click", renderResult);
-    function resetCurrentAttempt() {
-      if (!confirm("Start a new attempt? The current quiz progress will be reset. Earlier completed attempts remain in the dashboard.")) return;
+    function startNewQuiz() {
+      if (!confirm("Start a new quiz? An unfinished saved state will be discarded. Earlier completed attempts remain in the dashboard.")) return;
       localStorage.removeItem(STORAGE_KEY); clearDashboardProgress(); state = defaultState(); render();
     }
 
-    document.getElementById("resetBtn").addEventListener("click", resetCurrentAttempt);
+    document.getElementById("newQuizBtn").addEventListener("click", startNewQuiz);
 
-    const readyMessage = { source: "zhaw-quiz", version: 1, type: "quiz-ready", quizId: DASHBOARD_QUIZ_ID };
+    const readyMessage = { source: "quiz-dashboard", version: 1, type: "quiz-ready", quizId: DASHBOARD_QUIZ_ID };
     if (window.parent && window.parent !== window) window.parent.postMessage(readyMessage, "*");
     if (window.opener && !window.opener.closed) window.opener.postMessage(readyMessage, "*");
     render();

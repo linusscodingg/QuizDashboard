@@ -3,8 +3,10 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta name="description" content="Persönliches Offline-Dashboard für ZHAW-Lernquiz und Vorlesungsreviews.">
-  <title>ZHAW Quiz-Dashboard</title>
+  <meta name="description" content="Persönliches Dashboard für Lernquiz und Vorlesungsreviews mit optionaler Cloud-Synchronisation.">
+  <meta name="referrer" content="strict-origin-when-cross-origin">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' https://www.gstatic.com; style-src 'self' 'unsafe-inline'; img-src 'self' data:; connect-src 'self' https://*.googleapis.com https://*.firebaseio.com https://*.firebaseapp.com; frame-src 'self' https://*.firebaseapp.com; object-src 'none'; base-uri 'self'; form-action 'self'; upgrade-insecure-requests">
+  <title>Quiz-Dashboard</title>
   <style>
     :root {
       color-scheme: light;
@@ -91,6 +93,37 @@
     .button.secondary { color: #fff; border-color: rgba(255,255,255,.32); background: rgba(255,255,255,.1); }
     .button.danger { color: var(--red); border-color: #efc6ca; background: #fff; }
     .button.small { min-height: 38px; padding: 7px 12px; font-size: .9rem; }
+
+    .cloud-bar {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px 16px;
+      align-items: center;
+      margin: 14px 0 0;
+      padding: 13px 16px;
+      border: 1px solid var(--line);
+      border-radius: 14px;
+      background: rgba(255,255,255,.86);
+      box-shadow: 0 8px 24px rgba(18,65,88,.06);
+    }
+    .cloud-state { flex: 1 1 260px; }
+    .cloud-state strong, .cloud-state span { display: block; }
+    .cloud-state span { margin-top: 2px; color: var(--muted); font-size: .82rem; }
+    .cloud-panel {
+      display: grid;
+      grid-template-columns: minmax(180px, 1fr) minmax(180px, 1fr) auto auto;
+      gap: 10px;
+      align-items: end;
+      width: 100%;
+      padding-top: 12px;
+      border-top: 1px solid var(--line);
+    }
+    .cloud-panel[hidden] { display: none; }
+    .field label { display: block; margin-bottom: 4px; color: var(--muted); font-size: .78rem; font-weight: 750; }
+    .field input { width: 100%; min-height: 42px; padding: 9px 11px; color: var(--ink); border: 1px solid var(--line); border-radius: 10px; background: #fff; }
+    .cloud-error { grid-column: 1 / -1; margin: 0; color: var(--red); font-size: .84rem; font-weight: 700; }
+    .delete-panel { grid-template-columns: minmax(220px, 1fr) auto auto; }
+    .footnote a { color: var(--blue); }
 
     .summary-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px; margin: 20px 0; }
     .summary-card { padding: 20px; border: 1px solid rgba(177, 204, 216, .76); border-radius: 18px; background: rgba(255,255,255,.9); box-shadow: 0 10px 28px rgba(18,65,88,.07); }
@@ -223,6 +256,7 @@
       .attempt { grid-template-columns: 1fr auto; }
       .attempt-meta { grid-column: 1; }
       .player-bar span { display: none; }
+      .cloud-panel { grid-template-columns: 1fr; }
     }
   </style>
 </head>
@@ -241,6 +275,26 @@
       </div>
     </header>
 
+    <section class="cloud-bar" aria-label="Cloud-Synchronisation">
+      <div class="cloud-state"><strong id="cloudTitle">Lokal gespeichert</strong><span id="cloudStatus">Firebase wird vorbereitet …</span></div>
+      <button class="button small" id="cloudLoginToggle" type="button">Anmelden</button>
+      <button class="button small danger" id="cloudLogoutBtn" type="button" hidden>Abmelden</button>
+      <button class="button small danger" id="cloudDeleteToggle" type="button" hidden>Konto löschen</button>
+      <div class="cloud-panel" id="cloudPanel" hidden>
+        <div class="field"><label for="cloudEmail">E-Mail-Adresse</label><input id="cloudEmail" type="email" autocomplete="email" placeholder="name@example.com"></div>
+        <div class="field"><label for="cloudPassword">Passwort</label><input id="cloudPassword" type="password" autocomplete="current-password" minlength="6" placeholder="Mindestens 6 Zeichen"></div>
+        <button class="button small" id="cloudLoginBtn" type="button">Anmelden</button>
+        <button class="button small secondary" id="cloudRegisterBtn" type="button">Konto erstellen</button>
+        <p class="cloud-error" id="cloudError" hidden></p>
+      </div>
+      <div class="cloud-panel delete-panel" id="cloudDeletePanel" hidden>
+        <div class="field" id="deletePasswordField"><label for="deletePassword">Zur Bestätigung aktuelles Passwort</label><input id="deletePassword" type="password" autocomplete="current-password" minlength="6"></div>
+        <button class="button small danger" id="cloudDeleteConfirm" type="button">Cloud-Daten und Konto endgültig löschen</button>
+        <button class="button small" id="cloudDeleteCancel" type="button">Abbrechen</button>
+        <p class="cloud-error" id="cloudDeleteError" hidden></p>
+      </div>
+    </section>
+
     <section class="summary-grid" aria-label="Gesamtübersicht">
       <div class="summary-card"><span>Bearbeitet</span><strong id="completedTotal">0 / 0</strong><em>Quiz mindestens einmal abgeschlossen</em></div>
       <div class="summary-card"><span>Durchschnitt</span><strong id="averagePercent">–</strong><em>aus den jeweiligen Bestwerten</em></div>
@@ -258,7 +312,7 @@
     </aside>
 
     <div class="subjects" id="subjects"></div>
-    <p class="footnote">Die Lernnote dient deiner Motivation und Selbsteinschätzung. Sie ist keine offizielle ZHAW-Note.</p>
+    <p class="footnote">Die Lernnote dient deiner Motivation und Selbsteinschätzung. Sie ist keine offizielle Bewertung. · <a href="privacy.html">Datenschutzerklärung</a></p>
   </main>
 
   <section class="player" id="player" hidden aria-label="Quiz-Player">
@@ -276,7 +330,7 @@
     (() => {
       "use strict";
 
-      const STORAGE_KEY = "zhaw-quiz-dashboard-v1";
+      const STORAGE_KEY = "quiz-dashboard-v1";
       const catalog = window.QUIZ_CATALOG || { version: 1, subjects: [], quizzes: [] };
       const quizMap = new Map(catalog.quizzes.map(quiz => [quiz.id, quiz]));
       const player = document.getElementById("player");
@@ -284,13 +338,27 @@
       let activeQuizId = null;
       let toastTimer = null;
       let loadTimer = null;
+      let cloudSaveTimer = null;
+      let cloudUser = null;
+      let cloudInitialised = false;
       let store = loadStore();
 
       function emptyStore() { return { version: 1, attempts: {}, progress: {} }; }
 
       function loadStore() {
         try {
-          const parsed = JSON.parse(localStorage.getItem(STORAGE_KEY));
+          let storedValue = localStorage.getItem(STORAGE_KEY);
+          if (!storedValue && Number.isInteger(localStorage.length) && typeof localStorage.key === "function") {
+            for (let index = 0; index < localStorage.length; index += 1) {
+              const candidate = localStorage.key(index);
+              if (candidate && candidate !== STORAGE_KEY && candidate.endsWith("-quiz-dashboard-v1")) {
+                storedValue = localStorage.getItem(candidate);
+                if (storedValue) break;
+              }
+            }
+          }
+          const parsed = JSON.parse(storedValue);
+          if (storedValue && !localStorage.getItem(STORAGE_KEY)) localStorage.setItem(STORAGE_KEY, storedValue);
           return validStore(parsed) ? normaliseStore(parsed) : emptyStore();
         } catch (_) {
           return emptyStore();
@@ -309,6 +377,130 @@
 
       function saveStore() {
         localStorage.setItem(STORAGE_KEY, JSON.stringify(store));
+        queueCloudSave();
+      }
+
+      function mergeStores(localValue, remoteValue) {
+        const local = validStore(localValue) ? normaliseStore(localValue) : emptyStore();
+        const remote = validStore(remoteValue) ? normaliseStore(remoteValue) : emptyStore();
+        const merged = emptyStore();
+        const quizIds = new Set([...Object.keys(local.attempts), ...Object.keys(remote.attempts)]);
+        quizIds.forEach(quizId => {
+          const attempts = [...(remote.attempts[quizId] || []), ...(local.attempts[quizId] || [])];
+          const byId = new Map();
+          attempts.forEach(attempt => {
+            if (!attempt?.attemptId) return;
+            const previous = byId.get(attempt.attemptId);
+            if (!previous || String(attempt.completedAt) >= String(previous.completedAt)) byId.set(attempt.attemptId, attempt);
+          });
+          if (byId.size) merged.attempts[quizId] = [...byId.values()];
+        });
+        const progressIds = new Set([...Object.keys(local.progress), ...Object.keys(remote.progress)]);
+        progressIds.forEach(quizId => {
+          const localProgress = local.progress[quizId];
+          const remoteProgress = remote.progress[quizId];
+          const chosen = !localProgress ? remoteProgress : !remoteProgress ? localProgress
+            : String(localProgress.updatedAt) >= String(remoteProgress.updatedAt) ? localProgress : remoteProgress;
+          if (chosen) merged.progress[quizId] = chosen;
+        });
+        return merged;
+      }
+
+      function queueCloudSave() {
+        if (!cloudUser || !window.quizCloud) return;
+        clearTimeout(cloudSaveTimer);
+        setCloudStatus("Synchronisierung ausstehend …");
+        cloudSaveTimer = setTimeout(async () => {
+          try {
+            await window.quizCloud.save(store);
+            setCloudStatus(`Mit Firebase synchronisiert · ${new Date().toLocaleTimeString("de-CH", { hour: "2-digit", minute: "2-digit" })}`);
+          } catch (error) {
+            setCloudStatus("Cloud-Speicherung fehlgeschlagen – lokal weiterhin sicher gespeichert.", true);
+          }
+        }, 650);
+      }
+
+      function setCloudStatus(message, isError = false) {
+        const element = document.getElementById("cloudStatus");
+        element.textContent = message;
+        element.style.color = isError ? "var(--red)" : "";
+      }
+
+      function friendlyAuthError(error) {
+        const messages = {
+          "auth/email-already-in-use": "Für diese E-Mail-Adresse existiert bereits ein Konto.",
+          "auth/invalid-credential": "E-Mail-Adresse oder Passwort ist nicht korrekt.",
+          "auth/invalid-email": "Die E-Mail-Adresse ist ungültig.",
+          "auth/weak-password": "Das Passwort ist zu schwach. Verwende mindestens 6 Zeichen.",
+          "auth/missing-password": "Gib ein Passwort ein.",
+          "auth/network-request-failed": "Firebase ist momentan nicht erreichbar. Prüfe deine Internetverbindung.",
+          "auth/too-many-requests": "Zu viele Versuche. Warte kurz und probiere es erneut.",
+          "auth/email-verification-sent": "Konto erstellt. Bestätige den Link in deiner E-Mail und melde dich danach an.",
+          "auth/email-not-verified": "Bestätige zuerst deine E-Mail-Adresse. Ein neuer Bestätigungslink wurde versendet.",
+          "auth/wrong-password": "Das Passwort ist nicht korrekt.",
+          "auth/requires-recent-login": "Melde dich neu an und versuche die Kontolöschung nochmals.",
+          "auth/popup-closed-by-user": "Die GitHub-Bestätigung wurde abgebrochen.",
+          "auth/popup-blocked": "Das GitHub-Fenster wurde vom Browser blockiert."
+        };
+        return messages[error?.code] || "Die Anmeldung ist fehlgeschlagen. Prüfe deine Angaben und die Firebase-Konfiguration.";
+      }
+
+      function showCloudError(message) {
+        const error = document.getElementById("cloudError");
+        error.textContent = message;
+        error.hidden = !message;
+      }
+
+      async function runAuthAction(action) {
+        const email = document.getElementById("cloudEmail").value.trim();
+        const password = document.getElementById("cloudPassword").value;
+        if (!email || !password) return showCloudError("Gib deine E-Mail-Adresse und dein Passwort ein.");
+        showCloudError("");
+        setCloudStatus("Anmeldung läuft …");
+        try {
+          await action(email, password);
+          document.getElementById("cloudPassword").value = "";
+          document.getElementById("cloudPanel").hidden = true;
+        } catch (error) {
+          showCloudError(friendlyAuthError(error));
+          setCloudStatus("Nicht angemeldet – Cloud-Synchronisation ist nicht aktiv.", true);
+        }
+      }
+
+      function initCloud() {
+        if (cloudInitialised || !window.quizCloud) return;
+        cloudInitialised = true;
+        window.quizCloud.onAuthChange(async user => {
+          cloudUser = user;
+          const title = document.getElementById("cloudTitle");
+          const loginToggle = document.getElementById("cloudLoginToggle");
+          const logout = document.getElementById("cloudLogoutBtn");
+          const deleteToggle = document.getElementById("cloudDeleteToggle");
+          if (!user) {
+            title.textContent = "Lokal gespeichert";
+            loginToggle.hidden = false;
+            logout.hidden = true;
+            deleteToggle.hidden = true;
+            setCloudStatus("Melde dich an, um den Fortschritt zwischen Geräten zu synchronisieren.");
+            return;
+          }
+          title.textContent = user.email || "Firebase-Konto";
+          loginToggle.hidden = true;
+          logout.hidden = false;
+          deleteToggle.hidden = false;
+          document.getElementById("cloudPanel").hidden = true;
+          setCloudStatus("Cloudstand wird geladen …");
+          try {
+            const remote = await window.quizCloud.load();
+            store = mergeStores(store, remote);
+            localStorage.setItem(STORAGE_KEY, JSON.stringify(store));
+            render();
+            await window.quizCloud.save(store);
+            setCloudStatus("Lokaler und Cloud-Fortschritt wurden zusammengeführt und synchronisiert.");
+          } catch (error) {
+            setCloudStatus("Cloud konnte nicht geladen werden – lokaler Fortschritt bleibt erhalten.", true);
+          }
+        });
       }
 
       function escapeHtml(value) {
@@ -392,6 +584,9 @@
       function renderQuiz(quiz) {
         const attempts = attemptsFor(quiz.id).slice().sort((a, b) => String(b.completedAt).localeCompare(String(a.completedAt)));
         const best = bestAttempt(quiz.id);
+        const grades = attempts.map(attempt => Number(attempt.grade)).filter(Number.isFinite);
+        const averageAttemptGrade = grades.length ? grades.reduce((sum, value) => sum + value, 0) / grades.length : null;
+        const bestAttemptGrade = grades.length ? Math.max(...grades) : null;
         const progress = progressFor(quiz.id);
         const status = best ? understanding(best.percentage) : progress ? { label: "In Bearbeitung", color: "var(--blue)", background: "#e5f3fa" } : { label: "Noch nicht bearbeitet", color: "var(--grey)", background: "var(--grey-bg)" };
         const history = attempts.length ? `
@@ -415,7 +610,8 @@
               <div class="quiz-stats">
                 <div class="quiz-stat"><span>Bestwert</span><strong>${best ? `${formatPoints(best.score)} / ${formatPoints(best.maximumScore)}` : "–"}</strong></div>
                 <div class="quiz-stat"><span>Prozent</span><strong>${best ? `${best.percentage} %` : "–"}</strong></div>
-                <div class="quiz-stat"><span>Lernnote</span><strong>${best ? Number(best.grade).toFixed(1) : "–"}</strong></div>
+                <div class="quiz-stat"><span>Ø Lernnote</span><strong>${averageAttemptGrade === null ? "–" : averageAttemptGrade.toFixed(1)}</strong></div>
+                <div class="quiz-stat"><span>Beste Lernnote</span><strong>${bestAttemptGrade === null ? "–" : bestAttemptGrade.toFixed(1)}</strong></div>
                 <div class="quiz-stat"><span>Versuche</span><strong>${attempts.length}</strong></div>
               </div>
             </div>
@@ -493,7 +689,7 @@
 
       window.addEventListener("message", event => {
         const message = event.data;
-        if (event.source !== frame.contentWindow || !message || message.source !== "zhaw-quiz" || message.version !== 1) return;
+        if (event.source !== frame.contentWindow || !message || message.source !== "quiz-dashboard" || message.version !== 1) return;
         if (message.quizId !== activeQuizId) return;
         if (message.type === "quiz-ready") {
           clearTimeout(loadTimer);
@@ -540,12 +736,12 @@
       }
 
       function exportBackup() {
-        const payload = { format: "zhaw-quiz-dashboard", exportedAt: new Date().toISOString(), catalogVersion: catalog.version, data: store };
+        const payload = { format: "quiz-dashboard", exportedAt: new Date().toISOString(), catalogVersion: catalog.version, data: store };
         const blob = new Blob([JSON.stringify(payload, null, 2)], { type: "application/json" });
         const url = URL.createObjectURL(blob);
         const link = document.createElement("a");
         link.href = url;
-        link.download = `ZHAW_QuizDashboard_Sicherung_${new Date().toISOString().slice(0, 10)}.json`;
+        link.download = `QuizDashboard_Sicherung_${new Date().toISOString().slice(0, 10)}.json`;
         link.click();
         URL.revokeObjectURL(url);
       }
@@ -553,7 +749,9 @@
       async function importBackup(file) {
         try {
           const payload = JSON.parse(await file.text());
-          if (payload?.format !== "zhaw-quiz-dashboard" || !validStore(payload.data)) throw new Error("invalid");
+          const compatibleFormat = payload?.format === "quiz-dashboard"
+            || (typeof payload?.format === "string" && payload.format.endsWith("-quiz-dashboard"));
+          if (!compatibleFormat || !validStore(payload.data)) throw new Error("invalid");
           if (!confirm("Die Sicherung ersetzt die aktuell im Dashboard gespeicherten Resultate. Fortfahren?")) return;
           store = normaliseStore(payload.data);
           saveStore();
@@ -578,10 +776,66 @@
       document.getElementById("exportBtn").addEventListener("click", exportBackup);
       document.getElementById("importBtn").addEventListener("click", () => document.getElementById("importInput").click());
       document.getElementById("importInput").addEventListener("change", event => event.target.files[0] && importBackup(event.target.files[0]));
+      document.getElementById("cloudLoginToggle").addEventListener("click", () => {
+        const panel = document.getElementById("cloudPanel");
+        panel.hidden = !panel.hidden;
+        showCloudError("");
+        if (!panel.hidden) document.getElementById("cloudEmail").focus();
+      });
+      document.getElementById("cloudLoginBtn").addEventListener("click", () => runAuthAction((email, password) => window.quizCloud.login(email, password)));
+      document.getElementById("cloudRegisterBtn").addEventListener("click", () => runAuthAction((email, password) => window.quizCloud.register(email, password)));
+      document.getElementById("cloudLogoutBtn").addEventListener("click", async () => {
+        try {
+          await window.quizCloud.logout();
+          window.location.replace("login.html");
+        } catch (_) {
+          showToast("Abmelden ist momentan nicht möglich.");
+        }
+      });
+      document.getElementById("cloudDeleteToggle").addEventListener("click", () => {
+        const githubAccount = cloudUser?.providerData?.some(provider => provider.providerId === "github.com");
+        document.getElementById("deletePasswordField").hidden = githubAccount;
+        document.getElementById("deletePassword").value = "";
+        document.getElementById("cloudDeletePanel").hidden = false;
+        if (!githubAccount) document.getElementById("deletePassword").focus();
+      });
+      document.getElementById("cloudDeleteCancel").addEventListener("click", () => {
+        document.getElementById("deletePassword").value = "";
+        document.getElementById("cloudDeletePanel").hidden = true;
+      });
+      document.getElementById("cloudDeleteConfirm").addEventListener("click", async () => {
+        const password = document.getElementById("deletePassword").value;
+        const githubAccount = cloudUser?.providerData?.some(provider => provider.providerId === "github.com");
+        const error = document.getElementById("cloudDeleteError");
+        if (!githubAccount && !password) {
+          error.textContent = "Gib dein aktuelles Passwort ein.";
+          error.hidden = false;
+          return;
+        }
+        if (!window.confirm("Wirklich Konto und gesamten Cloud-Fortschritt endgültig löschen? Eine lokale Sicherung solltest du vorher exportieren.")) return;
+        error.hidden = true;
+        try {
+          await window.quizCloud.deleteAccountAndData(password);
+          localStorage.removeItem(STORAGE_KEY);
+          window.location.replace("login.html");
+        } catch (deleteError) {
+          error.textContent = friendlyAuthError(deleteError);
+          error.hidden = false;
+        }
+      });
+      document.getElementById("cloudPassword").addEventListener("keydown", event => {
+        if (event.key === "Enter") document.getElementById("cloudLoginBtn").click();
+      });
       document.addEventListener("keydown", event => { if (event.key === "Escape" && !player.hidden) closeQuiz(); });
+
+      window.addEventListener("quiz-cloud-ready", initCloud);
+      window.addEventListener("quiz-cloud-unavailable", () => setCloudStatus("Firebase konnte nicht geladen werden – lokale Speicherung bleibt aktiv.", true));
+      initCloud();
 
       render();
     })();
   </script>
+  <script src="firebase-config.js"></script>
+  <script src="firebase-sync.js"></script>
 </body>
 </html>

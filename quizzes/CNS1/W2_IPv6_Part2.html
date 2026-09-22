@@ -152,8 +152,6 @@
     .concept-box { padding: 16px; border-radius: 15px; background: #f5f8fa; }
     .concept-box h3 { margin: 0 0 9px; font-size: 1rem; }
     .concept-box ul { margin: 0; padding-left: 19px; color: var(--muted); }
-    .recommendation { margin-top: 18px; padding: 18px; border: 1px solid #9dd2e5; border-radius: 16px; background: #eefafd; }
-    .recommendation h3 { margin: 0 0 6px; }
     .hidden { display: none !important; }
 
     @media (max-width: 820px) {
@@ -208,7 +206,7 @@
           <div class="actions">
             <button class="btn primary" id="saveBtn">Zwischenstand speichern</button>
             <button class="btn ghost" id="finishBtn">Auswertung</button>
-            <button class="btn danger" id="resetBtn">Fortschritt zurücksetzen</button>
+            <button class="btn danger" id="newQuizBtn">Neues Quiz starten</button>
           </div>
           <p class="save-note" id="saveNotice" aria-live="polite">Änderungen werden auch automatisch lokal gespeichert.</p>
           <p class="source-note">Grundlage: offizielle CNS1-Folien „IPv6 - Part 2“, technische Inhalte der Folien 6-43 sowie Zusammenfassung 45-46. Lösungen bleiben verborgen, bis du sie ausdrücklich öffnest.</p>
@@ -669,10 +667,10 @@
     }
 
     function classification(pct) {
-      if (pct >= 85) return { status: "Sehr gut verstanden", answer: "Später auffrischen", recommendation: "Du hast den Stoff sehr gut verstanden. Eine kurze spätere Recall-Runde kann helfen, das Wissen langfristig zu behalten." };
-      if (pct >= 70) return { status: "Grundsätzlich verstanden, aber mit Lücken", answer: "Optional gezielt üben", recommendation: "Wenn du möchtest, kannst du die unsicheren Konzepte später mit neuen Aufgaben festigen." };
-      if (pct >= 50) return { status: "Noch nicht sicher verstanden", answer: "Optional nochmals anschauen", recommendation: "Ein gezieltes Review kann dir helfen, die schwachen und teilweise verstandenen Bereiche aus anderen Blickwinkeln zu üben." };
-      return { status: "Deutliche Wissenslücken", answer: "Optional Grundlagen festigen", recommendation: "Es kann sich lohnen, die wichtigsten schwachen Konzepte kurz nachzulesen und später ein fokussiertes Review zu versuchen." };
+      if (pct >= 85) return { status: "Sehr gut verstanden" };
+      if (pct >= 70) return { status: "Grundsätzlich verstanden, aber mit Lücken" };
+      if (pct >= 50) return { status: "Noch nicht sicher verstanden" };
+      return { status: "Deutliche Wissenslücken" };
     }
 
     function list(items, emptyText) { return items.length ? `<ul>${items.map(x => `<li>${esc(x)}</li>`).join("")}</ul>` : `<p>${esc(emptyText)}</p>`; }
@@ -708,24 +706,19 @@
           <div class="concept-box"><h3>Unsicher</h3>${list(concepts.mixed, "Keine gemischten Bereiche.")}</div>
           <div class="concept-box"><h3>Wiederholen</h3>${list(concepts.weak, "Keine klar schwachen Bereiche.")}</div>
         </div>
-        <div class="recommendation"><h3>Nächster freiwilliger Schritt: ${esc(cls.answer)}</h3><p>${esc(cls.recommendation)}</p></div>
         <div class="actions">
-          <button class="btn primary" id="exportBtn">Ergebnis als JSON exportieren</button>
-          ${pct < 85 ? `<button class="btn secondary" id="targetBtn">Gezieltes Review vorbereiten (optional)</button>` : ""}
           <button class="btn ghost" id="backToQuiz">Antworten ansehen</button>
-          <button class="btn danger" id="retakeBtn">Quiz nochmals machen</button>
+          <button class="btn danger" id="retakeBtn">Neues Quiz starten</button>
         </div>`;
-      document.getElementById("exportBtn").addEventListener("click", () => exportResult(false));
-      document.getElementById("targetBtn")?.addEventListener("click", () => exportResult(true));
       document.getElementById("backToQuiz").addEventListener("click", () => { state.completed = false; saveState(); render(); });
-      document.getElementById("retakeBtn").addEventListener("click", resetCurrentAttempt);
+      document.getElementById("retakeBtn").addEventListener("click", startNewQuiz);
       reportResultToDashboard(score, pct, concepts, cls);
       updateHeader();
     }
 
     function reportResultToDashboard(score, pct, concepts, cls) {
       const message = {
-        source: "zhaw-quiz",
+        source: "quiz-dashboard",
         version: 1,
         type: "quiz-completed",
         quizId: DASHBOARD_QUIZ_ID,
@@ -749,7 +742,7 @@
     function reportProgressToDashboard(manual = false) {
       if (state.completed) return;
       const message = {
-        source: "zhaw-quiz", version: 1, type: "quiz-progress", quizId: DASHBOARD_QUIZ_ID, manual,
+        source: "quiz-dashboard", version: 1, type: "quiz-progress", quizId: DASHBOARD_QUIZ_ID, manual,
         progress: {
           attemptId: state.attemptId,
           currentTask: state.current + 1,
@@ -774,37 +767,9 @@
     }
 
     function clearDashboardProgress() {
-      const message = { source: "zhaw-quiz", version: 1, type: "quiz-progress-reset", quizId: DASHBOARD_QUIZ_ID };
+      const message = { source: "quiz-dashboard", version: 1, type: "quiz-progress-reset", quizId: DASHBOARD_QUIZ_ID };
       if (window.parent && window.parent !== window) window.parent.postMessage(message, "*");
       if (window.opener && !window.opener.closed) window.opener.postMessage(message, "*");
-    }
-
-    function exportResult(targeted) {
-      const score = earned();
-      const pct = Math.round(score / maxPoints * 100);
-      const concepts = conceptAnalysis();
-      const payload = {
-        subject: "CNS1",
-        lecture: "IPv6 - Part 2",
-        source: "W2_CNS1-sld-02-ipv6-2.pdf",
-        date: state.completedAt || new Date().toISOString(),
-        attemptId: state.attemptId,
-        totalScore: score,
-        maximumScore: maxPoints,
-        percentage: pct,
-        grade: Number(grade(score)),
-        recommendation: pct >= 85 ? "no_new_review" : pct >= 70 ? "short_targeted_review" : "targeted_review",
-        questionResults: questions.map(q => ({ id: q.id, topic: q.topic, points: resultFor(q.id)?.points || 0, maximum: q.points, status: resultFor(q.id)?.status || "unanswered" })),
-        weakConcepts: concepts.weak,
-        partiallyUnderstoodConcepts: concepts.mixed,
-        strongConcepts: concepts.strong,
-        request: targeted ? "Create a new targeted HTML review with different questions for weak and partially understood concepts." : undefined
-      };
-      const blob = new Blob([JSON.stringify(payload, null, 2)], { type: "application/json" });
-      const url = URL.createObjectURL(blob);
-      const link = document.createElement("a");
-      link.href = url; link.download = targeted ? "CNS1_IPv6_Part2_targeted_review.json" : "CNS1_IPv6_Part2_result.json";
-      link.click(); URL.revokeObjectURL(url);
     }
 
     function render() {
@@ -814,14 +779,14 @@
 
     document.getElementById("saveBtn").addEventListener("click", saveProgressManually);
     document.getElementById("finishBtn").addEventListener("click", renderResult);
-    function resetCurrentAttempt() {
-      if (!confirm("Neuen Versuch starten? Der aktuelle Quizstand wird zurückgesetzt. Frühere abgeschlossene Versuche bleiben im Dashboard erhalten.")) return;
+    function startNewQuiz() {
+      if (!confirm("Neues Quiz beginnen? Ein noch nicht abgeschlossener Zwischenstand wird verworfen. Bereits abgeschlossene Versuche bleiben im Dashboard erhalten.")) return;
       localStorage.removeItem(STORAGE_KEY); clearDashboardProgress(); state = defaultState(); render();
     }
 
-    document.getElementById("resetBtn").addEventListener("click", resetCurrentAttempt);
+    document.getElementById("newQuizBtn").addEventListener("click", startNewQuiz);
 
-    const readyMessage = { source: "zhaw-quiz", version: 1, type: "quiz-ready", quizId: DASHBOARD_QUIZ_ID };
+    const readyMessage = { source: "quiz-dashboard", version: 1, type: "quiz-ready", quizId: DASHBOARD_QUIZ_ID };
     if (window.parent && window.parent !== window) window.parent.postMessage(readyMessage, "*");
     if (window.opener && !window.opener.closed) window.opener.postMessage(readyMessage, "*");
     render();

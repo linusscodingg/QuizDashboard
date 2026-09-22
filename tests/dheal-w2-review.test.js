@@ -111,7 +111,7 @@ assert.equal(completed.attempt.percentage, 100);
 assert.equal(completed.attempt.grade, 6);
 assert.match(element("resultView").innerHTML, /Sehr gut verstanden/);
 assert.match(element("resultView").innerHTML, /Selbsteinschätzungsnote 6\.0/);
-assert.match(element("resultView").innerHTML, /Quiz nochmals machen/);
+assert.match(element("resultView").innerHTML, /Neues Quiz starten/);
 
 saved = JSON.parse(storage.get("dheal-w2-healthcare-data-review-v1"));
 assert.equal(saved.completed, true);

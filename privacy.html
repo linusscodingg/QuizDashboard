@@ -1,0 +1,63 @@
+<!doctype html>
+<html lang="de">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Datenschutzerklärung für das Quiz-Dashboard.">
+  <meta name="referrer" content="strict-origin-when-cross-origin">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'none'; style-src 'unsafe-inline'; base-uri 'self'; form-action 'none'">
+  <title>Datenschutz · Quiz-Dashboard</title>
+  <style>
+    :root { color-scheme:light; --ink:#14243a; --muted:#607086; --blue:#087da8; --line:#d3e2e9; --wash:#eef7fa; }
+    * { box-sizing:border-box; }
+    body { margin:0; padding:28px 16px 60px; color:var(--ink); font:16px/1.65 Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif; background:linear-gradient(145deg,#f9fcfd,var(--wash)); }
+    main { width:min(820px,100%); margin:auto; padding:clamp(24px,5vw,48px); border:1px solid var(--line); border-radius:22px; background:#fff; box-shadow:0 18px 55px rgba(18,65,88,.1); }
+    h1 { margin:0 0 8px; line-height:1.15; }
+    h2 { margin:30px 0 7px; font-size:1.18rem; }
+    p, ul { margin:8px 0; }
+    a { color:var(--blue); }
+    .muted { color:var(--muted); }
+    .back { display:inline-block; margin-bottom:24px; font-weight:750; }
+  </style>
+</head>
+<body>
+  <main>
+    <a class="back" href="index.html">← Zurück zum Dashboard</a>
+    <h1>Datenschutzerklärung</h1>
+    <p class="muted">Stand: 22. September 2026</p>
+
+    <h2>1. Verantwortlicher und Kontakt</h2>
+    <p>Verantwortlich für dieses private Lernprojekt ist der Inhaber des GitHub-Kontos <strong>linusscodingg</strong>. Kontakt ist über das <a href="https://github.com/linusscodingg/QuizDashboard/issues">GitHub-Repository</a> möglich. Für eine breitere öffentliche Nutzung sollte hier zusätzlich eine direkte Kontaktadresse des Betreibers ergänzt werden.</p>
+
+    <h2>2. Welche Daten verarbeitet werden</h2>
+    <p>Für die Nutzung der veröffentlichten Website ist ein bestätigtes Firebase-Konto erforderlich. Dabei werden folgende Daten verarbeitet:</p>
+    <ul>
+      <li>E-Mail-Adresse, Firebase-Nutzer-ID, gewählte Anmeldemethode und technische Anmeldedaten;</li>
+      <li>Quizversuche, Punktzahlen, Zwischenstände und Zeitpunkte der Synchronisation;</li>
+      <li>technisch notwendige Verbindungs- und Sicherheitsdaten wie IP-Adresse, Browserinformationen und Serverprotokolle bei GitHub und Google/Firebase.</li>
+    </ul>
+    <p>Das Passwort wird nicht vom Quiz-Dashboard gespeichert. Die Anmeldung wird direkt durch Firebase Authentication verarbeitet. Bei der GitHub-Anmeldung werden die von GitHub für die Anmeldung bereitgestellten Profildaten verarbeitet; das Dashboard fordert keinen Zugriff auf private Repositories an.</p>
+
+    <h2>3. Zweck</h2>
+    <p>Die Daten werden verwendet, um das Dashboard bereitzustellen, den persönlichen Lernfortschritt zwischen Geräten zu synchronisieren, Konten zu schützen und technische Angriffe oder Fehler zu erkennen. Es findet keine Werbung, Profilbildung zu Marketingzwecken oder Weitergabe zu Werbezwecken statt.</p>
+
+    <h2>4. Eingesetzte Dienste und Übermittlung ins Ausland</h2>
+    <p>Die Website wird über <a href="https://pages.github.com/">GitHub Pages</a> bereitgestellt. Anmeldung und Cloud-Speicherung erfolgen über <a href="https://firebase.google.com/">Google Firebase</a>. Dabei können Daten durch GitHub, Inc. und Google LLC beziehungsweise deren verbundene Unternehmen auch ausserhalb der Schweiz verarbeitet werden. Es gelten ergänzend die <a href="https://docs.github.com/en/site-policy/privacy-policies/github-general-privacy-statement">Datenschutzhinweise von GitHub</a> und die <a href="https://policies.google.com/privacy">Datenschutzhinweise von Google</a>.</p>
+
+    <h2>5. Lokale Speicherung und Cookies</h2>
+    <p>Das Dashboard verwendet lokalen Browser-Speicher als Zwischenspeicher für den Quizfortschritt. Firebase Authentication kann technisch notwendige Browser-Speicherungen für die angemeldete Sitzung verwenden. Es werden keine Analyse-, Werbe- oder Marketing-Cookies eingesetzt.</p>
+
+    <h2>6. Speicherdauer und Löschung</h2>
+    <p>Lokale Daten bleiben gespeichert, bis der Browser-Speicher gelöscht oder eine Sicherung zurückgesetzt wird. Cloud-Daten bleiben bis zur Löschung des Kontos gespeichert. Angemeldete Nutzer können im Dashboard über „Konto löschen“ das Firebase-Konto und den zugehörigen Cloud-Fortschritt löschen. Vorher kann über „Sicherung exportieren“ eine lokale Kopie erstellt werden.</p>
+
+    <h2>7. Sicherheit</h2>
+    <p>Cloud-Daten werden durch Firebase Authentication und Firestore Security Rules auf das jeweils angemeldete und bestätigte Konto beschränkt. Trotz angemessener Massnahmen kann keine Internetübertragung vollständig risikofrei garantiert werden.</p>
+
+    <h2>8. Rechte</h2>
+    <p>Betroffene Personen können Auskunft, Berichtigung oder Löschung ihrer personenbezogenen Daten verlangen. Dafür ist der oben genannte Kontakt zu verwenden. Änderungen an dieser Erklärung werden auf dieser Seite veröffentlicht.</p>
+
+    <h2>9. Hinweis zum Projekt</h2>
+    <p>Dieses Dashboard ist ein inoffizielles privates Lernprojekt. Die angezeigte Lernnote ist keine offizielle Bewertung.</p>
+  </main>
+</body>
+</html>
