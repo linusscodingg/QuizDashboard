@@ -90,6 +90,11 @@
     }
     .option:hover { border-color: #72bddc; transform: translateY(-1px); }
     .option input { margin-top: 3px; accent-color: var(--blue); }
+    .option.answer-correct { border-color: #49a96b; background: #e8f8ee; }
+    .option.answer-wrong { border-color: #dc7070; background: #fff0f0; }
+    .answer-label { display: block; margin-top: 5px; font-size: .78rem; font-weight: 850; }
+    .answer-correct .answer-label { color: #14642f; }
+    .answer-wrong .answer-label { color: #922020; }
     textarea {
       width: 100%; min-height: 150px; resize: vertical;
       padding: 14px; border: 1px solid var(--line); border-radius: 14px;
@@ -98,6 +103,8 @@
     textarea:focus, button:focus-visible, input:focus-visible { outline: 3px solid rgba(56,189,248,.35); outline-offset: 2px; }
     .order-list { display: grid; gap: 9px; }
     .order-row { display: grid; grid-template-columns: 36px 1fr auto auto; gap: 9px; align-items: center; padding: 10px; border: 1px solid var(--line); border-radius: 13px; background: #fbfdfe; }
+    .order-row.answer-correct { border-color: #49a96b; background: #e8f8ee; }
+    .order-row.answer-wrong { border-color: #dc7070; background: #fff0f0; }
     .rank { display: grid; place-items: center; width: 30px; height: 30px; border-radius: 50%; color: white; background: var(--blue); font-weight: 800; }
     .icon-btn { width: 35px; height: 35px; border: 1px solid var(--line); border-radius: 10px; background: white; color: var(--blue-dark); font-weight: 900; }
     .actions { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 22px; }
@@ -115,6 +122,11 @@
     .solution { border: 1px solid #b9dce9; background: #eef9fd; }
     .solution h3 { margin: 0 0 8px; font-size: 1rem; color: var(--blue-dark); }
     .solution p { margin: 6px 0; }
+    .answer-analysis { display: grid; gap: 8px; margin: 12px 0; }
+    .analysis-item { padding: 10px 12px; border-radius: 10px; }
+    .analysis-item.correct { border-left: 4px solid var(--green); background: #e8f8ee; }
+    .analysis-item.wrong { border-left: 4px solid var(--red); background: #fff0f0; }
+    .analysis-item strong { display: block; margin-bottom: 3px; }
     .reference { color: var(--muted); font-size: .88rem; }
     .rating { display: flex; flex-wrap: wrap; gap: 9px; margin-top: 14px; }
     .rating .selected { color: white; background: var(--blue); }
@@ -196,7 +208,7 @@
           <div class="actions">
             <button class="btn primary" id="saveBtn">Zwischenstand speichern</button>
             <button class="btn ghost" id="finishBtn">Auswertung</button>
-            <button class="btn danger" id="resetBtn">Zurücksetzen</button>
+            <button class="btn danger" id="resetBtn">Fortschritt zurücksetzen</button>
           </div>
           <p class="save-note" id="saveNotice" aria-live="polite">Änderungen werden auch automatisch lokal gespeichert.</p>
           <p class="source-note">Grundlage: offizielle CNS1-Folien „IPv6 - Part 2“, technische Inhalte der Folien 6-43 sowie Zusammenfassung 45-46. Lösungen bleiben verborgen, bis du sie ausdrücklich öffnest.</p>
@@ -218,6 +230,13 @@
           "ICMPv6 transportiert reguläre TCP-Nutzdaten zwischen Anwendungen.",
           "ICMPv6 ist ein integraler, obligatorischer Bestandteil von IPv6."
         ], correct: [1,2,4],
+        optionExplanations: [
+          "ICMPv6 ist kein optionales Ping-Zusatzprotokoll, sondern für zentrale IPv6-Funktionen erforderlich.",
+          "Duplicate Address Detection und Neighbor Discovery verwenden ICMPv6-Nachrichten.",
+          "Neighbor Discovery und Multicast Listener Discovery übernehmen Aufgaben, die bei IPv4 durch ARP beziehungsweise IGMP abgedeckt werden.",
+          "TCP-Nutzdaten werden in TCP-Segmenten transportiert; ICMPv6 dient Kontroll-, Fehler- und Informationsfunktionen.",
+          "IPv6 ist bei Adressauflösung, Autokonfiguration und Fehlermeldungen auf ICMPv6 angewiesen."
+        ],
         solution: "Richtig sind die Aussagen 2, 3 und 5. ICMPv6 ist für IPv6 obligatorisch und übernimmt neben Fehler- und Informationsmeldungen auch Funktionen wie Autokonfiguration, Nachbarerkennung, Adressauflösung und Multicast-Gruppenverwaltung.",
         reference: "Folien 6-7", concepts: ["ICMPv6"]
       },
@@ -230,6 +249,12 @@
           "Der Router sendet ICMPv6 Type 3 'Time Exceeded' und erhöht den Hop Limit.",
           "Der Router wandelt das Paket automatisch in IPv4 um."
         ], correct: 1,
+        optionExplanations: [
+          "IPv6-Router fragmentieren weitergeleitete Pakete nicht; nötige Fragmentierung erfolgt am sendenden Host.",
+          "Packet Too Big meldet dem Sender die kleinere Next-Hop-MTU, damit er die Paketgrösse anpassen kann.",
+          "Time Exceeded betrifft ein abgelaufenes Hop Limit und erhöht dieses nicht.",
+          "Eine MTU-Überschreitung löst keine automatische Übersetzung nach IPv4 aus."
+        ],
         solution: "Der Router verwirft das Paket und meldet mit ICMPv6 Type 2 'Packet Too Big' die MTU des nächsten Hops. Darauf basiert Path MTU Discovery; IPv6-Router fragmentieren nicht.",
         reference: "Folie 10; Vergleich auf Folie 45", concepts: ["ICMPv6", "Path MTU Discovery"]
       },
@@ -242,6 +267,12 @@
           "Type 3, Code 0: Hop Limit exceeded in transit",
           "Type 4, Code 1: Unrecognized Next Header"
         ], correct: 2,
+        optionExplanations: [
+          "Port unreachable meldet einen nicht erreichbaren UDP-Port am Ziel und identifiziert keine Zwischenrouter.",
+          "Packet Too Big gehört zur Path MTU Discovery, nicht zur Hop-für-Hop-Ermittlung von traceroute.",
+          "Jeder Router, an dem das Hop Limit null wird, antwortet mit Time Exceeded; dadurch wird seine Adresse sichtbar.",
+          "Unrecognized Next Header meldet einen unbekannten Folgekookopf und hat nichts mit dem Hop Limit zu tun."
+        ],
         solution: "ICMPv6 Type 3, Code 0 ('Hop Limit exceeded in transit') wird von einem Router gesendet, wenn das Hop Limit abläuft. traceroute nutzt genau diesen Mechanismus.",
         reference: "Folie 11", concepts: ["ICMPv6", "Troubleshooting"]
       },
@@ -254,6 +285,12 @@
           "0A00:0900:00A1:7226",
           "FE80:0000:0A00:09A1"
         ], correct: 1,
+        optionExplanations: [
+          "Hier wurde FF-FE zwar eingefügt, das Universal/Local-Bit des ersten Bytes 08 aber nicht invertiert.",
+          "Aus 08 wird durch Invertieren des 7. Bits 0A; FF-FE wird in der Mitte ergänzt.",
+          "Diese Variante fügt FF-FE nicht korrekt zwischen dem dritten und vierten MAC-Byte ein.",
+          "FE80:: ist ein Link-Local-Präfix und keine aus der MAC-Adresse gebildete 64-Bit-Interface-ID."
+        ],
         solution: "Zwischen dem 3. und 4. MAC-Byte wird FF-FE eingefügt und das 7. Bit wird invertiert. Aus 08-00-09-A1-72-26 wird deshalb 0A00:09FF:FEA1:7226.",
         reference: "Folien 16-17", concepts: ["SLAAC", "EUI-64"]
       },
@@ -281,6 +318,13 @@
           "M=1, O=0: bevorzugte Einstellung für stateless DHCPv6",
           "M=0, O=1: DHCPv6 liefert zwingend auch die IPv6-Adresse"
         ], correct: [0,1,2],
+        optionExplanations: [
+          "Bei M=0/O=0 bildet der Host seine Adresse selbst per SLAAC und bezieht keine Zusatzparameter per DHCPv6.",
+          "O=1 fordert zusätzliche Konfigurationsinformationen wie DNS an, während M=0 die Adressbildung bei SLAAC lässt.",
+          "M=1 signalisiert verwaltete Adressvergabe; zusammen mit O=1 liefert DHCPv6 auch weitere Parameter.",
+          "M=1/O=0 ist in den Folien als unbenutzte Kombination markiert und beschreibt nicht stateless DHCPv6.",
+          "Bei M=0 bleibt SLAAC für die Adresse zuständig; DHCPv6 liefert hier nur zusätzliche Parameter."
+        ],
         solution: "0/0 bedeutet SLAAC only, 0/1 bedeutet SLAAC plus stateless DHCPv6 für Zusatzparameter, 1/1 bedeutet stateful DHCPv6. Die Kombination 1/0 ist in den Folien als unbenutzt markiert.",
         reference: "Folie 20", concepts: ["DHCPv6", "Router Advertisement"]
       },
@@ -300,6 +344,12 @@
           "Ein Dual-Stack-Resolver fragt nur AAAA ab und leitet daraus bei Bedarf einen A-Record ab.",
           "DNS-Abfragen nach AAAA müssen zwingend über eine IPv6-Verbindung transportiert werden."
         ], correct: 1,
+        optionExplanations: [
+          "Die Richtung ist vertauscht und IPv6-Reverse-Lookups verwenden ip6.arpa, nicht in-addr.arpa.",
+          "AAAA liefert die IPv6-Adresse zu einem Namen; ip6.arpa nutzt für Reverse DNS die umgekehrte Nibble-Schreibweise.",
+          "A und AAAA sind eigenständige Record-Typen; ein Resolver leitet den einen nicht automatisch aus dem anderen ab.",
+          "DNS-Inhalt und Transport sind getrennt: Eine AAAA-Abfrage kann auch über IPv4 übertragen werden."
+        ],
         solution: "AAAA ordnet einem Hostnamen eine IPv6-Adresse zu. Reverse Lookups liegen unter ip6.arpa und notieren die Adresse nibbleweise in umgekehrter Reihenfolge. Die DNS-Kommunikation selbst darf über IPv4 oder IPv6 laufen.",
         reference: "Folien 25-27", concepts: ["DNS"]
       },
@@ -320,6 +370,13 @@
           "Eine IPv4-mapped IPv6-Adresse wandelt den entfernten IPv4-Host automatisch in einen IPv6-Host um.",
           "IPv6-Tunneling ist laut Folien heute wichtiger als Dual Stack."
         ], correct: [0,1,2],
+        optionExplanations: [
+          "Das Präfix kennzeichnet die IPv4-mapped IPv6-Darstellung im IPv6-Adressraum.",
+          "Nach den ersten 96 Bit bleiben genau 32 Bit für die eingebettete IPv4-Adresse.",
+          "Protocol 41 im äusseren IPv4-Header signalisiert, dass die Nutzlast ein IPv6-Paket ist.",
+          "Die Darstellung erleichtert APIs und Sockets, führt aber keine automatische Netzprotokoll-Übersetzung durch.",
+          "Die Folien beschreiben Dual Stack als wichtigeren heutigen Ansatz; klassisches Tunneling hat an Bedeutung verloren."
+        ],
         solution: "Das Mapping nutzt ::FFFF:0:0/96; die IPv4-Adresse liegt in den letzten 32 Bit. Bei IPv6-in-IPv4 wird das IPv6-Paket als IPv4-Nutzlast gekapselt, wobei Protocol=41 verwendet wird. Mapping ist eine Socket-/Adressdarstellung, keine automatische Protokollumwandlung; Tunneling hat laut Folien an Bedeutung verloren.",
         reference: "Folien 32-35", concepts: ["IPv4-mapped IPv6", "Tunneling"]
       },
@@ -329,6 +386,14 @@
         hint: "Wähle alle richtigen Felder.",
         options: ["Source Address", "Destination Address", "Payload Length", "Next Header", "Flow Label", "Hop Limit"],
         correct: [0,1,2,3],
+        optionExplanations: [
+          "Die Quelladresse wird in die Transportprüfsumme einbezogen.",
+          "Die Zieladresse wird ebenfalls eingebunden, damit Fehlzustellungen erkannt werden können.",
+          "Die Payload Length gehört zum Pseudo-Header und beschreibt die geprüfte Länge.",
+          "Next Header identifiziert das Transportprotokoll, dessen Prüfsumme berechnet wird.",
+          "Der Flow Label steht im IPv6-Basisheader, gehört aber nicht zum Pseudo-Header.",
+          "Der Hop Limit verändert sich auf dem Weg und ist deshalb kein Bestandteil der End-to-End-Prüfsumme."
+        ],
         solution: "Der IPv6-Pseudo-Header enthält Source Address, Destination Address, Payload Length und Next Header. Er bindet für die Checksumme relevante Netzwerkschichtinformationen ein und schützt so vor Fehlzustellung bzw. Korruption abhängiger Headerfelder.",
         reference: "Folie 37", concepts: ["Pseudo-Header", "Checksum"]
       },
@@ -341,6 +406,12 @@
           "AH (50) verschlüsselt Nutzdaten; ESP (51) prüft nur den IPv6-Header.",
           "Beide Verfahren sind heute zwingende Bestandteile jeder IPv6-Verbindung."
         ], correct: 1,
+        optionExplanations: [
+          "AH verschlüsselt nicht und bietet daher keine Vertraulichkeit; Replay-Schutz ist nicht die einzige ESP-Eigenschaft.",
+          "AH trägt die Nummer 51 und schützt Integrität sowie Herkunft; ESP 50 kann zusätzlich verschlüsseln.",
+          "Die Headernummern und Aufgaben sind vertauscht: AH ist 51, ESP ist 50.",
+          "IPsec-Unterstützung wurde bei IPv6 von obligatorisch auf optional geändert und wird nicht für jede Verbindung erzwungen."
+        ],
         solution: "AH ist Extension Header 51 und bietet verbindungslose Integrität, Herkunftsauthentisierung und Replay-Schutz. ESP ist Header 50 und bietet Herkunftsauthentizität, Integrität und Vertraulichkeit. IPsec wurde später von obligatorisch zu optional herabgestuft.",
         reference: "Folie 38", concepts: ["IPsec"]
       },
@@ -384,6 +455,7 @@
     const esc = value => String(value ?? "").replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;","'":"&#39;"}[c]));
     const resultFor = id => state.results[id];
     const isDone = q => Boolean(resultFor(q.id));
+    const isSubmitted = q => isDone(q) || (q.type === "text" && state.revealed[q.id] && Boolean(state.answers[q.id]));
     const earned = () => questions.reduce((sum, q) => sum + (resultFor(q.id)?.points || 0), 0);
     const completedCount = () => questions.filter(isDone).length;
 
@@ -434,18 +506,30 @@
     }
 
     function answerMarkup(q) {
-      const disabled = isDone(q) ? "disabled" : "";
+      const disabled = isSubmitted(q) ? "disabled" : "";
       if (q.type === "single" || q.type === "multi") {
         const selected = Array.isArray(state.answers[q.id]) ? state.answers[q.id] : [];
         const inputType = q.type === "single" ? "radio" : "checkbox";
-        return `<div class="options">${q.options.map((opt, i) => `<label class="option"><input ${disabled} type="${inputType}" name="${q.id}" value="${i}" ${selected.includes(i) ? "checked" : ""}><span>${esc(opt)}</span></label>`).join("")}</div>`;
+        return `<div class="options">${q.options.map((opt, i) => {
+          const correct = Array.isArray(q.correct) ? q.correct.includes(i) : q.correct === i;
+          const chosen = selected.includes(i);
+          const reviewClass = isDone(q) ? (correct ? "answer-correct" : "answer-wrong") : "";
+          const label = !isDone(q) ? "" : correct ? (chosen ? "✓ Richtig gewählt" : "✓ Richtige Antwort – nicht gewählt") : (chosen ? "✕ Falsch gewählt" : "✕ Nicht korrekt");
+          return `<label class="option ${reviewClass}"><input ${disabled} type="${inputType}" name="${q.id}" value="${i}" ${chosen ? "checked" : ""}><span>${esc(opt)}${label ? `<small class="answer-label">${label}</small>` : ""}</span></label>`;
+        }).join("")}</div>`;
       }
       if (q.type === "text") {
         return `<textarea id="textAnswer" ${disabled} placeholder="Deine Antwort...">${esc(state.answers[q.id] || "")}</textarea>`;
       }
       if (q.type === "order") {
         const order = state.order[q.id] || q.initial || q.items.map((_, i) => i);
-        return `<div class="order-list">${order.map((itemIndex, pos) => `<div class="order-row"><span class="rank">${pos+1}</span><span>${esc(q.items[itemIndex])}</span><button class="icon-btn" ${disabled || pos === 0 ? "disabled" : ""} data-move="${pos},-1" aria-label="Nach oben">↑</button><button class="icon-btn" ${disabled || pos === order.length-1 ? "disabled" : ""} data-move="${pos},1" aria-label="Nach unten">↓</button></div>`).join("")}</div>`;
+        return `<div class="order-list">${order.map((itemIndex, pos) => {
+          const correctPosition = q.correct.indexOf(itemIndex);
+          const correct = correctPosition === pos;
+          const reviewClass = isDone(q) ? (correct ? "answer-correct" : "answer-wrong") : "";
+          const label = !isDone(q) ? "" : correct ? "✓ Position richtig" : `✕ Gehört auf Position ${correctPosition + 1}`;
+          return `<div class="order-row ${reviewClass}"><span class="rank">${pos+1}</span><span>${esc(q.items[itemIndex])}${label ? `<small class="answer-label">${label}</small>` : ""}</span><button class="icon-btn" ${disabled || pos === 0 ? "disabled" : ""} data-move="${pos},-1" aria-label="Nach oben">↑</button><button class="icon-btn" ${disabled || pos === order.length-1 ? "disabled" : ""} data-move="${pos},1" aria-label="Nach unten">↓</button></div>`;
+        }).join("")}</div>`;
       }
       return "";
     }
@@ -460,7 +544,11 @@
     function solutionMarkup(q) {
       if (!state.revealed[q.id]) return "";
       const rating = q.type === "text" && !isDone(q) ? `<div class="rating"><button class="btn secondary" data-rate="correct">Voll richtig</button><button class="btn secondary" data-rate="partial">Teilweise richtig</button><button class="btn secondary" data-rate="wrong">Falsch / wusste ich nicht</button></div>` : "";
-      return `<div class="solution"><h3>Lösung und Begründung</h3><p>${esc(q.solution)}</p><p class="reference"><strong>Quelle:</strong> ${esc(q.reference)}</p>${rating}</div>`;
+      const analysis = q.optionExplanations ? `<div class="answer-analysis">${q.optionExplanations.map((reason, i) => {
+        const correct = Array.isArray(q.correct) ? q.correct.includes(i) : q.correct === i;
+        return `<div class="analysis-item ${correct ? "correct" : "wrong"}"><strong>${correct ? "✓ Aussage ist richtig" : "✕ Aussage ist falsch"}</strong>${esc(reason)}</div>`;
+      }).join("")}</div>` : "";
+      return `<div class="solution"><h3>Lösung und Begründung</h3>${analysis}<p>${esc(q.solution)}</p><p class="reference"><strong>Quelle:</strong> ${esc(q.reference)}</p>${rating}</div>`;
     }
 
     function renderQuestion() {
@@ -478,9 +566,8 @@
         ${answerMarkup(q)}
         <div class="actions">
           ${q.type !== "text" && !isDone(q) ? `<button class="btn primary" id="checkBtn">Antwort prüfen</button>` : ""}
-          ${q.type === "text" && !isDone(q) ? `<button class="btn primary" id="saveTextBtn">Antwort speichern</button>` : ""}
-          <button class="btn secondary" id="solutionBtn">${state.revealed[q.id] ? "Lösung ausblenden" : "Lösung anzeigen"}</button>
-          ${!isDone(q) ? `<button class="btn ghost" id="skipBtn">Überspringen</button>` : ""}
+          ${q.type === "text" && !isSubmitted(q) ? `<button class="btn primary" id="saveTextBtn">Antwort prüfen</button>` : ""}
+          ${!isSubmitted(q) ? `<button class="btn ghost" id="skipBtn">Überspringen</button>` : ""}
         </div>
         ${feedbackMarkup(q)}
         ${solutionMarkup(q)}
@@ -513,14 +600,6 @@
         if (!text) return alert("Schreibe zuerst eine eigene Antwort.");
         state.answers[q.id] = text; state.revealed[q.id] = true; saveState(); render();
       });
-      document.getElementById("solutionBtn").addEventListener("click", () => {
-        if (q.type === "text" && !isDone(q)) {
-          const text = document.getElementById("textAnswer")?.value.trim();
-          if (!text) return alert("Schreibe zuerst eine eigene Antwort, bevor du die Lösung öffnest.");
-          state.answers[q.id] = text;
-        }
-        state.revealed[q.id] = !state.revealed[q.id]; saveState(); render();
-      });
       document.querySelectorAll("[data-rate]").forEach(btn => btn.addEventListener("click", () => {
         const status = btn.dataset.rate;
         const factor = status === "correct" ? 1 : status === "partial" ? .5 : 0;
@@ -536,6 +615,7 @@
     }
 
     function gradeAuto(q) {
+      if (isDone(q)) return;
       let points = 0, status = "wrong", note = "";
       if (q.type === "single") {
         const answer = state.answers[q.id]?.[0];
@@ -558,6 +638,7 @@
       }
       status = points === q.points ? "correct" : points > 0 ? "partial" : "wrong";
       state.results[q.id] = { status, points, note };
+      state.revealed[q.id] = true;
       saveState(); render();
     }
 
@@ -632,10 +713,12 @@
           <button class="btn primary" id="exportBtn">Ergebnis als JSON exportieren</button>
           ${pct < 85 ? `<button class="btn secondary" id="targetBtn">Gezieltes Review vorbereiten (optional)</button>` : ""}
           <button class="btn ghost" id="backToQuiz">Antworten ansehen</button>
+          <button class="btn danger" id="retakeBtn">Quiz nochmals machen</button>
         </div>`;
       document.getElementById("exportBtn").addEventListener("click", () => exportResult(false));
       document.getElementById("targetBtn")?.addEventListener("click", () => exportResult(true));
       document.getElementById("backToQuiz").addEventListener("click", () => { state.completed = false; saveState(); render(); });
+      document.getElementById("retakeBtn").addEventListener("click", resetCurrentAttempt);
       reportResultToDashboard(score, pct, concepts, cls);
       updateHeader();
     }
@@ -731,10 +814,12 @@
 
     document.getElementById("saveBtn").addEventListener("click", saveProgressManually);
     document.getElementById("finishBtn").addEventListener("click", renderResult);
-    document.getElementById("resetBtn").addEventListener("click", () => {
-      if (!confirm("Wirklich alle Antworten und Punkte dieses Reviews löschen?")) return;
+    function resetCurrentAttempt() {
+      if (!confirm("Neuen Versuch starten? Der aktuelle Quizstand wird zurückgesetzt. Frühere abgeschlossene Versuche bleiben im Dashboard erhalten.")) return;
       localStorage.removeItem(STORAGE_KEY); clearDashboardProgress(); state = defaultState(); render();
-    });
+    }
+
+    document.getElementById("resetBtn").addEventListener("click", resetCurrentAttempt);
 
     const readyMessage = { source: "zhaw-quiz", version: 1, type: "quiz-ready", quizId: DASHBOARD_QUIZ_ID };
     if (window.parent && window.parent !== window) window.parent.postMessage(readyMessage, "*");

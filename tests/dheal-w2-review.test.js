@@ -73,8 +73,18 @@ vm.runInContext(scripts[0], context, { filename: "W2_Healthcare_Data.html" });
 assert.equal(element("scoreText").textContent, "0 / 100 Punkte");
 assert.equal(element("progressText").textContent, "0 / 12 Aufgaben");
 assert.match(element("quizView").innerHTML, /Aufgabe 1 von 12/);
+assert.doesNotMatch(element("quizView").innerHTML, /Lösung anzeigen/, "Automatic tasks must not reveal the solution before submission");
 assert.equal(dashboardMessages[0].type, "quiz-ready");
 assert.equal(dashboardMessages[0].quizId, "dheal-w2-healthcare-data");
+
+vm.runInContext("state.current = 1; state.answers.modalities = [0, 1]; gradeAuto(questions[1]);", context);
+assert.equal(vm.runInContext("state.revealed.modalities", context), true, "Checking must reveal the explanation");
+assert.match(element("quizView").innerHTML, /answer-correct/);
+assert.match(element("quizView").innerHTML, /answer-wrong/);
+assert.match(element("quizView").innerHTML, /Richtige Antwort – nicht gewählt/);
+assert.match(element("quizView").innerHTML, /Nicht korrekt/);
+assert.match(element("quizView").innerHTML, /Physiologische Signale bestehen aus Messwerten über die Zeit/);
+assert.doesNotMatch(element("quizView").innerHTML, /Lösung (anzeigen|ausblenden)/);
 
 vm.runInContext("state.current = 3; render();", context);
 element("textAnswer").value = "Mein unfertiger Entwurf";
@@ -83,6 +93,14 @@ let saved = JSON.parse(storage.get("dheal-w2-healthcare-data-review-v1"));
 assert.equal(saved.answers["glucose-context"], "Mein unfertiger Entwurf");
 assert.equal(dashboardMessages.at(-1).type, "quiz-progress");
 assert.equal(dashboardMessages.at(-1).manual, true);
+
+element("textAnswer").value = "Meine eingereichte Antwort";
+element("saveTextBtn").click();
+assert.match(element("quizView").innerHTML, /<textarea id="textAnswer" disabled/);
+assert.doesNotMatch(element("quizView").innerHTML, /id="saveTextBtn"/);
+assert.match(element("quizView").innerHTML, /data-rate="correct"/);
+assert.match(element("quizView").innerHTML, /Auswertung und Begründung/);
+assert.doesNotMatch(element("quizView").innerHTML, /id="skipBtn"/);
 
 vm.runInContext("questions.forEach(q => state.results[q.id] = { status: 'correct', points: q.points }); renderResult();", context);
 const completed = dashboardMessages.at(-1);
@@ -93,6 +111,7 @@ assert.equal(completed.attempt.percentage, 100);
 assert.equal(completed.attempt.grade, 6);
 assert.match(element("resultView").innerHTML, /Sehr gut verstanden/);
 assert.match(element("resultView").innerHTML, /Selbsteinschätzungsnote 6\.0/);
+assert.match(element("resultView").innerHTML, /Quiz nochmals machen/);
 
 saved = JSON.parse(storage.get("dheal-w2-healthcare-data-review-v1"));
 assert.equal(saved.completed, true);
@@ -100,7 +119,7 @@ assert.ok(saved.attemptId);
 assert.ok(saved.completedAt);
 
 const previousAttemptId = vm.runInContext("state.attemptId", context);
-element("resetBtn").click();
+element("retakeBtn").click();
 const resetAttemptId = vm.runInContext("state.attemptId", context);
 assert.notEqual(resetAttemptId, previousAttemptId);
 assert.equal(storage.has("dheal-w2-healthcare-data-review-v1"), false);

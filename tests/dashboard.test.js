@@ -79,13 +79,13 @@ context.window.addEventListener = (type, handler) => { windowListeners[type] = h
 
 vm.runInContext(catalogCode, context, { filename: "quiz-catalog.js" });
 const catalog = context.window.QUIZ_CATALOG;
-assert.equal(catalog.quizzes.length, 2);
+assert.equal(catalog.quizzes.length, 4);
 for (const quiz of catalog.quizzes) {
   assert.ok(fs.existsSync(path.resolve(dashboardDirectory, quiz.path)), `Missing quiz file: ${quiz.path}`);
 }
 
 vm.runInContext(inlineScripts[0], context, { filename: "dashboard-inline.js" });
-assert.equal(elements.completedTotal.textContent, "0 / 2");
+assert.equal(elements.completedTotal.textContent, "0 / 4");
 assert.equal(elements.averageGrade.textContent, "–");
 
 openQuizButton.click();
@@ -118,7 +118,7 @@ assert.match(elements.subjects.innerHTML, /In Bearbeitung/);
 assert.match(elements.subjects.innerHTML, /Quiz fortsetzen/);
 
 report("attempt-1", 70);
-assert.equal(elements.completedTotal.textContent, "1 / 2");
+assert.equal(elements.completedTotal.textContent, "1 / 4");
 assert.equal(elements.averagePercent.textContent, "70 %");
 assert.equal(elements.averageGrade.textContent, "4.5");
 assert.equal(String(elements.attemptTotal.textContent), "1");
@@ -140,11 +140,22 @@ for (const quiz of catalog.quizzes) {
   assert.match(quizHtml, /source:\s*"zhaw-quiz"/);
   assert.match(quizHtml, /quizId:\s*DASHBOARD_QUIZ_ID/);
   assert.match(quizHtml, /type:\s*"quiz-progress"/);
-  assert.match(quizHtml, /Zwischenstand speichern/);
+  assert.match(quizHtml, /Zwischenstand speichern|Save progress/);
   const questionsLiteral = quizHtml.match(/const questions = (\[[\s\S]*?\n\s*\]);\n\n\s*const STORAGE_KEY/);
   assert.ok(questionsLiteral, `Questions array should remain readable for ${quiz.id}`);
   const questions = vm.runInNewContext(questionsLiteral[1]);
   assert.equal(questions.reduce((sum, question) => sum + question.points, 0), quiz.maximumScore);
+  for (const question of questions.filter(question => question.options)) {
+    assert.equal(question.optionExplanations?.length, question.options.length, `Every option needs an explanation: ${quiz.id}/${question.id}`);
+  }
+  assert.match(quizHtml, /state\.revealed\[[^\]]+\.id\] = true/);
+  assert.match(quizHtml, /Richtige Antwort – nicht gewählt|Correct answer – not selected/);
+  assert.match(quizHtml, /Falsch gewählt|Incorrectly selected/);
+  assert.match(quizHtml, /if \(isDone\([^)]*\)\) return;/);
+  assert.match(quizHtml, /Quiz nochmals machen|Retake quiz/);
+  assert.match(quizHtml, /Frühere abgeschlossene Versuche bleiben im Dashboard erhalten|Earlier completed attempts remain in the dashboard/);
+  assert.doesNotMatch(quizHtml, /id="solutionBtn"/);
+  assert.doesNotMatch(quizHtml, />Lösung anzeigen</);
 }
 
 console.log("Quiz-Dashboard tests passed");

@@ -1,21 +1,21 @@
 <!doctype html>
-<html lang="de">
+<html lang="en">
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta name="description" content="Interaktives DHEAL-Review zu Healthcare Data: From Clinical Care to AI-Ready Data.">
-  <title>DHEAL - Healthcare Data - Lecture Review</title>
+  <meta name="description" content="Interactive SWS1 review on Secure Development Lifecycle.">
+  <title>SWS1 - Secure Development Lifecycle - Lecture Review</title>
   <style>
     :root {
-      --ink: #17303a;
-      --muted: #60747b;
-      --teal: #236f70;
-      --teal-dark: #164f55;
-      --mint: #dff3ee;
+      --ink: #2f241f;
+      --muted: #74655c;
+      --teal: #9a4f24;
+      --teal-dark: #713515;
+      --mint: #f8e7d8;
       --blue: #367fba;
       --paper: #fff;
-      --wash: #edf6f4;
-      --line: #cfe0dc;
+      --wash: #faf2eb;
+      --line: #ead3c2;
       --green: #198754;
       --amber: #a96c00;
       --red: #b9343b;
@@ -43,7 +43,7 @@
       padding: 25px;
       color: #fff;
       border-radius: 24px;
-      background: linear-gradient(120deg, #164f55, #237274 62%, #3b8f83);
+      background: linear-gradient(120deg, #713515, #9a4f24 62%, #c46d35);
       box-shadow: var(--shadow);
     }
     .eyebrow { margin: 0 0 6px; color: #c8f4ed; font-size: .78rem; font-weight: 850; letter-spacing: .14em; text-transform: uppercase; }
@@ -115,7 +115,7 @@
     .dot.wrong, .dot.skipped { color: #fff; border-color: var(--red); background: var(--red); }
     .result { display: none; }
     .result.show { display: block; }
-    .result-hero { padding: 24px; color: #fff; border-radius: 18px; background: linear-gradient(120deg, #164f55, #2d827c); }
+    .result-hero { padding: 24px; color: #fff; border-radius: 18px; background: linear-gradient(120deg, #713515, #9a4f24); }
     .result-hero h2 { margin: 0 0 8px; font-size: 2rem; }
     .result-big { font-size: clamp(2.5rem, 7vw, 4.8rem); font-weight: 900; line-height: 1; }
     .result-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin: 18px 0; }
@@ -148,14 +148,14 @@
   <main class="shell">
     <header class="topbar">
       <div>
-        <p class="eyebrow">DHEAL · Lecture 02</p>
-        <h1>Healthcare Data: From Clinical Care to AI-Ready Data</h1>
-        <p class="subtitle">Aktiver Verständnischeck zu klinischen Daten, Kontext, Interoperabilität und validen Vorhersagen</p>
+        <p class="eyebrow">SWS1 · Lecture 02</p>
+        <h1>Secure Development Lifecycle</h1>
+        <p class="subtitle">Active understanding check on security activities, their lifecycle position, and how they complement each other</p>
       </div>
-      <div class="scorebox" aria-live="polite"><strong id="scoreText">0 / 100 Punkte</strong><span id="percentText">0 % · noch keine Endnote</span></div>
+      <div class="scorebox" aria-live="polite"><strong id="scoreText">0 / 100 points</strong><span id="percentText">0 % · no final grade yet</span></div>
       <div class="progress-wrap">
         <div class="progress-track"><div class="progress-fill" id="progressFill"></div></div>
-        <div class="progress-labels"><span id="progressText">0 / 12 Aufgaben</span><span id="streakText">Streak: 0</span></div>
+        <div class="progress-labels"><span id="progressText">0 / 12 questions</span><span id="streakText">Streak: 0</span></div>
       </div>
     </header>
 
@@ -165,18 +165,18 @@
         <div id="resultView" class="result"></div>
       </section>
       <aside class="side-card">
-        <h2>Aufgabenübersicht</h2>
+        <h2>Question overview</h2>
         <div class="overview" id="overview"></div>
-        <div class="mini-stat"><span>Bearbeitet</span><strong id="doneSide">0 / 12</strong></div>
-        <div class="mini-stat"><span>Aktuelle Punkte</span><strong id="pointsSide">0 / 100</strong></div>
-        <div class="mini-stat"><span>Lernnote</span><strong id="gradeSide">am Ende</strong></div>
+        <div class="mini-stat"><span>Completed</span><strong id="doneSide">0 / 12</strong></div>
+        <div class="mini-stat"><span>Current score</span><strong id="pointsSide">0 / 100</strong></div>
+        <div class="mini-stat"><span>Self-assessment grade</span><strong id="gradeSide">shown at the end</strong></div>
         <div class="actions">
-          <button class="btn secondary" id="saveBtn" type="button">Zwischenstand speichern</button>
-          <button class="btn primary" id="finishBtn" type="button" disabled>Review abschliessen</button>
-          <button class="btn ghost" id="resetBtn" type="button">Fortschritt zurücksetzen</button>
+          <button class="btn secondary" id="saveBtn" type="button">Save progress</button>
+          <button class="btn primary" id="finishBtn" type="button" disabled>Finish review</button>
+          <button class="btn ghost" id="resetBtn" type="button">Reset progress</button>
         </div>
-        <p class="save-note" id="saveNotice" aria-live="polite">Änderungen werden auch automatisch lokal gespeichert.</p>
-        <p class="source-note">Quelle: <strong>02.digital-health.healthcare-data_moodle.pdf</strong>, Folien 1–36. Die Note ist eine Selbsteinschätzung, keine offizielle Hochschulnote.</p>
+        <p class="save-note" id="saveNotice" aria-live="polite">Changes are also saved locally and automatically.</p>
+        <p class="source-note">Source: <strong>W2_SecureDevelopmentLifecycle.pdf</strong>, Slides 1–26. The grade is a self-assessment, not an official university grade.</p>
       </aside>
     </div>
   </main>
@@ -184,198 +184,326 @@
   <script>
     const questions = [
       {
-        id: "care-data", type: "single", topic: "Clinical workflow", points: 6,
-        prompt: "Welche Aussage beschreibt am besten, wie aus klinischer Versorgung ein Patientendatensatz entsteht?",
-        options: [
-          "Der Patient erzeugt während der Behandlung automatisch genau eine vollständige Tabellenzeile.",
-          "Klinische Abläufe erzeugen Beobachtungen zu verschiedenen Zeiten und Zwecken; ein Datensatz ist eine für eine konkrete Frage konstruierte Repräsentation.",
-          "Alle relevanten Daten entstehen erst beim Spitalaustritt im EHR.",
-          "Ein einzelnes Informationssystem enthält normalerweise die vollständige Patient Journey."
-        ], correct: 1,
-        optionExplanations: [
-          "In der Versorgung entstehen viele einzelne Beobachtungen; eine vollständige Tabellenzeile wird nicht automatisch erzeugt.",
-          "Ein Analysedatensatz entsteht erst durch Auswahl, Verknüpfung und zeitliche Abgrenzung passend zur Fragestellung.",
-          "Daten entstehen laufend vor, während und nach dem Aufenthalt und nicht erst beim Austritt.",
-          "Die Patient Journey ist typischerweise auf mehrere Systeme und Organisationseinheiten verteilt."
+        "id": "sdl-core",
+        "type": "single",
+        "topic": "Core idea of an SDL",
+        "points": 6,
+        "prompt": "Which statement best describes a Secure Development Lifecycle (SDL)?",
+        "options": [
+          "A separate development process that replaces agile and iterative processes.",
+          "A set of security activities applied during the appropriate phases of an existing development process.",
+          "A penetration test performed immediately before release.",
+          "An approach in which security problems are fixed only after deployment."
         ],
-        solution: "Klinische Versorgung erzeugt verteilte, heterogene und longitudinale Beobachtungen. Die Zeile pro Patient entsteht erst durch Auswahl und Zusammenführung für eine bestimmte klinische oder Forschungsfrage.",
-        reference: "Folien 7–8", concepts: ["Clinical workflow", "Dataset representation"]
-      },
-      {
-        id: "modalities", type: "multi", topic: "Data modalities", points: 7,
-        prompt: "Welche Zuordnungen von Datenmodalität und natürlicher Struktur sind korrekt?",
-        hint: "Wähle alle korrekten Aussagen.",
-        options: [
-          "Clinical text – Sequenz von Wörtern bzw. Tokens",
-          "Medical imaging – 3D-Volumen plus Metadaten",
-          "Physiological signals – Zeitreihe von Samples",
-          "Alle Modalitäten – identische flache Tabelle ohne Informationsverlust",
-          "ECG – räumliche Anatomie ohne zeitliche Dynamik"
-        ], correct: [0,1,2],
-        optionExplanations: [
-          "Klinischer Text hat eine sprachliche Reihenfolge; Wörter beziehungsweise Tokens bilden eine Sequenz.",
-          "Bildgebung besitzt räumliche Dimensionen und braucht Metadaten wie Orientierung, Modalität und Aufnahmeparameter.",
-          "Physiologische Signale bestehen aus Messwerten über die Zeit und sind damit Zeitreihen.",
-          "Beim Erzwingen einer flachen Tabelle gehen natürliche Struktur, Beziehungen oder zeitliche Information verloren.",
-          "Ein ECG bildet elektrische Aktivität über die Zeit ab und ist keine rein räumliche Anatomiedarstellung."
+        "correct": 1,
+        "optionExplanations": [
+          "An SDL does not replace the underlying process. Its security activities can be applied to waterfall, iterative, and agile processes.",
+          "This is the central idea: security is considered throughout development by applying appropriate security activities.",
+          "Penetration testing is only one of several activities and cannot cover the lifecycle by itself.",
+          "This would be a reactive penetrate-and-patch approach, which the lecture argues against."
         ],
-        solution: "Text, Bilder und Signale kodieren Information grundsätzlich unterschiedlich: als sprachliche Sequenz, räumliches Volumen mit Metadaten beziehungsweise zeitliche Signalfolge.",
-        reference: "Folien 10 und 13", concepts: ["Data modalities", "Representation"]
+        "solution": "An SDL is not a new software development process. It adds security activities to the requirements, architecture and design, implementation, testing, and operations phases of an existing process.",
+        "reference": "Slides 4–7",
+        "concepts": [
+          "SDL concept",
+          "Process independence"
+        ]
       },
       {
-        id: "representation-chain", type: "order", topic: "From patient to model", points: 8,
-        prompt: "Bringe die Stationen von der klinischen Realität bis zum tatsächlichen Modell-Input in die richtige Reihenfolge.",
-        items: ["Clinical reality", "Care systems", "Raw data", "Analysis dataset", "Model input"],
-        initial: [2,0,4,1,3], correct: [0,1,2,3,4],
-        solution: "Clinical reality → Care systems → Raw data → Analysis dataset → Model input. Jeder Übergang enthält Modellierungsentscheidungen und verändert, was das Modell lernen kann.",
-        reference: "Folie 27", concepts: ["Dataset representation", "Modelling decisions"]
-      },
-      {
-        id: "glucose-context", type: "text", topic: "Semantics and provenance", points: 9,
-        prompt: "In einem Export steht nur „glucose = 100“. Erkläre, warum das für eine klinische Interpretation nicht genügt und welche Informationen du zusätzlich brauchst.",
-        hint: "Denke nicht nur an die Einheit, sondern auch an Entstehung und Zeitpunkt.",
-        solution: "Benötigt werden mindestens Einheit, Messzeitpunkt, klinischer Kontext beziehungsweise Messbedingung und Provenance: zum Beispiel mg/dL oder mmol/L, nüchtern oder nach einer Mahlzeit, vor oder nach Behandlung sowie Labor, Gerät/Assay und Referenzbereich. Ein Zahlenwert ohne Metadaten ist unvollständig.",
-        reference: "Folien 11 und 18", concepts: ["Clinical context", "Metadata", "Data provenance"]
-      },
-      {
-        id: "longitudinal-feature", type: "single", topic: "Longitudinal features", points: 7,
-        prompt: "Vor dem Prediction Time Point liegen Kreatininwerte 105, 118 und 127 µmol/L vor. Welche Aussage ist korrekt?",
-        options: [
-          "Der Patient hat genau einen objektiv richtigen Kreatininwert: 127.",
-          "Erster Wert, letzter Wert, Maximum, Mittelwert oder Veränderung sind mögliche Features mit unterschiedlicher Bedeutung.",
-          "Zeitpunkte sind nur Metadaten und verändern das Feature nicht.",
-          "Für Modelle muss immer der Mittelwert verwendet werden."
-        ], correct: 1,
-        optionExplanations: [
-          "127 ist nur der letzte Messwert; je nach Fragestellung können andere Zusammenfassungen sinnvoll sein.",
-          "Die Feature-Definition entscheidet, welcher Aspekt des longitudinalen Verlaufs für das Modell sichtbar wird.",
-          "Zeitpunkt und Reihenfolge bestimmen die klinische Bedeutung und müssen bei der Feature-Bildung berücksichtigt werden.",
-          "Die passende Aggregation hängt von Vorhersagefrage und klinischer Bedeutung ab; ein Mittelwert ist nicht immer richtig."
+        "id": "process-application",
+        "type": "multi",
+        "topic": "Applying an SDL to different processes",
+        "points": 7,
+        "prompt": "Which statements about applying security activities are correct?",
+        "hint": "Select all correct statements.",
+        "options": [
+          "In a waterfall process, each associated security activity is typically performed once.",
+          "In iterative or agile processes, security activities are repeated to the degree appropriate for each iteration.",
+          "Threat modeling may only start after all source code has been completed.",
+          "The activities are associated with development phases rather than with one specific overall process.",
+          "A team must adopt the Microsoft SDL unchanged for its process to qualify as an SDL."
         ],
-        solution: "Longitudinale Beobachtungen müssen durch einen Zeitpunkt, ein Zeitfenster oder eine Aggregationsregel in Features überführt werden. Jede Wahl – etwa first, last, maximum, mean oder change – verändert die Bedeutung.",
-        reference: "Folie 12", concepts: ["Longitudinal data", "Feature engineering", "Timing"]
-      },
-      {
-        id: "missingness", type: "multi", topic: "Informative missingness", points: 8,
-        prompt: "Warum kann ein fehlender Laborwert in klinischen Daten auftreten?",
-        hint: "Wähle alle von der Vorlesung gestützten Gründe.",
-        options: [
-          "Der Test war klinisch nicht angezeigt und wurde nicht angeordnet.",
-          "Der Test wurde angeordnet, aber nicht durchgeführt.",
-          "Das Resultat existiert in einem anderen Informationssystem.",
-          "Ein technischer oder betrieblicher Fehler verhinderte die Verfügbarkeit.",
-          "Fehlende Werte entstehen immer rein zufällig."
-        ], correct: [0,1,2,3],
-        optionExplanations: [
-          "Nicht angeordnete Tests spiegeln klinische Entscheidungen wider; ihr Fehlen kann deshalb informativ sein.",
-          "Zwischen Anordnung und Durchführung kann der Prozess abbrechen, wodurch kein Resultat entsteht.",
-          "Fragmentierte Informationssysteme können dazu führen, dass ein vorhandenes Resultat im betrachteten Export fehlt.",
-          "Geräte-, Schnittstellen- oder Betriebsprobleme können Werte trotz klinischer Absicht unzugänglich machen.",
-          "Klinische Missingness ist häufig systematisch und vom Workflow abhängig, also nicht immer zufällig."
+        "correct": [
+          0,
+          1,
+          3
         ],
-        solution: "Missingness kann aus Entscheidungen, Workflows, verteilten Systemen oder technischen Problemen entstehen. Deshalb kann das Fehlen selbst Information über den Versorgungsprozess tragen.",
-        reference: "Folien 16–17", concepts: ["Missingness", "Clinical workflow"]
-      },
-      {
-        id: "outlier", type: "single", topic: "Data quality", points: 7,
-        prompt: "Eine Herzfrequenz von 190 bpm fällt stark aus der Verteilung. Was ist der fachlich richtige erste Schritt?",
-        options: [
-          "Den Wert automatisch löschen, weil er statistisch extrem ist.",
-          "Den Wert durch den Mittelwert ersetzen.",
-          "Kontext prüfen: Waveform/ECG, Nachbarwerte, Notizen, Medikamente, Timestamp und Gerät.",
-          "Den gesamten Patienten aus dem Datensatz entfernen."
-        ], correct: 2,
-        optionExplanations: [
-          "Ein extremer Wert kann echte kritische Physiologie darstellen; automatisches Löschen könnte wichtige Information entfernen.",
-          "Eine Ersetzung ohne Ursachenprüfung kann ein Artefakt verdecken oder einen echten Notfall verfälschen.",
-          "Erst der klinische und technische Kontext zeigt, ob der Wert plausibel, fehlerhaft oder behandlungsbedingt ist.",
-          "Ein einzelner auffälliger Messwert rechtfertigt nicht, sämtliche Daten dieses Patienten zu verwerfen."
+        "optionExplanations": [
+          "In a traditional waterfall process, a phase is usually performed once, so its security activity is typically performed once as well.",
+          "Requirements, design, and code grow across iterations; the corresponding security activities grow with them.",
+          "Threat modeling primarily belongs to requirements and architecture/design and should be performed early and repeatedly.",
+          "This phase-oriented approach makes the activities applicable to waterfall, the Unified Process, and agile development.",
+          "The lecture focuses on common activities and explicitly allows practices from different SDL approaches to be combined."
         ],
-        solution: "Ein Ausreisser kann Artefakt oder klinisch wichtige Physiologie sein. Statistische Auffälligkeit allein reicht nicht; zuerst muss der klinische und technische Kontext untersucht werden.",
-        reference: "Folie 19", concepts: ["Data quality", "Outliers", "Clinical context"]
+        "solution": "Security activities are attached to phases of the chosen development process. If a phase is repeated, its corresponding security activity is repeated as well.",
+        "reference": "Slides 5–7",
+        "concepts": [
+          "Process independence",
+          "Iterative application"
+        ]
       },
       {
-        id: "proxy-label", type: "text", topic: "Targets and labels", points: 10,
-        prompt: "Ein Modell soll Patient deterioration vorhersagen. Als Label wird ICU admission verwendet. Erkläre den Proxy-Label-Risikofaktor.",
-        solution: "ICU admission ist beobachtbar und leicht aus dem EHR zu extrahieren, entspricht aber nicht allein der physiologischen Verschlechterung. Sie hängt zusätzlich von klinischen Entscheidungen, Behandlungszielen, Bettverfügbarkeit und lokaler Spitalpraxis ab. Das Modell kann dadurch Prozesse des Gesundheitssystems statt nur den Patientenzustand lernen.",
-        reference: "Folien 20–21", concepts: ["Targets and labels", "Proxy labels", "Validity"]
-      },
-      {
-        id: "systems", type: "single", topic: "Clinical information systems", points: 8,
-        prompt: "Welche Kombination beschreibt DICOM, PACS und den Radiologiebericht korrekt?",
-        options: [
-          "DICOM speichert nur den Befundtext; PACS erstellt automatisch die Diagnose.",
-          "DICOM repräsentiert Bilder plus Metadaten; PACS speichert und ruft Studien ab; der Bericht enthält die klinische Interpretation.",
-          "PACS ist ein standardisierter FHIR-Ressourcentyp für Laborwerte.",
-          "Ein DICOM Study enthält Pixelwerte, aber grundsätzlich keine Metadaten."
-        ], correct: 1,
-        optionExplanations: [
-          "DICOM umfasst Bildpixel und strukturierte Metadaten; die Diagnose entsteht nicht automatisch im PACS.",
-          "DICOM definiert Bild und Metadaten, PACS verwaltet die Studien, und der Report dokumentiert die ärztliche Interpretation.",
-          "PACS ist ein Bildarchivierungs- und Kommunikationssystem und keine FHIR-Ressource für Laborwerte.",
-          "DICOM-Metadaten sind wesentlich, damit Pixel räumlich und klinisch interpretierbar bleiben."
+        "id": "activity-order",
+        "type": "order",
+        "topic": "Security activities across the lifecycle",
+        "points": 8,
+        "prompt": "Arrange the activities according to their primary position in the development lifecycle. The horizontal Security Risk Analysis activity is not included.",
+        "items": [
+          "Security Requirements",
+          "Threat Modeling",
+          "Security Design / Controls",
+          "Secure Coding",
+          "Code Review",
+          "Penetration Testing",
+          "Security Operations"
         ],
-        solution: "DICOM standardisiert Bilddaten und interpretierbare Metadaten. PACS ist das Archivierungs- und Kommunikationssystem; die radiologische Interpretation erscheint im Report.",
-        reference: "Folie 25", concepts: ["PACS", "DICOM", "Clinical information systems"]
-      },
-      {
-        id: "fhir", type: "multi", topic: "Interoperability", points: 8,
-        prompt: "Welche Aussagen zu FHIR sind gemäss Vorlesung korrekt?",
-        options: [
-          "FHIR repräsentiert Healthcare Information als standardisierte, verlinkbare Ressourcen.",
-          "Das Ziel ist eine einzige riesige Tabelle für alle klinischen Daten.",
-          "Ressourcen wie Patient, Encounter, Observation und Condition können miteinander verknüpft werden.",
-          "Die Ressourcen helfen, Beziehungen und Bedeutung über Systeme hinweg zu bewahren.",
-          "FHIR ersetzt die klinischen Workflows, in denen Daten entstehen."
-        ], correct: [0,2,3],
-        optionExplanations: [
-          "FHIR modelliert Informationen als standardisierte Ressourcen, die ausgetauscht und referenziert werden können.",
-          "FHIR bewahrt fachliche Strukturen und Beziehungen; es reduziert nicht alles auf eine einzige Giant Table.",
-          "Referenzen zwischen Ressourcen bilden Beziehungen wie Patient, Aufenthalt, Beobachtung und Diagnose ab.",
-          "Gemeinsame Strukturen und Codes helfen, Bedeutung beim Austausch zwischen Systemen zu erhalten.",
-          "FHIR beschreibt und transportiert Daten, ersetzt aber nicht die klinischen Prozesse, in denen sie entstehen."
+        "initial": [
+          3,
+          0,
+          5,
+          2,
+          6,
+          1,
+          4
         ],
-        solution: "FHIR schafft eine gemeinsame, austauschbare Struktur aus verlinkten Ressourcen. Es geht nicht um eine Giant Table und nicht darum, die klinische Entstehung der Daten zu ersetzen.",
-        reference: "Folie 26", concepts: ["FHIR", "Interoperability"]
-      },
-      {
-        id: "leakage", type: "multi", topic: "Temporal leakage", points: 10,
-        prompt: "Prediction Time ist 24 Stunden nach Aufnahme; vorhergesagt wird deterioration in den nächsten 48 Stunden. Welche Inputs sind zulässig?",
-        hint: "Wähle nur Informationen, die am Prediction Time Point tatsächlich bekannt sind.",
-        options: [
-          "Alter, bei Aufnahme dokumentiert",
-          "Erste Herzfrequenz um 08:15 Uhr",
-          "Maximale Herzfrequenz innerhalb der ersten 24 Stunden",
-          "Kreatininresultat, das erst nach 26 Stunden berichtet wurde",
-          "ICU transfer nach 36 Stunden",
-          "Discharge diagnosis",
-          "Length of stay",
-          "Medikation, die an Tag 4 gestartet wurde"
-        ], correct: [0,1,2],
-        optionExplanations: [
-          "Das Alter ist bereits bei Aufnahme bekannt und liegt damit vor dem Prediction Time Point vor.",
-          "Die erste Herzfrequenz wurde vor t0 gemessen und kann als frühes Feature verwendet werden.",
-          "Das Maximum des vollständig abgeschlossenen 0–24-Stunden-Fensters ist bei t0 berechenbar.",
-          "Ein erst nach 26 Stunden berichtetes Resultat war bei t0 noch nicht verfügbar und würde Zukunftsinformation einbringen.",
-          "Der ICU-Transfer nach 36 Stunden liegt im Vorhersagezeitraum und darf nicht als Eingabe dienen.",
-          "Die Austrittsdiagnose ist erst später bekannt und würde Information aus der Zukunft verraten.",
-          "Die Aufenthaltsdauer steht erst am Ende vollständig fest und ist bei t0 unbekannt.",
-          "Eine erst an Tag 4 gestartete Medikation liegt nach t0 und darf nicht in die Eingaben einfliessen."
+        "correct": [
+          0,
+          1,
+          2,
+          3,
+          4,
+          5,
+          6
         ],
-        solution: "Zulässig sind Alter, erste Herzfrequenz und das Maximum aus dem abgeschlossenen 0–24-h-Fenster. Alles, was erst nach t0 bekannt wird, leakt Information aus der Zukunft.",
-        reference: "Folien 29–31", concepts: ["Prediction time", "Temporal leakage", "Observation window"]
+        "solution": "Security Requirements → Threat Modeling → Security Design / Controls → Secure Coding → Code Review → Penetration Testing → Security Operations. In practice, feedback loops exist; this sequence shows each activity's primary lifecycle position.",
+        "reference": "Slides 5–6 and 9–19",
+        "concepts": [
+          "Security activities",
+          "Lifecycle mapping"
+        ]
       },
       {
-        id: "boss", type: "text", topic: "Boss Question – Data Reality Check", points: 12,
-        prompt: "Ein Team will bei Spitalaufnahme ein Modell für Verschlechterung entwickeln. Formuliere einen sauberen Prediction Task und nenne mindestens vier konkrete Prüfungen aus dem Data Reality Check, bevor das Modell trainiert wird.",
-        hint: "Verbinde Population, Prediction Time, Observation Window, Target und mögliche Datenprobleme.",
-        solution: "Beispiel: Für definierte stationär aufgenommene Erwachsene soll bei t0 = 24 h nach Aufnahme mit ausschliesslich bis dahin verfügbaren Daten eine Verschlechterung in den folgenden 48 h vorhergesagt werden. Vor dem Training sind mindestens zu prüfen: Population (Ein-/Ausschlüsse und Zielpopulation), Time (Messung und Verfügbarkeit bei t0), Measurement (Gerät/Assay/Workflow/Definition), Missingness (warum fehlt etwas und ist das informativ?), Target (wie wurde deterioration operationalisiert, ist es ein Proxy?) und Setting (Unterschiede zwischen Spitälern, Populationen oder Zeitperioden). Zusätzlich müssen Provenance und Transformationen von Care Systems über Raw Data bis zu Features explizit sein.",
-        reference: "Folien 22, 29–32 und 35", concepts: ["Problem formulation", "Data Reality Check", "Validity", "Temporal leakage"]
+        "id": "requirement-quality",
+        "type": "text",
+        "topic": "Security Requirements",
+        "points": 8,
+        "prompt": "Evaluate the requirement: ‘Implement Spring Security with RBAC in controller X.’ Why is it problematic as an early security requirement, and how would you formulate it more appropriately?",
+        "hint": "Separate the required security outcome from the later technical solution.",
+        "solution": "The statement already fixes the framework, mechanism, and implementation location. A security requirement should be specific and understandable, but preferably technology-agnostic. A better formulation is: ‘For every access to protected functionality and data, the authorization of the authenticated user must be checked.’ Whether Spring Security and RBAC are appropriate is decided later during Security Design / Controls.",
+        "reference": "Slides 9–10 and 12–14",
+        "concepts": [
+          "Security Requirements",
+          "Security Design / Controls"
+        ]
+      },
+      {
+        "id": "threat-modeling",
+        "type": "order",
+        "topic": "Threat Modeling",
+        "points": 9,
+        "prompt": "Put the simplified threat-modeling procedure in the correct order.",
+        "items": [
+          "View the system from the perspective of a realistic attacker",
+          "Identify possible threats and attack goals",
+          "Examine the current design and existing controls for vulnerabilities",
+          "Derive additional security requirements to mitigate the vulnerabilities"
+        ],
+        "initial": [
+          2,
+          0,
+          3,
+          1
+        ],
+        "correct": [
+          0,
+          1,
+          2,
+          3
+        ],
+        "solution": "First adopt the attacker's point of view, then identify threats. Next, search the current design for vulnerabilities and feed identified gaps back into the Security Requirements activity so that suitable countermeasures are required.",
+        "reference": "Slide 11",
+        "concepts": [
+          "Threat Modeling",
+          "Attacker perspective",
+          "Design flaws"
+        ]
+      },
+      {
+        "id": "bug-or-flaw",
+        "type": "single",
+        "topic": "Security bug vs. security design flaw",
+        "points": 8,
+        "prompt": "An application checks authorization only when displaying the menu, but not for direct API requests. Which activity should primarily have prevented or detected this conceptual error early?",
+        "options": [
+          "Threat Modeling",
+          "Compiler warnings",
+          "Security Operations",
+          "Only a code-style linter"
+        ],
+        "correct": 0,
+        "optionExplanations": [
+          "Threat modeling evaluates whether requirements and controls are sufficient against realistic attacks and therefore targets security design flaws.",
+          "Compiler warnings help with implementation problems but do not reliably detect a missing authorization strategy.",
+          "Security Operations may monitor attacks in production, but that is too late to primarily prevent the design flaw.",
+          "A style linter checks formatting and simple patterns, not the completeness of the security design."
+        ],
+        "solution": "Missing consistent authorization is a security design flaw. Threat modeling should expose direct API access as a threat and lead to an appropriate requirement and security control.",
+        "reference": "Slides 10–12 and 16",
+        "concepts": [
+          "Threat Modeling",
+          "Design flaws",
+          "Authorization"
+        ]
+      },
+      {
+        "id": "coding-review",
+        "type": "multi",
+        "topic": "Secure Coding and Code Review",
+        "points": 8,
+        "prompt": "Which statements correctly distinguish Secure Coding from Code Review?",
+        "options": [
+          "Secure Coding implements the specified controls correctly and tries to avoid introducing new security bugs.",
+          "Code Review searches for security bugs introduced during implementation.",
+          "By reading code alone, Code Review can discover practically all security design flaws.",
+          "Automated code analysis is common; manual review is especially reasonable for highly security-critical sections.",
+          "Compiler warnings about insecure or deprecated functions should be ignored if tests pass."
+        ],
+        "correct": [
+          0,
+          1,
+          3
+        ],
+        "optionExplanations": [
+          "Secure Coding covers both the correct implementation of security controls and the avoidance of general security bugs.",
+          "This is the primary goal of Code Review in the lecture.",
+          "Many design flaws are virtually impossible to identify from code alone and should be addressed by Threat Modeling.",
+          "Automation scales, while focused manual review complements it where the security risk is particularly high.",
+          "Such warnings often indicate real security risks and should be taken seriously."
+        ],
+        "solution": "Secure Coding is preventive work during implementation; Code Review is the subsequent search for implementation errors. Security design flaws mainly require early analysis activities.",
+        "reference": "Slides 15–16",
+        "concepts": [
+          "Secure Coding",
+          "Code Review",
+          "Security bugs"
+        ]
+      },
+      {
+        "id": "penetration-testing",
+        "type": "single",
+        "topic": "Penetration Testing",
+        "points": 8,
+        "prompt": "Which combination describes the two purposes of penetration testing in an SDL?",
+        "options": [
+          "Writing requirements and selecting the programming language",
+          "Verifying that security requirements are fulfilled in the running system and checking that no security bugs were introduced",
+          "Only configuring network devices and archiving logs",
+          "Completely reconstructing the design from source code and eliminating every risk"
+        ],
+        "correct": 1,
+        "optionExplanations": [
+          "These are planning decisions, not the two purposes of Penetration Testing.",
+          "The test examines the complete running system in reality and checks both implemented requirements and possible bugs.",
+          "Configuration and monitoring belong mainly to Security Operations; Penetration Testing actively takes the attacker's view.",
+          "Penetration Testing provides valuable evidence but cannot guarantee completeness or eliminate every risk."
+        ],
+        "solution": "Penetration Testing takes the attacker's view of the running system. It validates the practical fulfillment of security requirements and checks for security bugs.",
+        "reference": "Slide 17",
+        "concepts": [
+          "Penetration Testing",
+          "System validation"
+        ]
+      },
+      {
+        "id": "operations-risk",
+        "type": "multi",
+        "topic": "Security Operations and Security Risk Analysis",
+        "points": 8,
+        "prompt": "Which statements are correct according to the lecture?",
+        "options": [
+          "Security Operations includes secure configuration, updates, and monitoring during operation.",
+          "Monitoring remains important because preventive security measures may fail.",
+          "Security Risk Analysis rates the criticality of detected problems and supports prioritization decisions.",
+          "Every low-risk vulnerability must immediately be fixed with maximum effort.",
+          "Security Risk Analysis exclusively finds new bugs in source code."
+        ],
+        "correct": [
+          0,
+          1,
+          2
+        ],
+        "optionExplanations": [
+          "These ongoing tasks are part of operating a system securely.",
+          "Without monitoring, detecting that a system has been compromised is very difficult.",
+          "Risk Analysis is horizontal and assesses findings from activities such as Threat Modeling or Penetration Testing.",
+          "For a low-risk issue, a conscious decision may be made to do nothing; the decision should be risk-based.",
+          "Finding source-code bugs is primarily a Code Review task; Risk Analysis evaluates problems that have already been detected."
+        ],
+        "solution": "Security Operations protects and monitors the production system. Security Risk Analysis complements all phases by rating detected vulnerabilities and supporting decisions about countermeasures.",
+        "reference": "Slides 18–19",
+        "concepts": [
+          "Security Operations",
+          "Security Risk Analysis"
+        ]
+      },
+      {
+        "id": "incremental-adoption",
+        "type": "text",
+        "topic": "Incremental adoption of an SDL",
+        "points": 9,
+        "prompt": "A small team cannot introduce all security activities at once. Justify a reasonable incremental adoption strategy and explain why the long-term goal should still include all activities.",
+        "solution": "One possible sequence is to start with automated Code Reviews because they can find many implementation errors, then add Threat Modeling to cover design flaws, and use Penetration Testing for feedback about the real security of the complete system. Other starting points are possible. Every added activity improves security, but no single activity covers everything. In the long term, all are needed because they address different phases, error classes, and feedback needs.",
+        "reference": "Slide 21",
+        "concepts": [
+          "Incremental adoption",
+          "Complementary activities"
+        ]
+      },
+      {
+        "id": "shift-left",
+        "type": "single",
+        "topic": "Fixing Earlier is Better",
+        "points": 9,
+        "prompt": "Shortly before release, a penetration test reveals that the entire access-control design is unsuitable. Which conclusion best matches the lecture?",
+        "options": [
+          "Late testing is sufficient because every design flaw can be patched locally.",
+          "Early activities could have prevented the fundamental flaw; discovering it late will probably require expensive redesign.",
+          "The problem proves that Threat Modeling is useful only after release.",
+          "The finding should be ignored until an actual attack has been documented."
+        ],
+        "correct": 1,
+        "optionExplanations": [
+          "Fundamental design problems often affect many components and cannot be reliably solved with local patches.",
+          "Security Requirements, Threat Modeling, and Security Design / Controls can prevent such flaws early and avoid expensive rework.",
+          "Threat Modeling should be used early and repeated as the design grows.",
+          "A demonstrated fundamental design flaw is security-relevant even if no successful attack is yet known."
+        ],
+        "solution": "Early activities are preventive. If a fundamental design flaw is found only during a late penetration test, the result is often expensive redesign, quick fixes, and a return to the penetrate-and-patch cycle.",
+        "reference": "Slides 22–23",
+        "concepts": [
+          "Early defect prevention",
+          "Penetrate and patch"
+        ]
+      },
+      {
+        "id": "boss",
+        "type": "text",
+        "topic": "Boss Question – Applying an SDL",
+        "points": 12,
+        "prompt": "A team is iteratively developing a webshop with customer and administration areas. Outline a sensible security plan for the next iteration: name at least five security activities, explain their concrete contribution, and include at least one feedback loop between activities.",
+        "hint": "Consider requirements, the attacker view, controls, implementation, review, testing, operations, and risk.",
+        "solution": "Example: Security Requirements demand authorization on every access and strong administrator authentication. Threat Modeling considers direct API requests, session hijacking, and attacks against administration functions; identified gaps create additional requirements. Security Design / Controls selects framework-based RBAC, MFA, and possibly a separate administration application. Secure Coding implements these controls correctly and avoids new bugs. Code Review searches for implementation errors. Penetration Testing attacks the running iteration and validates the requirements. Security Risk Analysis prioritizes findings; Security Operations plans secure configuration, updates, and monitoring. The activities are repeated when new functionality is added in later iterations.",
+        "reference": "Slides 5–23",
+        "concepts": [
+          "Applying an SDL",
+          "Complementary activities",
+          "Iterative application"
+        ]
       }
     ];
 
-    const STORAGE_KEY = "dheal-w2-healthcare-data-review-v1";
-    const DASHBOARD_QUIZ_ID = "dheal-w2-healthcare-data";
+    const STORAGE_KEY = "sws1-w2-secure-development-lifecycle-review-v1";
+    const DASHBOARD_QUIZ_ID = "sws1-w2-secure-development-lifecycle";
     const maxPoints = questions.reduce((sum, question) => sum + question.points, 0);
     const defaultState = () => ({
       current: 0, answers: {}, order: {}, results: {}, revealed: {}, completed: false,
@@ -402,7 +530,7 @@
     function completedCount() { return questions.filter(isDone).length; }
     function formatPoints(value) { return Number.isInteger(value) ? value : value.toFixed(1); }
     function grade(score) { return (1 + 5 * score / maxPoints).toFixed(1); }
-    function statusLabel(status) { return status === "correct" ? "Richtig" : status === "partial" ? "Teilweise richtig" : status === "wrong" ? "Falsch" : "Übersprungen"; }
+    function statusLabel(status) { return status === "correct" ? "Correct" : status === "partial" ? "Partially correct" : status === "wrong" ? "Incorrect" : "Skipped"; }
 
     function streak() {
       let best = 0, current = 0;
@@ -418,14 +546,14 @@
       const score = earned();
       const done = completedCount();
       const percentage = Math.round(score / maxPoints * 100);
-      document.getElementById("scoreText").textContent = `${formatPoints(score)} / ${maxPoints} Punkte`;
-      document.getElementById("percentText").textContent = state.completed ? `${percentage} % · Note ${grade(score)}` : `${percentage} % · noch keine Endnote`;
-      document.getElementById("progressText").textContent = `${done} / ${questions.length} Aufgaben`;
+      document.getElementById("scoreText").textContent = `${formatPoints(score)} / ${maxPoints} points`;
+      document.getElementById("percentText").textContent = state.completed ? `${percentage} % · Note ${grade(score)}` : `${percentage} % · no final grade yet`;
+      document.getElementById("progressText").textContent = `${done} / ${questions.length} questions`;
       document.getElementById("progressFill").style.width = `${done / questions.length * 100}%`;
       document.getElementById("streakText").textContent = `Streak: ${streak()}`;
       document.getElementById("doneSide").textContent = `${done} / ${questions.length}`;
       document.getElementById("pointsSide").textContent = `${formatPoints(score)} / ${maxPoints}`;
-      document.getElementById("gradeSide").textContent = state.completed ? grade(score) : "am Ende";
+      document.getElementById("gradeSide").textContent = state.completed ? grade(score) : "shown at the end";
       document.getElementById("saveBtn").disabled = state.completed;
       document.getElementById("finishBtn").disabled = done !== questions.length;
       renderOverview();
@@ -435,7 +563,7 @@
       const overview = document.getElementById("overview");
       overview.innerHTML = questions.map((question, index) => {
         const status = resultFor(question.id)?.status || "";
-        return `<button class="dot ${status} ${!state.completed && state.current === index ? "current" : ""}" data-jump="${index}" aria-label="Aufgabe ${index + 1}: ${status || "unbeantwortet"}">${index + 1}</button>`;
+        return `<button class="dot ${status} ${!state.completed && state.current === index ? "current" : ""}" data-jump="${index}" aria-label="Question ${index + 1}: ${status || "unanswered"}">${index + 1}</button>`;
       }).join("");
       overview.querySelectorAll("[data-jump]").forEach(button => button.addEventListener("click", () => {
         state.completed = false;
@@ -453,7 +581,7 @@
           const correct = Array.isArray(question.correct) ? question.correct.includes(index) : question.correct === index;
           const chosen = selected.includes(index);
           const reviewClass = isDone(question) ? (correct ? "answer-correct" : "answer-wrong") : "";
-          const label = !isDone(question) ? "" : correct ? (chosen ? "✓ Richtig gewählt" : "✓ Richtige Antwort – nicht gewählt") : (chosen ? "✕ Falsch gewählt" : "✕ Nicht korrekt");
+          const label = !isDone(question) ? "" : correct ? (chosen ? "✓ Correctly selected" : "✓ Correct answer – not selected") : (chosen ? "✕ Incorrectly selected" : "✕ Not correct");
           return `<label class="option ${reviewClass}"><input ${disabled} type="${inputType}" name="answer" value="${index}" ${chosen ? "checked" : ""}><span>${escapeHtml(option)}${label ? `<small class="answer-label">${label}</small>` : ""}</span></label>`;
         }).join("")}</div>`;
       }
@@ -463,28 +591,28 @@
           const correctPosition = question.correct.indexOf(itemIndex);
           const correct = correctPosition === position;
           const reviewClass = isDone(question) ? (correct ? "answer-correct" : "answer-wrong") : "";
-          const label = !isDone(question) ? "" : correct ? "✓ Position richtig" : `✕ Gehört auf Position ${correctPosition + 1}`;
+          const label = !isDone(question) ? "" : correct ? "✓ Correct position" : `✕ Expected at position ${correctPosition + 1}`;
           return `<div class="order-row ${reviewClass}"><span class="rank">${position + 1}</span><span>${escapeHtml(question.items[itemIndex])}${label ? `<small class="answer-label">${label}</small>` : ""}</span><button class="move" data-move="${position},-1" ${disabled || position === 0 ? "disabled" : ""} aria-label="Nach oben">↑</button><button class="move" data-move="${position},1" ${disabled || position === order.length - 1 ? "disabled" : ""} aria-label="Nach unten">↓</button></div>`;
         }).join("")}</div>`;
       }
-      return `<textarea id="textAnswer" ${disabled} placeholder="Formuliere deine Antwort in eigenen Worten …">${escapeHtml(state.answers[question.id] || "")}</textarea>`;
+      return `<textarea id="textAnswer" ${disabled} placeholder="Write your answer in your own words …">${escapeHtml(state.answers[question.id] || "")}</textarea>`;
     }
 
     function feedback(question) {
       const result = resultFor(question.id);
       if (!result) return "";
-      const detail = result.status === "skipped" ? "Diese Aufgabe wurde übersprungen und erhält 0 Punkte." : `${statusLabel(result.status)} · ${formatPoints(result.points)} von ${question.points} Punkten.`;
+      const detail = result.status === "skipped" ? "This question was skipped and receives 0 points." : `${statusLabel(result.status)} · ${formatPoints(result.points)} of ${question.points} points.`;
       return `<div class="feedback ${result.status}"><strong>${escapeHtml(detail)}</strong>${result.note ? `<div>${escapeHtml(result.note)}</div>` : ""}</div>`;
     }
 
     function solution(question) {
       if (!state.revealed[question.id]) return "";
-      const rating = question.type === "text" && !isDone(question) ? `<div class="self-rate"><button class="btn primary" data-rate="correct">Voll richtig</button><button class="btn secondary" data-rate="partial">Teilweise richtig</button><button class="btn ghost" data-rate="wrong">Falsch / wusste ich nicht</button></div>` : "";
+      const rating = question.type === "text" && !isDone(question) ? `<div class="self-rate"><button class="btn primary" data-rate="correct">Fully correct</button><button class="btn secondary" data-rate="partial">Partially correct</button><button class="btn ghost" data-rate="wrong">Incorrect / I did not know</button></div>` : "";
       const analysis = question.optionExplanations ? `<div class="answer-analysis">${question.optionExplanations.map((reason, index) => {
         const correct = Array.isArray(question.correct) ? question.correct.includes(index) : question.correct === index;
-        return `<div class="analysis-item ${correct ? "correct" : "wrong"}"><strong>${correct ? "✓ Aussage ist richtig" : "✕ Aussage ist falsch"}</strong>${escapeHtml(reason)}</div>`;
+        return `<div class="analysis-item ${correct ? "correct" : "wrong"}"><strong>${correct ? "✓ Statement is correct" : "✕ Statement is incorrect"}</strong>${escapeHtml(reason)}</div>`;
       }).join("")}</div>` : "";
-      return `<div class="solution"><h3>Auswertung und Begründung</h3>${analysis}<p>${escapeHtml(question.solution)}</p><p class="reference"><strong>Quelle:</strong> ${escapeHtml(question.reference)}</p>${rating}</div>`;
+      return `<div class="solution"><h3>Answer review and reasoning</h3>${analysis}<p>${escapeHtml(question.solution)}</p><p class="reference"><strong>Source:</strong> ${escapeHtml(question.reference)}</p>${rating}</div>`;
     }
 
     function renderQuestion() {
@@ -493,18 +621,18 @@
       const quiz = document.getElementById("quizView");
       quiz.classList.remove("hidden");
       quiz.innerHTML = `
-        <div class="task-head"><div><div class="task-no">Aufgabe ${state.current + 1} von ${questions.length}</div><div class="topic">${escapeHtml(question.topic)}</div></div><div class="points">${question.points} Punkte</div></div>
+        <div class="task-head"><div><div class="task-no">Question ${state.current + 1} of ${questions.length}</div><div class="topic">${escapeHtml(question.topic)}</div></div><div class="points">${question.points} points</div></div>
         <div class="question">${escapeHtml(question.prompt)}</div>
         ${question.hint ? `<p class="hint">${escapeHtml(question.hint)}</p>` : ""}
         ${answerArea(question)}
         ${feedback(question)}
         ${solution(question)}
         <div class="actions">
-          ${question.type === "text" && !isSubmitted(question) ? `<button class="btn primary" id="saveTextBtn">Antwort prüfen</button>` : ""}
-          ${question.type !== "text" && !isDone(question) ? `<button class="btn primary" id="checkBtn">Antwort prüfen</button>` : ""}
-          ${!isSubmitted(question) ? `<button class="btn ghost" id="skipBtn">Überspringen</button>` : ""}
-          <button class="btn ghost" id="prevBtn" ${state.current === 0 ? "disabled" : ""}>← Zurück</button>
-          <button class="btn ghost" id="nextBtn" ${state.current === questions.length - 1 ? "disabled" : ""}>Weiter →</button>
+          ${question.type === "text" && !isSubmitted(question) ? `<button class="btn primary" id="saveTextBtn">Check answer</button>` : ""}
+          ${question.type !== "text" && !isDone(question) ? `<button class="btn primary" id="checkBtn">Check answer</button>` : ""}
+          ${!isSubmitted(question) ? `<button class="btn ghost" id="skipBtn">Skip</button>` : ""}
+          <button class="btn ghost" id="prevBtn" ${state.current === 0 ? "disabled" : ""}>← Back</button>
+          <button class="btn ghost" id="nextBtn" ${state.current === questions.length - 1 ? "disabled" : ""}>Next →</button>
         </div>`;
       bindEvents(question);
     }
@@ -524,7 +652,7 @@
       document.getElementById("checkBtn")?.addEventListener("click", () => gradeAuto(question));
       document.getElementById("saveTextBtn")?.addEventListener("click", () => {
         const text = document.getElementById("textAnswer").value.trim();
-        if (!text) return alert("Schreibe zuerst eine eigene Antwort.");
+        if (!text) return alert("Write your own answer first.");
         state.answers[question.id] = text; state.revealed[question.id] = true; saveState(); render();
       });
       document.querySelectorAll("[data-rate]").forEach(button => button.addEventListener("click", () => {
@@ -545,22 +673,22 @@
       let points = 0, note = "";
       if (question.type === "single") {
         const answer = state.answers[question.id]?.[0];
-        if (answer === undefined) return alert("Wähle zuerst eine Antwort.");
+        if (answer === undefined) return alert("Select an answer first.");
         points = answer === question.correct ? question.points : 0;
       } else if (question.type === "multi") {
         const selected = state.answers[question.id] || [];
-        if (!selected.length) return alert("Wähle zuerst mindestens eine Antwort.");
+        if (!selected.length) return alert("Select at least one answer first.");
         const correctHits = selected.filter(value => question.correct.includes(value)).length;
         const wrongHits = selected.filter(value => !question.correct.includes(value)).length;
         const fraction = Math.max(0, (correctHits - wrongHits) / question.correct.length);
         points = Math.round(question.points * fraction * 2) / 2;
-        if (points > 0 && points < question.points) note = "Teilpunkte: korrekte Auswahl abzüglich falscher Auswahl.";
+        if (points > 0 && points < question.points) note = "Partial credit: correct selections minus incorrect selections.";
       } else if (question.type === "order") {
         const order = state.order[question.id] || question.initial || question.items.map((_, index) => index);
         const hits = order.filter((value, index) => value === question.correct[index]).length;
         points = Math.round(question.points * hits / question.correct.length * 2) / 2;
         state.order[question.id] = order;
-        if (points > 0 && points < question.points) note = `${hits} von ${question.correct.length} Positionen stimmen.`;
+        if (points > 0 && points < question.points) note = `${hits} of ${question.correct.length} positions are correct.`;
       }
       const status = points === question.points ? "correct" : points > 0 ? "partial" : "wrong";
       state.results[question.id] = { status, points, note };
@@ -595,15 +723,15 @@
     }
 
     function classification(percentage) {
-      if (percentage >= 85) return { status: "Sehr gut verstanden", next: "Später auffrischen", recommendation: "Du hast den Stoff sehr gut verstanden. Eine kurze spätere Recall-Runde kann das Wissen langfristig festigen." };
-      if (percentage >= 70) return { status: "Grundsätzlich verstanden, aber mit Lücken", next: "Optional gezielt üben", recommendation: "Wenn du möchtest, kannst du die unsicheren Konzepte später mit neuen Aufgaben festigen." };
-      if (percentage >= 50) return { status: "Noch nicht sicher verstanden", next: "Optional nochmals anschauen", recommendation: "Ein gezieltes Review kann dir helfen, schwache und teilweise verstandene Bereiche aus einem anderen Blickwinkel zu üben." };
-      return { status: "Deutliche Wissenslücken", next: "Optional Grundlagen festigen", recommendation: "Es kann sich lohnen, zuerst die wichtigsten schwachen Konzepte nachzulesen und später ein fokussiertes Review zu versuchen." };
+      if (percentage >= 85) return { status: "Very well understood", next: "Review later", recommendation: "You understood the material very well. A short recall session later can strengthen long-term retention." };
+      if (percentage >= 70) return { status: "Generally understood, but with gaps", next: "Optional targeted practice", recommendation: "If you want, you can strengthen uncertain concepts later with new questions." };
+      if (percentage >= 50) return { status: "Not yet understood with confidence", next: "Optional focused review", recommendation: "A targeted review can help you practise weak and partially understood areas from a different angle." };
+      return { status: "Significant knowledge gaps", next: "Optional foundation practice", recommendation: "It may help to revisit the most important weak concepts first and then attempt a focused review." };
     }
     function list(items, emptyText) { return items.length ? `<ul>${items.map(item => `<li>${escapeHtml(item)}</li>`).join("")}</ul>` : `<p>${escapeHtml(emptyText)}</p>`; }
 
     function renderResult() {
-      if (completedCount() !== questions.length) return alert("Bearbeite oder überspringe zuerst alle Aufgaben.");
+      if (completedCount() !== questions.length) return alert("Complete or skip all questions first.");
       state.completed = true;
       state.completedAt ||= new Date().toISOString();
       saveState();
@@ -622,11 +750,11 @@
       const view = document.getElementById("resultView");
       view.classList.add("show");
       view.innerHTML = `
-        <div class="result-hero"><p class="eyebrow">Ergebnis</p><h2>${escapeHtml(resultClass.status)}</h2><div class="result-big">${percentage} %</div><p>${formatPoints(score)} / ${maxPoints} Punkte · Selbsteinschätzungsnote ${grade(score)}</p></div>
-        <div class="result-grid"><div class="result-tile"><strong>${counts.correct}</strong><span>voll richtig</span></div><div class="result-tile"><strong>${counts.partial}</strong><span>teilweise richtig</span></div><div class="result-tile"><strong>${counts.wrong}</strong><span>falsch / übersprungen</span></div></div>
-        <div class="concepts"><div class="concept-box"><h3>Stärken</h3>${list(concepts.strong, "Noch kein Bereich über 80 %.")}</div><div class="concept-box"><h3>Unsicher</h3>${list(concepts.mixed, "Keine gemischten Bereiche.")}</div><div class="concept-box"><h3>Wiederholen</h3>${list(concepts.weak, "Keine klar schwachen Bereiche.")}</div></div>
-        <div class="recommendation"><h3>Nächster freiwilliger Schritt: ${escapeHtml(resultClass.next)}</h3><p>${escapeHtml(resultClass.recommendation)}</p></div>
-        <div class="actions"><button class="btn primary" id="exportBtn">Ergebnis als JSON exportieren</button>${percentage < 85 ? `<button class="btn secondary" id="targetBtn">Gezieltes Review vorbereiten (optional)</button>` : ""}<button class="btn ghost" id="backToQuiz">Antworten ansehen</button><button class="btn ghost" id="retakeBtn">Quiz nochmals machen</button></div>`;
+        <div class="result-hero"><p class="eyebrow">Result</p><h2>${escapeHtml(resultClass.status)}</h2><div class="result-big">${percentage} %</div><p>${formatPoints(score)} / ${maxPoints} points · Self-assessment grade ${grade(score)}</p></div>
+        <div class="result-grid"><div class="result-tile"><strong>${counts.correct}</strong><span>fully correct</span></div><div class="result-tile"><strong>${counts.partial}</strong><span>partially correct</span></div><div class="result-tile"><strong>${counts.wrong}</strong><span>incorrect / skipped</span></div></div>
+        <div class="concepts"><div class="concept-box"><h3>Strengths</h3>${list(concepts.strong, "No area above 80% yet.")}</div><div class="concept-box"><h3>Uncertain</h3>${list(concepts.mixed, "No mixed areas.")}</div><div class="concept-box"><h3>Review</h3>${list(concepts.weak, "No clearly weak areas.")}</div></div>
+        <div class="recommendation"><h3>Optional next step: ${escapeHtml(resultClass.next)}</h3><p>${escapeHtml(resultClass.recommendation)}</p></div>
+        <div class="actions"><button class="btn primary" id="exportBtn">Result als JSON exportieren</button>${percentage < 85 ? `<button class="btn secondary" id="targetBtn">Prepare targeted review (optional)</button>` : ""}<button class="btn ghost" id="backToQuiz">Review answers</button><button class="btn ghost" id="retakeBtn">Retake quiz</button></div>`;
       document.getElementById("exportBtn").addEventListener("click", () => exportResult(false));
       document.getElementById("targetBtn")?.addEventListener("click", () => exportResult(true));
       document.getElementById("backToQuiz").addEventListener("click", () => { state.completed = false; saveState(); render(); });
@@ -637,8 +765,8 @@
 
     function resultPayload(score, percentage, concepts, resultClass) {
       return {
-        subject: "DHEAL", lecture: "Lecture 02 – Healthcare Data: From Clinical Care to AI-Ready Data",
-        source: "02.digital-health.healthcare-data_moodle.pdf", date: state.completedAt || new Date().toISOString(), attemptId: state.attemptId,
+        subject: "SWS1", lecture: "Lecture 02 – Secure Development Lifecycle",
+        source: "W2_SecureDevelopmentLifecycle.pdf", date: state.completedAt || new Date().toISOString(), attemptId: state.attemptId,
         totalScore: score, maximumScore: maxPoints, percentage, grade: Number(grade(score)), understanding: resultClass.status,
         recommendation: percentage >= 85 ? "future_recall_optional" : percentage >= 70 ? "targeted_practice_optional" : "foundation_practice_optional",
         questionResults: questions.map(question => ({ id: question.id, topic: question.topic, points: resultFor(question.id)?.points || 0, maximum: question.points, status: resultFor(question.id)?.status || "unanswered" })),
@@ -681,7 +809,7 @@
       if (question?.type === "text" && text) state.answers[question.id] = text.value;
       saveState();
       reportProgressToDashboard(true);
-      document.getElementById("saveNotice").textContent = `Zwischenstand gespeichert · ${new Date().toLocaleTimeString("de-CH", { hour: "2-digit", minute: "2-digit" })}`;
+      document.getElementById("saveNotice").textContent = `Progress saved · ${new Date().toLocaleTimeString("de-CH", { hour: "2-digit", minute: "2-digit" })}`;
     }
 
     function clearDashboardProgress() {
@@ -699,7 +827,7 @@
       const url = URL.createObjectURL(blob);
       const link = document.createElement("a");
       link.href = url;
-      link.download = targeted ? "DHEAL_Lecture02_targeted_review.json" : "DHEAL_Lecture02_result.json";
+      link.download = targeted ? "SWS1_W2_SecureDevelopmentLifecycle_targeted_review.json" : "SWS1_W2_SecureDevelopmentLifecycle_result.json";
       link.click(); URL.revokeObjectURL(url);
     }
 
@@ -711,7 +839,7 @@
     document.getElementById("saveBtn").addEventListener("click", saveProgressManually);
     document.getElementById("finishBtn").addEventListener("click", renderResult);
     function resetCurrentAttempt() {
-      if (!confirm("Neuen Versuch starten? Der aktuelle Quizstand wird zurückgesetzt. Frühere abgeschlossene Versuche bleiben im Dashboard erhalten.")) return;
+      if (!confirm("Start a new attempt? The current quiz progress will be reset. Earlier completed attempts remain in the dashboard.")) return;
       localStorage.removeItem(STORAGE_KEY); clearDashboardProgress(); state = defaultState(); render();
     }
 
