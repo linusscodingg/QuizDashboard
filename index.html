@@ -1,0 +1,587 @@
+<!doctype html>
+<html lang="de">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Persönliches Offline-Dashboard für ZHAW-Lernquiz und Vorlesungsreviews.">
+  <title>ZHAW Quiz-Dashboard</title>
+  <style>
+    :root {
+      color-scheme: light;
+      --ink: #14243a;
+      --muted: #607086;
+      --navy: #083f63;
+      --blue: #087da8;
+      --cyan: #20b7d4;
+      --paper: #ffffff;
+      --wash: #eef7fa;
+      --line: #d3e2e9;
+      --green: #168447;
+      --green-bg: #e7f7ed;
+      --yellow: #946400;
+      --yellow-bg: #fff5cf;
+      --orange: #ad4f12;
+      --orange-bg: #fff0e3;
+      --red: #b42f35;
+      --red-bg: #fdebed;
+      --grey: #667385;
+      --grey-bg: #eef1f4;
+      --shadow: 0 18px 55px rgba(18, 65, 88, .12);
+    }
+
+    * { box-sizing: border-box; }
+    html { min-width: 320px; background: var(--wash); }
+    body {
+      margin: 0;
+      min-height: 100vh;
+      color: var(--ink);
+      font: 16px/1.5 Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      background:
+        radial-gradient(circle at 4% 0%, rgba(32, 183, 212, .16), transparent 27rem),
+        linear-gradient(145deg, #f9fcfd 0%, var(--wash) 60%, #e4f1f5 100%);
+    }
+    button, input { font: inherit; }
+    button { cursor: pointer; }
+    button:focus-visible, summary:focus-visible, input:focus-visible { outline: 3px solid rgba(32, 183, 212, .35); outline-offset: 3px; }
+
+    .shell { width: min(1220px, calc(100% - 32px)); margin: 0 auto; padding: 28px 0 56px; }
+    .masthead {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) auto;
+      gap: 24px;
+      align-items: end;
+      padding: clamp(24px, 4vw, 42px);
+      overflow: hidden;
+      color: #fff;
+      border-radius: 26px;
+      background: linear-gradient(125deg, #073b5d 0%, #076d96 58%, #0a91ad 100%);
+      box-shadow: var(--shadow);
+      position: relative;
+    }
+    .masthead::after {
+      content: "";
+      position: absolute;
+      width: 300px;
+      height: 300px;
+      right: -100px;
+      top: -170px;
+      border: 42px solid rgba(255,255,255,.09);
+      border-radius: 50%;
+      pointer-events: none;
+    }
+    .eyebrow { margin: 0 0 8px; color: #bceefe; font-size: .78rem; font-weight: 850; letter-spacing: .16em; text-transform: uppercase; }
+    h1 { margin: 0; font-size: clamp(2rem, 5vw, 3.45rem); line-height: 1; letter-spacing: -.04em; }
+    .intro { max-width: 650px; margin: 13px 0 0; color: #d9f4fb; font-size: 1rem; }
+    .head-actions { display: flex; flex-wrap: wrap; justify-content: flex-end; gap: 10px; position: relative; z-index: 1; }
+    .button {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 44px;
+      padding: 10px 15px;
+      border: 1px solid transparent;
+      border-radius: 12px;
+      color: var(--ink);
+      background: #fff;
+      font-weight: 750;
+      text-decoration: none;
+      transition: transform .15s ease, box-shadow .15s ease, background .15s ease;
+    }
+    .button:hover { transform: translateY(-1px); box-shadow: 0 8px 22px rgba(0,0,0,.12); }
+    .button.secondary { color: #fff; border-color: rgba(255,255,255,.32); background: rgba(255,255,255,.1); }
+    .button.danger { color: var(--red); border-color: #efc6ca; background: #fff; }
+    .button.small { min-height: 38px; padding: 7px 12px; font-size: .9rem; }
+
+    .summary-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px; margin: 20px 0; }
+    .summary-card { padding: 20px; border: 1px solid rgba(177, 204, 216, .76); border-radius: 18px; background: rgba(255,255,255,.9); box-shadow: 0 10px 28px rgba(18,65,88,.07); }
+    .summary-card span { display: block; color: var(--muted); font-size: .88rem; font-weight: 700; }
+    .summary-card strong { display: block; margin-top: 5px; font-size: clamp(1.55rem, 4vw, 2.15rem); line-height: 1.1; }
+    .summary-card em { display: block; margin-top: 5px; color: var(--muted); font-size: .78rem; font-style: normal; }
+
+    .legend {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 9px 18px;
+      align-items: center;
+      margin: 0 0 24px;
+      padding: 13px 16px;
+      color: var(--muted);
+      border: 1px solid var(--line);
+      border-radius: 14px;
+      background: rgba(255,255,255,.68);
+      font-size: .84rem;
+    }
+    .legend strong { color: var(--ink); }
+    .legend-item { display: inline-flex; gap: 7px; align-items: center; }
+    .dot { width: 10px; height: 10px; border-radius: 50%; background: var(--grey); }
+    .dot.green { background: var(--green); }
+    .dot.yellow { background: #d69b12; }
+    .dot.orange { background: #de6f24; }
+    .dot.red { background: var(--red); }
+
+    .subjects { display: grid; gap: 22px; }
+    .subject {
+      overflow: hidden;
+      border: 1px solid rgba(177, 204, 216, .8);
+      border-radius: 22px;
+      background: rgba(255,255,255,.94);
+      box-shadow: var(--shadow);
+    }
+    .subject-head {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) auto;
+      gap: 20px;
+      align-items: center;
+      padding: 22px 24px;
+      border-top: 5px solid var(--accent, var(--blue));
+      border-bottom: 1px solid var(--line);
+    }
+    .subject-title { display: flex; gap: 13px; align-items: center; }
+    .subject-mark { display: grid; place-items: center; width: 45px; height: 45px; border-radius: 13px; color: #fff; background: var(--accent, var(--blue)); font-size: .78rem; font-weight: 900; letter-spacing: .04em; }
+    .subject h2 { margin: 0; font-size: 1.35rem; }
+    .subject-description { margin: 2px 0 0; color: var(--muted); font-size: .9rem; }
+    .subject-score { text-align: right; }
+    .subject-score strong { display: block; font-size: 1.25rem; }
+    .subject-score span { color: var(--muted); font-size: .83rem; }
+    .subject-body { padding: 18px; }
+    .quiz-list { display: grid; gap: 12px; }
+    .quiz-card {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) auto;
+      gap: 18px;
+      padding: 18px;
+      border: 1px solid var(--line);
+      border-left: 6px solid var(--status-color, var(--grey));
+      border-radius: 16px;
+      background: #fbfdfe;
+    }
+    .quiz-topline { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+    .week { color: var(--blue); font-size: .78rem; font-weight: 850; letter-spacing: .08em; text-transform: uppercase; }
+    .status {
+      display: inline-flex;
+      align-items: center;
+      padding: 4px 9px;
+      color: var(--status-color, var(--grey));
+      border-radius: 999px;
+      background: var(--status-bg, var(--grey-bg));
+      font-size: .76rem;
+      font-weight: 800;
+    }
+    .quiz-card h3 { margin: 6px 0 3px; font-size: 1.08rem; }
+    .source { margin: 0; color: var(--muted); font-size: .82rem; }
+    .quiz-stats { display: flex; flex-wrap: wrap; gap: 15px; margin-top: 13px; }
+    .quiz-stat span { display: block; color: var(--muted); font-size: .72rem; font-weight: 750; text-transform: uppercase; letter-spacing: .05em; }
+    .quiz-stat strong { display: block; margin-top: 1px; font-size: .98rem; }
+    .quiz-actions { display: flex; flex-direction: column; justify-content: center; gap: 8px; min-width: 135px; }
+    .saved-progress { margin: 12px 0 0; color: var(--blue); font-size: .86rem; font-weight: 750; }
+    .history { grid-column: 1 / -1; border-top: 1px solid var(--line); padding-top: 12px; }
+    .history summary { width: fit-content; color: var(--blue); font-weight: 750; cursor: pointer; }
+    .attempts { display: grid; gap: 8px; margin-top: 11px; }
+    .attempt {
+      display: grid;
+      grid-template-columns: 1fr auto auto;
+      gap: 12px;
+      align-items: center;
+      padding: 10px 12px;
+      border-radius: 11px;
+      background: var(--wash);
+      font-size: .86rem;
+    }
+    .attempt strong { color: var(--ink); }
+    .attempt-meta { color: var(--muted); }
+    .icon-button { padding: 5px 8px; color: var(--red); border: 0; border-radius: 8px; background: transparent; font-weight: 800; }
+    .icon-button:hover { background: var(--red-bg); }
+    .empty { padding: 24px; color: var(--muted); border: 1px dashed #b8ccd5; border-radius: 14px; text-align: center; }
+    .empty strong { display: block; margin-bottom: 3px; color: var(--ink); }
+
+    .player[hidden] { display: none; }
+    .player { position: fixed; inset: 0; z-index: 20; display: grid; grid-template-rows: auto 1fr; background: #e9f3f7; }
+    .player-bar { display: flex; gap: 14px; align-items: center; padding: 12px 18px; color: #fff; background: var(--navy); box-shadow: 0 4px 18px rgba(0,0,0,.16); }
+    .player-bar h2 { flex: 1; margin: 0; font-size: 1rem; }
+    .player-bar span { color: #beeaf5; font-size: .82rem; }
+    .player iframe { width: 100%; height: 100%; border: 0; background: #fff; }
+    .toast { position: fixed; right: 18px; bottom: 18px; z-index: 30; max-width: min(390px, calc(100% - 36px)); padding: 13px 16px; color: #fff; border-radius: 12px; background: #123d55; box-shadow: var(--shadow); font-weight: 700; }
+    .toast[hidden] { display: none; }
+    .footnote { margin: 22px 4px 0; color: var(--muted); font-size: .82rem; text-align: center; }
+    #importInput { display: none; }
+
+    @media (max-width: 850px) {
+      .masthead { grid-template-columns: 1fr; align-items: start; }
+      .head-actions { justify-content: flex-start; }
+      .summary-grid { grid-template-columns: repeat(2, 1fr); }
+    }
+    @media (max-width: 620px) {
+      .shell { width: min(100% - 20px, 1220px); padding-top: 10px; }
+      .masthead { padding: 24px 20px; border-radius: 18px; }
+      .summary-grid { gap: 9px; margin-top: 12px; }
+      .summary-card { padding: 15px; }
+      .subject-head, .quiz-card { grid-template-columns: 1fr; }
+      .subject-head { padding: 18px; }
+      .subject-score { text-align: left; padding-left: 58px; }
+      .quiz-actions { flex-direction: row; justify-content: flex-start; }
+      .history { grid-column: 1; }
+      .attempt { grid-template-columns: 1fr auto; }
+      .attempt-meta { grid-column: 1; }
+      .player-bar span { display: none; }
+    }
+  </style>
+</head>
+<body>
+  <main class="shell">
+    <header class="masthead">
+      <div>
+        <p class="eyebrow">5. Semester · Lernfortschritt</p>
+        <h1>Quiz-Dashboard</h1>
+        <p class="intro">Alle Vorlesungsreviews an einem Ort – mit Punkten, Schweizer Lernnote und deinem persönlichen Verlauf.</p>
+      </div>
+      <div class="head-actions">
+        <button class="button" id="exportBtn" type="button">Sicherung exportieren</button>
+        <button class="button secondary" id="importBtn" type="button">Sicherung importieren</button>
+        <input id="importInput" type="file" accept="application/json,.json">
+      </div>
+    </header>
+
+    <section class="summary-grid" aria-label="Gesamtübersicht">
+      <div class="summary-card"><span>Bearbeitet</span><strong id="completedTotal">0 / 0</strong><em>Quiz mindestens einmal abgeschlossen</em></div>
+      <div class="summary-card"><span>Durchschnitt</span><strong id="averagePercent">–</strong><em>aus den jeweiligen Bestwerten</em></div>
+      <div class="summary-card"><span>Lernnote</span><strong id="averageGrade">–</strong><em>Schweizer Notenskala 1.0–6.0</em></div>
+      <div class="summary-card"><span>Versuche</span><strong id="attemptTotal">0</strong><em>alle abgeschlossenen Durchläufe</em></div>
+    </section>
+
+    <aside class="legend" aria-label="Verständnisstufen">
+      <strong>Verständnis:</strong>
+      <span class="legend-item"><i class="dot"></i>Noch offen</span>
+      <span class="legend-item"><i class="dot red"></i>Unter 50 % · deutliche Lücken</span>
+      <span class="legend-item"><i class="dot orange"></i>50–69 % · noch unsicher</span>
+      <span class="legend-item"><i class="dot yellow"></i>70–84 % · mit Lücken</span>
+      <span class="legend-item"><i class="dot green"></i>Ab 85 % · sehr gut verstanden</span>
+    </aside>
+
+    <div class="subjects" id="subjects"></div>
+    <p class="footnote">Die Lernnote dient deiner Motivation und Selbsteinschätzung. Sie ist keine offizielle ZHAW-Note.</p>
+  </main>
+
+  <section class="player" id="player" hidden aria-label="Quiz-Player">
+    <div class="player-bar">
+      <button class="button small" id="closePlayer" type="button">← Dashboard</button>
+      <h2 id="playerTitle">Quiz</h2>
+      <span id="playerStatus">Das Resultat wird beim Abschluss automatisch gespeichert.</span>
+    </div>
+    <iframe id="quizFrame" title="Geöffnetes Quiz"></iframe>
+  </section>
+  <div class="toast" id="toast" hidden role="status" aria-live="polite"></div>
+
+  <script src="quiz-catalog.js"></script>
+  <script>
+    (() => {
+      "use strict";
+
+      const STORAGE_KEY = "zhaw-quiz-dashboard-v1";
+      const catalog = window.QUIZ_CATALOG || { version: 1, subjects: [], quizzes: [] };
+      const quizMap = new Map(catalog.quizzes.map(quiz => [quiz.id, quiz]));
+      const player = document.getElementById("player");
+      const frame = document.getElementById("quizFrame");
+      let activeQuizId = null;
+      let toastTimer = null;
+      let loadTimer = null;
+      let store = loadStore();
+
+      function emptyStore() { return { version: 1, attempts: {}, progress: {} }; }
+
+      function loadStore() {
+        try {
+          const parsed = JSON.parse(localStorage.getItem(STORAGE_KEY));
+          return validStore(parsed) ? normaliseStore(parsed) : emptyStore();
+        } catch (_) {
+          return emptyStore();
+        }
+      }
+
+      function validStore(value) {
+        if (!value || value.version !== 1 || !value.attempts || typeof value.attempts !== "object" || Array.isArray(value.attempts)) return false;
+        if (!Object.values(value.attempts).every(list => Array.isArray(list))) return false;
+        return value.progress === undefined || (value.progress && typeof value.progress === "object" && !Array.isArray(value.progress));
+      }
+
+      function normaliseStore(value) {
+        return { version: 1, attempts: value.attempts || {}, progress: value.progress || {} };
+      }
+
+      function saveStore() {
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(store));
+      }
+
+      function escapeHtml(value) {
+        return String(value ?? "").replace(/[&<>"']/g, char => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", "\"": "&quot;", "'": "&#39;" }[char]));
+      }
+
+      function clamp(value, minimum, maximum) { return Math.min(maximum, Math.max(minimum, value)); }
+      function formatPoints(value) { return Number.isInteger(value) ? String(value) : Number(value).toFixed(1); }
+      function gradeFromPercentage(percentage) { return (1 + 5 * clamp(percentage, 0, 100) / 100).toFixed(1); }
+
+      function understanding(percentage) {
+        if (percentage >= 85) return { key: "green", label: "Sehr gut verstanden", color: "var(--green)", background: "var(--green-bg)" };
+        if (percentage >= 70) return { key: "yellow", label: "Grundsätzlich verstanden, aber mit Lücken", color: "var(--yellow)", background: "var(--yellow-bg)" };
+        if (percentage >= 50) return { key: "orange", label: "Noch nicht sicher verstanden", color: "var(--orange)", background: "var(--orange-bg)" };
+        return { key: "red", label: "Deutliche Wissenslücken", color: "var(--red)", background: "var(--red-bg)" };
+      }
+
+      function attemptsFor(quizId) {
+        return (store.attempts[quizId] || []).filter(attempt => attempt && typeof attempt === "object");
+      }
+
+      function progressFor(quizId) {
+        const progress = store.progress?.[quizId];
+        return progress && typeof progress === "object" ? progress : null;
+      }
+
+      function bestAttempt(quizId) {
+        return attemptsFor(quizId).slice().sort((a, b) => b.percentage - a.percentage || String(b.completedAt).localeCompare(String(a.completedAt)))[0] || null;
+      }
+
+      function totalsFor(quizzes) {
+        const best = quizzes.map(quiz => bestAttempt(quiz.id)).filter(Boolean);
+        const earned = best.reduce((sum, attempt) => sum + attempt.score, 0);
+        const maximum = best.reduce((sum, attempt) => sum + attempt.maximumScore, 0);
+        const percentage = maximum > 0 ? Math.round(earned / maximum * 100) : null;
+        return {
+          completed: best.length,
+          attempts: quizzes.reduce((sum, quiz) => sum + attemptsFor(quiz.id).length, 0),
+          percentage,
+          grade: percentage === null ? null : gradeFromPercentage(percentage)
+        };
+      }
+
+      function render() {
+        const totals = totalsFor(catalog.quizzes);
+        document.getElementById("completedTotal").textContent = `${totals.completed} / ${catalog.quizzes.length}`;
+        document.getElementById("averagePercent").textContent = totals.percentage === null ? "–" : `${totals.percentage} %`;
+        document.getElementById("averageGrade").textContent = totals.grade === null ? "–" : totals.grade;
+        document.getElementById("attemptTotal").textContent = totals.attempts;
+
+        const root = document.getElementById("subjects");
+        if (!catalog.subjects.length) {
+          root.innerHTML = '<div class="empty"><strong>Noch keine Fächer registriert.</strong>Ergänze das Quiz-Verzeichnis, um zu starten.</div>';
+          return;
+        }
+
+        root.innerHTML = catalog.subjects.map(subject => {
+          const quizzes = catalog.quizzes.filter(quiz => quiz.subject === subject.id).sort((a, b) => a.week - b.week || a.title.localeCompare(b.title));
+          const totals = totalsFor(quizzes);
+          const cards = quizzes.length ? quizzes.map(renderQuiz).join("") : '<div class="empty"><strong>Noch kein Quiz vorhanden.</strong>Das erste Review erscheint hier automatisch nach der Registrierung.</div>';
+          return `
+            <section class="subject" style="--accent:${escapeHtml(subject.accent)}">
+              <header class="subject-head">
+                <div class="subject-title">
+                  <div class="subject-mark">${escapeHtml(subject.id.slice(0, 4))}</div>
+                  <div><h2>${escapeHtml(subject.name)}</h2><p class="subject-description">${escapeHtml(subject.description)}</p></div>
+                </div>
+                <div class="subject-score">
+                  <strong>${totals.completed} / ${quizzes.length} bearbeitet</strong>
+                  <span>${totals.percentage === null ? "Noch kein Ergebnis" : `${totals.percentage} % · Lernnote ${totals.grade}`}</span>
+                </div>
+              </header>
+              <div class="subject-body"><div class="quiz-list">${cards}</div></div>
+            </section>`;
+        }).join("");
+
+        root.querySelectorAll("[data-open-quiz]").forEach(button => button.addEventListener("click", () => openQuiz(button.dataset.openQuiz)));
+        root.querySelectorAll("[data-delete-attempt]").forEach(button => button.addEventListener("click", () => deleteAttempt(button.dataset.quizId, button.dataset.deleteAttempt)));
+      }
+
+      function renderQuiz(quiz) {
+        const attempts = attemptsFor(quiz.id).slice().sort((a, b) => String(b.completedAt).localeCompare(String(a.completedAt)));
+        const best = bestAttempt(quiz.id);
+        const progress = progressFor(quiz.id);
+        const status = best ? understanding(best.percentage) : progress ? { label: "In Bearbeitung", color: "var(--blue)", background: "#e5f3fa" } : { label: "Noch nicht bearbeitet", color: "var(--grey)", background: "var(--grey-bg)" };
+        const history = attempts.length ? `
+          <details class="history">
+            <summary>${attempts.length} ${attempts.length === 1 ? "Versuch" : "Versuche"} anzeigen</summary>
+            <div class="attempts">${attempts.map((attempt, index) => `
+              <div class="attempt">
+                <div><strong>${formatPoints(attempt.score)} / ${formatPoints(attempt.maximumScore)} Punkte</strong> · ${attempt.percentage} % · Note ${Number(attempt.grade).toFixed(1)}${attempt.attemptId === best.attemptId ? " · Bestwert" : ""}</div>
+                <span class="attempt-meta">${formatDate(attempt.completedAt)}</span>
+                <button class="icon-button" type="button" data-delete-attempt="${escapeHtml(attempt.attemptId)}" data-quiz-id="${escapeHtml(quiz.id)}" aria-label="Versuch ${index + 1} löschen">Löschen</button>
+              </div>`).join("")}</div>
+          </details>` : "";
+
+        return `
+          <article class="quiz-card" style="--status-color:${status.color};--status-bg:${status.background}">
+            <div>
+              <div class="quiz-topline"><span class="week">Woche ${escapeHtml(quiz.week)}</span><span class="status">${escapeHtml(status.label)}</span></div>
+              <h3>${escapeHtml(quiz.title)}</h3>
+              <p class="source">Quelle: ${escapeHtml(quiz.source)}</p>
+              ${progress ? `<p class="saved-progress">Zwischenstand: ${progress.completedCount} / ${progress.totalQuestions} Aufgaben gespeichert · ${formatDate(progress.updatedAt)}</p>` : ""}
+              <div class="quiz-stats">
+                <div class="quiz-stat"><span>Bestwert</span><strong>${best ? `${formatPoints(best.score)} / ${formatPoints(best.maximumScore)}` : "–"}</strong></div>
+                <div class="quiz-stat"><span>Prozent</span><strong>${best ? `${best.percentage} %` : "–"}</strong></div>
+                <div class="quiz-stat"><span>Lernnote</span><strong>${best ? Number(best.grade).toFixed(1) : "–"}</strong></div>
+                <div class="quiz-stat"><span>Versuche</span><strong>${attempts.length}</strong></div>
+              </div>
+            </div>
+            <div class="quiz-actions"><button class="button" style="color:#fff;background:var(--status-color)" type="button" data-open-quiz="${escapeHtml(quiz.id)}">${progress ? "Quiz fortsetzen" : best ? "Quiz wiederholen" : "Quiz starten"}</button></div>
+            ${history}
+          </article>`;
+      }
+
+      function formatDate(value) {
+        const date = new Date(value);
+        return Number.isNaN(date.getTime()) ? "Datum unbekannt" : new Intl.DateTimeFormat("de-CH", { dateStyle: "medium", timeStyle: "short" }).format(date);
+      }
+
+      function openQuiz(quizId) {
+        const quiz = quizMap.get(quizId);
+        if (!quiz) return showToast("Dieses Quiz ist nicht im Katalog eingetragen.");
+        activeQuizId = quizId;
+        document.getElementById("playerTitle").textContent = `${quiz.subject} · Woche ${quiz.week} · ${quiz.title}`;
+        document.getElementById("playerStatus").textContent = "Quiz wird geladen …";
+        frame.src = quiz.path;
+        player.hidden = false;
+        document.body.style.overflow = "hidden";
+        document.getElementById("closePlayer").focus();
+        clearTimeout(loadTimer);
+        loadTimer = setTimeout(() => {
+          if (activeQuizId === quizId) document.getElementById("playerStatus").textContent = "Quiz konnte nicht geladen werden. Prüfe den Pfad im Quiz-Katalog.";
+        }, 4000);
+      }
+
+      function closeQuiz() {
+        player.hidden = true;
+        frame.src = "about:blank";
+        activeQuizId = null;
+        clearTimeout(loadTimer);
+        document.body.style.overflow = "";
+        render();
+      }
+
+      function normaliseAttempt(raw, quiz) {
+        const score = Number(raw.score);
+        const maximumScore = Number(raw.maximumScore || quiz.maximumScore);
+        if (!raw.attemptId || !Number.isFinite(score) || !Number.isFinite(maximumScore) || maximumScore <= 0) return null;
+        const safeScore = clamp(score, 0, maximumScore);
+        const percentage = Math.round(safeScore / maximumScore * 100);
+        const level = understanding(percentage);
+        return {
+          attemptId: String(raw.attemptId),
+          completedAt: Number.isNaN(new Date(raw.completedAt).getTime()) ? new Date().toISOString() : new Date(raw.completedAt).toISOString(),
+          score: safeScore,
+          maximumScore,
+          percentage,
+          grade: Number(gradeFromPercentage(percentage)),
+          understanding: level.label,
+          strongConcepts: Array.isArray(raw.strongConcepts) ? raw.strongConcepts.map(String) : [],
+          uncertainConcepts: Array.isArray(raw.uncertainConcepts) ? raw.uncertainConcepts.map(String) : [],
+          weakConcepts: Array.isArray(raw.weakConcepts) ? raw.weakConcepts.map(String) : []
+        };
+      }
+
+      function normaliseProgress(raw, quiz) {
+        const completedCount = Number(raw.completedCount);
+        const totalQuestions = Number(raw.totalQuestions);
+        const score = Number(raw.score);
+        if (!raw.attemptId || !Number.isFinite(completedCount) || !Number.isFinite(totalQuestions) || totalQuestions <= 0 || !Number.isFinite(score)) return null;
+        return {
+          attemptId: String(raw.attemptId),
+          currentTask: clamp(Number(raw.currentTask) || 1, 1, totalQuestions),
+          completedCount: clamp(completedCount, 0, totalQuestions),
+          totalQuestions,
+          score: clamp(score, 0, Number(raw.maximumScore || quiz.maximumScore)),
+          maximumScore: Number(raw.maximumScore || quiz.maximumScore),
+          updatedAt: Number.isNaN(new Date(raw.updatedAt).getTime()) ? new Date().toISOString() : new Date(raw.updatedAt).toISOString()
+        };
+      }
+
+      window.addEventListener("message", event => {
+        const message = event.data;
+        if (event.source !== frame.contentWindow || !message || message.source !== "zhaw-quiz" || message.version !== 1) return;
+        if (message.quizId !== activeQuizId) return;
+        if (message.type === "quiz-ready") {
+          clearTimeout(loadTimer);
+          document.getElementById("playerStatus").textContent = "Dein Zwischenstand bleibt lokal gespeichert.";
+          return;
+        }
+        if (message.type === "quiz-progress") {
+          const quiz = quizMap.get(message.quizId);
+          const progress = normaliseProgress(message.progress, quiz);
+          if (!progress) return showToast("Der Zwischenstand konnte nicht gespeichert werden.");
+          store.progress[quiz.id] = progress;
+          saveStore();
+          render();
+          document.getElementById("playerStatus").textContent = `${progress.completedCount} / ${progress.totalQuestions} Aufgaben gespeichert.`;
+          if (message.manual) showToast("Zwischenstand gespeichert.");
+          return;
+        }
+        if (message.type === "quiz-progress-reset") {
+          delete store.progress[message.quizId];
+          saveStore();
+          render();
+          document.getElementById("playerStatus").textContent = "Fortschritt zurückgesetzt.";
+          return;
+        }
+        if (message.type !== "quiz-completed") return;
+        const quiz = quizMap.get(message.quizId);
+        const attempt = normaliseAttempt(message.attempt, quiz);
+        if (!attempt) return showToast("Das Quizresultat konnte nicht gespeichert werden.");
+        const list = store.attempts[quiz.id] || [];
+        const existing = list.findIndex(item => item.attemptId === attempt.attemptId);
+        if (existing >= 0) list[existing] = attempt; else list.push(attempt);
+        store.attempts[quiz.id] = list;
+        delete store.progress[quiz.id];
+        saveStore();
+        render();
+        showToast(`Gespeichert: ${attempt.percentage} % · Lernnote ${attempt.grade.toFixed(1)}`);
+      });
+
+      function deleteAttempt(quizId, attemptId) {
+        if (!confirm("Diesen gespeicherten Versuch wirklich aus dem Dashboard löschen?")) return;
+        store.attempts[quizId] = attemptsFor(quizId).filter(attempt => attempt.attemptId !== attemptId);
+        saveStore();
+        render();
+      }
+
+      function exportBackup() {
+        const payload = { format: "zhaw-quiz-dashboard", exportedAt: new Date().toISOString(), catalogVersion: catalog.version, data: store };
+        const blob = new Blob([JSON.stringify(payload, null, 2)], { type: "application/json" });
+        const url = URL.createObjectURL(blob);
+        const link = document.createElement("a");
+        link.href = url;
+        link.download = `ZHAW_QuizDashboard_Sicherung_${new Date().toISOString().slice(0, 10)}.json`;
+        link.click();
+        URL.revokeObjectURL(url);
+      }
+
+      async function importBackup(file) {
+        try {
+          const payload = JSON.parse(await file.text());
+          if (payload?.format !== "zhaw-quiz-dashboard" || !validStore(payload.data)) throw new Error("invalid");
+          if (!confirm("Die Sicherung ersetzt die aktuell im Dashboard gespeicherten Resultate. Fortfahren?")) return;
+          store = normaliseStore(payload.data);
+          saveStore();
+          render();
+          showToast("Sicherung erfolgreich importiert.");
+        } catch (_) {
+          alert("Diese Datei ist keine gültige Quiz-Dashboard-Sicherung.");
+        } finally {
+          document.getElementById("importInput").value = "";
+        }
+      }
+
+      function showToast(message) {
+        const toast = document.getElementById("toast");
+        toast.textContent = message;
+        toast.hidden = false;
+        clearTimeout(toastTimer);
+        toastTimer = setTimeout(() => { toast.hidden = true; }, 4500);
+      }
+
+      document.getElementById("closePlayer").addEventListener("click", closeQuiz);
+      document.getElementById("exportBtn").addEventListener("click", exportBackup);
+      document.getElementById("importBtn").addEventListener("click", () => document.getElementById("importInput").click());
+      document.getElementById("importInput").addEventListener("change", event => event.target.files[0] && importBackup(event.target.files[0]));
+      document.addEventListener("keydown", event => { if (event.key === "Escape" && !player.hidden) closeQuiz(); });
+
+      render();
+    })();
+  </script>
+</body>
+</html>

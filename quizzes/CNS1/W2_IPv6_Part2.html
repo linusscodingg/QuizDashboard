@@ -1,0 +1,746 @@
+<!doctype html>
+<html lang="de">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>CNS1 - IPv6 Part 2 - Lecture Review</title>
+  <style>
+    :root {
+      --ink: #132238;
+      --muted: #5d6b7e;
+      --blue: #07689f;
+      --blue-dark: #034f7d;
+      --cyan: #38bdf8;
+      --green: #15803d;
+      --amber: #b45309;
+      --red: #b91c1c;
+      --paper: #ffffff;
+      --wash: #eef7fb;
+      --line: #cfdee8;
+      --shadow: 0 18px 50px rgba(13, 66, 95, .13);
+    }
+
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      min-height: 100vh;
+      color: var(--ink);
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      background:
+        radial-gradient(circle at 8% 2%, rgba(56,189,248,.18), transparent 28rem),
+        linear-gradient(145deg, #f8fcfe 0%, #eef7fb 65%, #e5f3f8 100%);
+    }
+    button, input, textarea { font: inherit; }
+    button { cursor: pointer; }
+    .shell { width: min(1120px, calc(100% - 32px)); margin: 0 auto; padding: 28px 0 44px; }
+    .topbar {
+      display: grid;
+      grid-template-columns: 1fr auto;
+      gap: 20px;
+      align-items: start;
+      padding: 24px;
+      color: white;
+      border-radius: 24px;
+      background: linear-gradient(120deg, #034f7d, #0879ad 62%, #0d91b2);
+      box-shadow: var(--shadow);
+    }
+    .eyebrow { margin: 0 0 6px; font-size: .78rem; font-weight: 800; letter-spacing: .14em; text-transform: uppercase; color: #bcecff; }
+    h1 { margin: 0; font-size: clamp(1.55rem, 3vw, 2.45rem); line-height: 1.08; }
+    .subtitle { margin: 9px 0 0; color: #dff6ff; }
+    .scorebox { min-width: 205px; padding: 14px 16px; border: 1px solid rgba(255,255,255,.28); border-radius: 16px; background: rgba(255,255,255,.1); }
+    .scorebox strong { display: block; font-size: 1.4rem; }
+    .scorebox span { display: block; margin-top: 4px; color: #dff6ff; font-size: .9rem; }
+    .progress-wrap { margin-top: 18px; grid-column: 1 / -1; }
+    .progress-track { height: 10px; overflow: hidden; border-radius: 999px; background: rgba(255,255,255,.2); }
+    .progress-fill { width: 0; height: 100%; border-radius: inherit; background: linear-gradient(90deg, #80e1ff, #e1fbff); transition: width .25s ease; }
+    .progress-labels { display: flex; justify-content: space-between; gap: 12px; margin-top: 8px; font-size: .87rem; color: #dff6ff; }
+
+    .layout { display: grid; grid-template-columns: minmax(0, 1fr) 265px; gap: 22px; margin-top: 22px; }
+    .card, .side-card {
+      background: rgba(255,255,255,.94);
+      border: 1px solid rgba(171, 201, 218, .72);
+      border-radius: 22px;
+      box-shadow: var(--shadow);
+    }
+    .card { padding: clamp(22px, 4vw, 38px); min-height: 560px; }
+    .side-card { padding: 18px; position: sticky; top: 18px; }
+    .side-card h2 { margin: 0 0 12px; font-size: 1rem; }
+    .mini-stat { display: flex; justify-content: space-between; gap: 10px; padding: 10px 0; border-bottom: 1px solid var(--line); color: var(--muted); font-size: .92rem; }
+    .mini-stat strong { color: var(--ink); }
+    .source-note { margin: 16px 0 0; font-size: .78rem; line-height: 1.45; color: var(--muted); }
+    .save-note { min-height: 1.25em; margin: 9px 0 0; color: var(--green); font-size: .8rem; font-weight: 750; }
+
+    .task-head { display: flex; justify-content: space-between; gap: 16px; align-items: flex-start; }
+    .task-no { color: var(--blue); font-size: .82rem; font-weight: 850; letter-spacing: .08em; text-transform: uppercase; }
+    .points { flex: none; padding: 7px 11px; border-radius: 999px; font-weight: 800; color: var(--blue-dark); background: #e0f3fb; }
+    .topic { margin: 7px 0 0; color: var(--muted); font-size: .94rem; }
+    .question { margin: 24px 0 18px; font-size: clamp(1.15rem, 2vw, 1.42rem); line-height: 1.42; }
+    .hint { margin: -6px 0 18px; color: var(--muted); font-size: .92rem; }
+    .options { display: grid; gap: 10px; }
+    .option {
+      display: grid;
+      grid-template-columns: auto 1fr;
+      gap: 12px;
+      align-items: start;
+      padding: 13px 15px;
+      border: 1px solid var(--line);
+      border-radius: 14px;
+      background: #fbfdfe;
+      transition: border-color .15s, background .15s, transform .15s;
+    }
+    .option:hover { border-color: #72bddc; transform: translateY(-1px); }
+    .option input { margin-top: 3px; accent-color: var(--blue); }
+    textarea {
+      width: 100%; min-height: 150px; resize: vertical;
+      padding: 14px; border: 1px solid var(--line); border-radius: 14px;
+      color: var(--ink); background: #fbfdfe; line-height: 1.5;
+    }
+    textarea:focus, button:focus-visible, input:focus-visible { outline: 3px solid rgba(56,189,248,.35); outline-offset: 2px; }
+    .order-list { display: grid; gap: 9px; }
+    .order-row { display: grid; grid-template-columns: 36px 1fr auto auto; gap: 9px; align-items: center; padding: 10px; border: 1px solid var(--line); border-radius: 13px; background: #fbfdfe; }
+    .rank { display: grid; place-items: center; width: 30px; height: 30px; border-radius: 50%; color: white; background: var(--blue); font-weight: 800; }
+    .icon-btn { width: 35px; height: 35px; border: 1px solid var(--line); border-radius: 10px; background: white; color: var(--blue-dark); font-weight: 900; }
+    .actions { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 22px; }
+    .btn { border: 0; border-radius: 12px; padding: 11px 15px; font-weight: 800; }
+    .primary { color: white; background: var(--blue); }
+    .primary:hover { background: var(--blue-dark); }
+    .secondary { color: var(--blue-dark); background: #e3f3fa; }
+    .ghost { color: var(--muted); background: #f1f5f7; }
+    .danger { color: var(--red); background: #fff0f0; }
+    .btn:disabled { cursor: not-allowed; opacity: .5; }
+    .feedback, .solution { margin-top: 18px; padding: 15px 17px; border-radius: 14px; line-height: 1.52; }
+    .feedback.correct { border-left: 5px solid var(--green); background: #ecfdf3; color: #135c2d; }
+    .feedback.partial { border-left: 5px solid var(--amber); background: #fff8e8; color: #85470b; }
+    .feedback.wrong { border-left: 5px solid var(--red); background: #fff1f1; color: #891b1b; }
+    .solution { border: 1px solid #b9dce9; background: #eef9fd; }
+    .solution h3 { margin: 0 0 8px; font-size: 1rem; color: var(--blue-dark); }
+    .solution p { margin: 6px 0; }
+    .reference { color: var(--muted); font-size: .88rem; }
+    .rating { display: flex; flex-wrap: wrap; gap: 9px; margin-top: 14px; }
+    .rating .selected { color: white; background: var(--blue); }
+    .nav { display: flex; justify-content: space-between; gap: 12px; margin-top: 28px; padding-top: 20px; border-top: 1px solid var(--line); }
+    .nav-group { display: flex; gap: 9px; }
+
+    .overview { margin-top: 14px; display: grid; grid-template-columns: repeat(5, 1fr); gap: 7px; }
+    .dot { aspect-ratio: 1; display: grid; place-items: center; border: 0; border-radius: 10px; color: #536270; background: #edf2f5; font-weight: 850; }
+    .dot.current { box-shadow: 0 0 0 3px rgba(56,189,248,.35); }
+    .dot.correct { color: #14642f; background: #dcfce7; }
+    .dot.partial { color: #8a4a08; background: #fef3c7; }
+    .dot.wrong { color: #922020; background: #fee2e2; }
+
+    .result { display: none; }
+    .result.show { display: block; }
+    .result-hero { padding: 24px; border-radius: 18px; color: white; background: linear-gradient(120deg, #034f7d, #0792ae); }
+    .result-hero h2 { margin: 0 0 8px; font-size: 2rem; }
+    .result-big { font-size: clamp(2.2rem, 6vw, 4.5rem); font-weight: 900; line-height: 1; }
+    .result-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin: 18px 0; }
+    .result-tile { padding: 16px; border: 1px solid var(--line); border-radius: 15px; background: #fbfdfe; }
+    .result-tile strong { display: block; font-size: 1.35rem; }
+    .concepts { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; margin-top: 18px; }
+    .concept-box { padding: 16px; border-radius: 15px; background: #f5f8fa; }
+    .concept-box h3 { margin: 0 0 9px; font-size: 1rem; }
+    .concept-box ul { margin: 0; padding-left: 19px; color: var(--muted); }
+    .recommendation { margin-top: 18px; padding: 18px; border: 1px solid #9dd2e5; border-radius: 16px; background: #eefafd; }
+    .recommendation h3 { margin: 0 0 6px; }
+    .hidden { display: none !important; }
+
+    @media (max-width: 820px) {
+      .topbar { grid-template-columns: 1fr; }
+      .scorebox { min-width: 0; }
+      .layout { grid-template-columns: 1fr; }
+      .side-card { position: static; }
+      .result-grid, .concepts { grid-template-columns: 1fr; }
+    }
+    @media (max-width: 520px) {
+      .shell { width: min(100% - 18px, 1120px); padding-top: 9px; }
+      .topbar, .card, .side-card { border-radius: 16px; }
+      .card { padding: 19px; }
+      .task-head { align-items: center; }
+      .nav { flex-direction: column; }
+      .nav-group { justify-content: space-between; }
+      .nav .btn { flex: 1; }
+    }
+  </style>
+</head>
+<body>
+  <main class="shell">
+    <header class="topbar">
+      <div>
+        <p class="eyebrow">CNS1 - Lecture Review</p>
+        <h1>Internet Protocol Version 6 - Part 2</h1>
+        <p class="subtitle">Aktiver Verständnischeck zu ICMPv6, Konfiguration, Koexistenz und Security</p>
+      </div>
+      <div class="scorebox" aria-live="polite">
+        <strong id="scoreText">0 / 100 Punkte</strong>
+        <span id="percentText">0% - noch keine Endnote</span>
+      </div>
+      <div class="progress-wrap">
+        <div class="progress-track"><div class="progress-fill" id="progressFill"></div></div>
+        <div class="progress-labels"><span id="progressText">0 / 13 Aufgaben</span><span id="streakText">Streak: 0</span></div>
+      </div>
+    </header>
+
+    <section class="layout">
+      <article class="card">
+        <div id="quizView"></div>
+        <div id="resultView" class="result"></div>
+      </article>
+
+      <aside>
+        <div class="side-card">
+          <h2>Aufgabenübersicht</h2>
+          <div class="mini-stat"><span>Bearbeitet</span><strong id="doneSide">0 / 13</strong></div>
+          <div class="mini-stat"><span>Aktuelle Punkte</span><strong id="pointsSide">0 / 100</strong></div>
+          <div class="mini-stat"><span>Selbsteinschätzung</span><strong id="gradeSide">am Ende</strong></div>
+          <div class="overview" id="overview"></div>
+          <div class="actions">
+            <button class="btn primary" id="saveBtn">Zwischenstand speichern</button>
+            <button class="btn ghost" id="finishBtn">Auswertung</button>
+            <button class="btn danger" id="resetBtn">Zurücksetzen</button>
+          </div>
+          <p class="save-note" id="saveNotice" aria-live="polite">Änderungen werden auch automatisch lokal gespeichert.</p>
+          <p class="source-note">Grundlage: offizielle CNS1-Folien „IPv6 - Part 2“, technische Inhalte der Folien 6-43 sowie Zusammenfassung 45-46. Lösungen bleiben verborgen, bis du sie ausdrücklich öffnest.</p>
+        </div>
+      </aside>
+    </section>
+  </main>
+
+  <script>
+    const questions = [
+      {
+        id: "icmp-role", type: "multi", topic: "ICMPv6", points: 6,
+        prompt: "Welche Aussagen beschreiben Funktionen von ICMPv6 korrekt?",
+        hint: "Wähle alle richtigen Aussagen.",
+        options: [
+          "ICMPv6 ist für IPv6 optional und wird nur für ping benötigt.",
+          "ICMPv6 unterstützt Duplicate Address Detection und Neighbor Discovery.",
+          "ICMPv6 übernimmt in IPv6 unter anderem Aufgaben, die bei IPv4 ARP oder IGMP zugeordnet sind.",
+          "ICMPv6 transportiert reguläre TCP-Nutzdaten zwischen Anwendungen.",
+          "ICMPv6 ist ein integraler, obligatorischer Bestandteil von IPv6."
+        ], correct: [1,2,4],
+        solution: "Richtig sind die Aussagen 2, 3 und 5. ICMPv6 ist für IPv6 obligatorisch und übernimmt neben Fehler- und Informationsmeldungen auch Funktionen wie Autokonfiguration, Nachbarerkennung, Adressauflösung und Multicast-Gruppenverwaltung.",
+        reference: "Folien 6-7", concepts: ["ICMPv6"]
+      },
+      {
+        id: "icmp-types", type: "single", topic: "ICMPv6-Fehlermeldungen", points: 7,
+        prompt: "Ein Router kann ein IPv6-Paket nicht weiterleiten, weil es grösser als die MTU des nächsten Hops ist. Was geschieht gemäss Vorlesung?",
+        options: [
+          "Der Router fragmentiert das Paket und sendet alle Fragmente weiter.",
+          "Der Router verwirft das Paket und sendet ICMPv6 Type 2 'Packet Too Big' mit der Next-Hop-MTU.",
+          "Der Router sendet ICMPv6 Type 3 'Time Exceeded' und erhöht den Hop Limit.",
+          "Der Router wandelt das Paket automatisch in IPv4 um."
+        ], correct: 1,
+        solution: "Der Router verwirft das Paket und meldet mit ICMPv6 Type 2 'Packet Too Big' die MTU des nächsten Hops. Darauf basiert Path MTU Discovery; IPv6-Router fragmentieren nicht.",
+        reference: "Folie 10; Vergleich auf Folie 45", concepts: ["ICMPv6", "Path MTU Discovery"]
+      },
+      {
+        id: "icmp-troubleshoot", type: "single", topic: "ICMPv6 Troubleshooting", points: 8,
+        prompt: "traceroute6 provoziert absichtlich ablaufende Hop Limits. Welche ICMPv6-Meldung macht dadurch die Zwischenrouter sichtbar?",
+        options: [
+          "Type 1, Code 4: Port unreachable",
+          "Type 2: Packet Too Big",
+          "Type 3, Code 0: Hop Limit exceeded in transit",
+          "Type 4, Code 1: Unrecognized Next Header"
+        ], correct: 2,
+        solution: "ICMPv6 Type 3, Code 0 ('Hop Limit exceeded in transit') wird von einem Router gesendet, wenn das Hop Limit abläuft. traceroute nutzt genau diesen Mechanismus.",
+        reference: "Folie 11", concepts: ["ICMPv6", "Troubleshooting"]
+      },
+      {
+        id: "eui64", type: "single", topic: "SLAAC / EUI-64", points: 10,
+        prompt: "Welche Interface-ID entsteht gemäss Folien aus der MAC-Adresse 08-00-09-A1-72-26?",
+        options: [
+          "0800:09FF:FEA1:7226",
+          "0A00:09FF:FEA1:7226",
+          "0A00:0900:00A1:7226",
+          "FE80:0000:0A00:09A1"
+        ], correct: 1,
+        solution: "Zwischen dem 3. und 4. MAC-Byte wird FF-FE eingefügt und das 7. Bit wird invertiert. Aus 08-00-09-A1-72-26 wird deshalb 0A00:09FF:FEA1:7226.",
+        reference: "Folien 16-17", concepts: ["SLAAC", "EUI-64"]
+      },
+      {
+        id: "slaac-order", type: "order", topic: "SLAAC-Ablauf", points: 8,
+        prompt: "Bringe den vereinfachten SLAAC-Ablauf aus der Vorlesung in die richtige Reihenfolge.",
+        items: [
+          "Link-Local-Adresse mit FE80:: und Interface-ID bilden",
+          "Router Solicitation senden",
+          "Router Advertisement mit Netzwerkpräfix empfangen",
+          "Globales Präfix und Interface-ID kombinieren",
+          "Duplicate Address Detection durchführen"
+        ], initial: [2,0,4,1,3], correct: [0,1,2,3,4],
+        solution: "Zuerst entsteht die Link-Local-Adresse. Damit kann der Host eine Router Solicitation senden. Das Router Advertisement liefert das Präfix; danach bildet der Host die globale Adresse und prüft sie mit Duplicate Address Detection.",
+        reference: "Folie 17", concepts: ["SLAAC", "Router Advertisement"]
+      },
+      {
+        id: "mo-flags", type: "multi", topic: "Router Advertisement / M- und O-Bit", points: 10,
+        prompt: "Welche Zuordnungen der M-/O-Bits sind korrekt?",
+        hint: "Wähle alle richtigen Zuordnungen.",
+        options: [
+          "M=0, O=0: nur SLAAC",
+          "M=0, O=1: SLAAC für die Adresse, DHCPv6 für zusätzliche Parameter",
+          "M=1, O=1: DHCPv6 verwaltet Adresse und zusätzliche Parameter",
+          "M=1, O=0: bevorzugte Einstellung für stateless DHCPv6",
+          "M=0, O=1: DHCPv6 liefert zwingend auch die IPv6-Adresse"
+        ], correct: [0,1,2],
+        solution: "0/0 bedeutet SLAAC only, 0/1 bedeutet SLAAC plus stateless DHCPv6 für Zusatzparameter, 1/1 bedeutet stateful DHCPv6. Die Kombination 1/0 ist in den Folien als unbenutzt markiert.",
+        reference: "Folie 20", concepts: ["DHCPv6", "Router Advertisement"]
+      },
+      {
+        id: "dhcpv6-case", type: "text", topic: "DHCPv6", points: 8,
+        prompt: "Ein Unternehmen möchte IPv6-Adressen zentral kontrollieren und zusätzlich DNS-Parameter verteilen. Erkläre, welcher Mechanismus passt und warum SLAAC allein nicht genügt.",
+        hint: "Antworte in 2-4 Sätzen. Bewerte dich nach dem Öffnen der Lösung selbst.",
+        solution: "Passend ist stateful DHCPv6: Der DHCPv6-Server liefert die IPv6-Adresse und zusätzliche Konfigurationsparameter. SLAAC allein erzeugt zwar eine Adresse, kann gemäss Folien aber beispielsweise keine DNS-Server- oder SIP-Proxy-Adressen bereitstellen. DHCPv6 verbessert zudem Kontrolle und Nachverfolgung der Adressnutzung.",
+        reference: "Folien 21-23", concepts: ["DHCPv6"]
+      },
+      {
+        id: "dns", type: "single", topic: "DNS für IPv6", points: 7,
+        prompt: "Welche Aussage zu DNS und IPv6 ist korrekt?",
+        options: [
+          "AAAA-Records bilden IPv6-Adressen auf Hostnamen ab; Reverse Lookups liegen unter in-addr.arpa.",
+          "AAAA-Records ordnen Hostnamen IPv6-Adressen zu; Reverse Lookups liegen unter ip6.arpa und verwenden Nibbles.",
+          "Ein Dual-Stack-Resolver fragt nur AAAA ab und leitet daraus bei Bedarf einen A-Record ab.",
+          "DNS-Abfragen nach AAAA müssen zwingend über eine IPv6-Verbindung transportiert werden."
+        ], correct: 1,
+        solution: "AAAA ordnet einem Hostnamen eine IPv6-Adresse zu. Reverse Lookups liegen unter ip6.arpa und notieren die Adresse nibbleweise in umgekehrter Reihenfolge. Die DNS-Kommunikation selbst darf über IPv4 oder IPv6 laufen.",
+        reference: "Folien 25-27", concepts: ["DNS"]
+      },
+      {
+        id: "coexistence", type: "text", topic: "Koexistenz / Dual Stack", points: 8,
+        prompt: "Ein Dienst läuft nur über IPv4, ein neues Mobilnetz soll intern aber IPv6-only sein. Erkläre das Grundproblem und nenne den in der Vorlesung erwähnten Ansatz für weiterhin benötigte IPv4-Konnektivität.",
+        hint: "Gesucht sind Prinzip und Übergangsmechanismus, nicht Detailkonfigurationen.",
+        solution: "Ein reiner IPv6-Client kann einen nur über IPv4 erreichbaren Dienst nicht direkt ansprechen. Die Vorlesung nennt für ein IPv6-only Mobilnetz 464XLAT, damit Anwendungen weiterhin IPv4-Konnektivität erhalten. Allgemein ist Dual Stack ein Koexistenzansatz, bei dem beide Protokollstapel parallel vorhanden sind.",
+        reference: "Folien 29-31 und 34", concepts: ["Koexistenz", "464XLAT"]
+      },
+      {
+        id: "mapped-tunnel", type: "multi", topic: "IPv4-mapped / Tunneling", points: 7,
+        prompt: "Welche Aussagen zu IPv4-mapped IPv6-Adressen und IPv6-in-IPv4-Tunneling sind korrekt?",
+        options: [
+          "IPv4-mapped IPv6-Adressen verwenden gemäss Folien das Präfix ::FFFF:0:0/96.",
+          "Die IPv4-Adresse belegt darin die verbleibenden 32 Bit.",
+          "Beim IPv6-in-IPv4-Tunnel signalisiert das IPv4-Protokollfeld den Wert 41.",
+          "Eine IPv4-mapped IPv6-Adresse wandelt den entfernten IPv4-Host automatisch in einen IPv6-Host um.",
+          "IPv6-Tunneling ist laut Folien heute wichtiger als Dual Stack."
+        ], correct: [0,1,2],
+        solution: "Das Mapping nutzt ::FFFF:0:0/96; die IPv4-Adresse liegt in den letzten 32 Bit. Bei IPv6-in-IPv4 wird das IPv6-Paket als IPv4-Nutzlast gekapselt, wobei Protocol=41 verwendet wird. Mapping ist eine Socket-/Adressdarstellung, keine automatische Protokollumwandlung; Tunneling hat laut Folien an Bedeutung verloren.",
+        reference: "Folien 32-35", concepts: ["IPv4-mapped IPv6", "Tunneling"]
+      },
+      {
+        id: "pseudo-header", type: "multi", topic: "Pseudo-Header / Checksum", points: 8,
+        prompt: "Welche Felder gehören laut Vorlesung zum IPv6-Pseudo-Header?",
+        hint: "Wähle alle richtigen Felder.",
+        options: ["Source Address", "Destination Address", "Payload Length", "Next Header", "Flow Label", "Hop Limit"],
+        correct: [0,1,2,3],
+        solution: "Der IPv6-Pseudo-Header enthält Source Address, Destination Address, Payload Length und Next Header. Er bindet für die Checksumme relevante Netzwerkschichtinformationen ein und schützt so vor Fehlzustellung bzw. Korruption abhängiger Headerfelder.",
+        reference: "Folie 37", concepts: ["Pseudo-Header", "Checksum"]
+      },
+      {
+        id: "ipsec", type: "single", topic: "IPv6 Security / IPsec", points: 6,
+        prompt: "Welche Gegenüberstellung von AH und ESP entspricht den Folien?",
+        options: [
+          "AH bietet Vertraulichkeit; ESP nur Replay-Schutz.",
+          "AH (51) bietet Integrität und Herkunftsauthentisierung; ESP (50) zusätzlich Vertraulichkeit.",
+          "AH (50) verschlüsselt Nutzdaten; ESP (51) prüft nur den IPv6-Header.",
+          "Beide Verfahren sind heute zwingende Bestandteile jeder IPv6-Verbindung."
+        ], correct: 1,
+        solution: "AH ist Extension Header 51 und bietet verbindungslose Integrität, Herkunftsauthentisierung und Replay-Schutz. ESP ist Header 50 und bietet Herkunftsauthentizität, Integrität und Vertraulichkeit. IPsec wurde später von obligatorisch zu optional herabgestuft.",
+        reference: "Folie 38", concepts: ["IPsec"]
+      },
+      {
+        id: "boss", type: "text", topic: "Boss Question - Diagnose", points: 7,
+        prompt: "Ein Linux-Host erhält per SLAAC eine globale IPv6-Adresse, aber keine DNS-Serverinformation. Das Router Advertisement zeigt M=0 und O=0. Formuliere eine passende Diagnose, eine Konfigurationsänderung und einen Linux-Befehl, mit dem du anschliessend die IPv6-Adressen kontrollierst.",
+        hint: "Verbinde Wissen aus Autokonfiguration, DHCPv6 und Kommandozeilenwerkzeugen.",
+        solution: "Diagnose: M=0/O=0 aktiviert nur SLAAC; die Adresse funktioniert, aber es werden keine zusätzlichen DHCPv6-Parameter bezogen. Änderung: O auf 1 setzen und stateless DHCPv6 bereitstellen, damit SLAAC die Adresse und DHCPv6 Zusatzparameter wie DNS liefert. Kontrolle unter Linux: ip -6 addr show. Je nach gewünschter Verwaltung wäre M=1/O=1 mit stateful DHCPv6 eine Alternative.",
+        reference: "Folien 20-22 und 41", concepts: ["SLAAC", "DHCPv6", "Troubleshooting"]
+      }
+    ];
+
+    const STORAGE_KEY = "cns1-ipv6-part2-review-v1";
+    const DASHBOARD_QUIZ_ID = "cns1-w2-ipv6-part2";
+    const maxPoints = questions.reduce((sum, q) => sum + q.points, 0);
+    const defaultState = () => ({
+      current: 0,
+      answers: {},
+      order: {},
+      results: {},
+      revealed: {},
+      completed: false,
+      attemptId: createAttemptId(),
+      startedAt: new Date().toISOString(),
+      completedAt: null
+    });
+    let state = loadState();
+
+    function createAttemptId() {
+      if (globalThis.crypto?.randomUUID) return globalThis.crypto.randomUUID();
+      return `attempt-${Date.now()}-${Math.random().toString(16).slice(2)}`;
+    }
+
+    function loadState() {
+      try {
+        const saved = JSON.parse(localStorage.getItem(STORAGE_KEY));
+        return saved && typeof saved === "object" ? { ...defaultState(), ...saved } : defaultState();
+      } catch { return defaultState(); }
+    }
+    function saveState() { localStorage.setItem(STORAGE_KEY, JSON.stringify(state)); }
+    const esc = value => String(value ?? "").replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;","'":"&#39;"}[c]));
+    const resultFor = id => state.results[id];
+    const isDone = q => Boolean(resultFor(q.id));
+    const earned = () => questions.reduce((sum, q) => sum + (resultFor(q.id)?.points || 0), 0);
+    const completedCount = () => questions.filter(isDone).length;
+
+    function statusLabel(status) {
+      return status === "correct" ? "Richtig" : status === "partial" ? "Teilweise richtig" : status === "wrong" ? "Falsch" : "Übersprungen";
+    }
+
+    function updateHeader() {
+      const score = earned();
+      const done = completedCount();
+      const pct = Math.round(score / maxPoints * 100);
+      document.getElementById("scoreText").textContent = `${formatPoints(score)} / ${maxPoints} Punkte`;
+      document.getElementById("percentText").textContent = state.completed ? `${pct}% - Note ${grade(score)}` : `${pct}% - noch keine Endnote`;
+      document.getElementById("progressText").textContent = `${done} / ${questions.length} Aufgaben`;
+      document.getElementById("progressFill").style.width = `${done / questions.length * 100}%`;
+      document.getElementById("streakText").textContent = `Streak: ${streak()}`;
+      document.getElementById("doneSide").textContent = `${done} / ${questions.length}`;
+      document.getElementById("pointsSide").textContent = `${formatPoints(score)} / ${maxPoints}`;
+      document.getElementById("gradeSide").textContent = state.completed ? grade(score) : "am Ende";
+      document.getElementById("saveBtn").disabled = state.completed;
+      document.getElementById("finishBtn").disabled = done !== questions.length;
+      renderOverview();
+    }
+
+    function formatPoints(value) { return Number.isInteger(value) ? value : value.toFixed(1); }
+    function grade(score) { return (1 + 5 * (score / maxPoints)).toFixed(1); }
+    function streak() {
+      let best = 0, current = 0;
+      questions.forEach(q => {
+        const r = resultFor(q.id);
+        if (r?.status === "correct") { current += 1; best = Math.max(best, current); }
+        else if (r) current = 0;
+      });
+      return best;
+    }
+
+    function renderOverview() {
+      const el = document.getElementById("overview");
+      el.innerHTML = questions.map((q, i) => {
+        const status = resultFor(q.id)?.status || "";
+        return `<button class="dot ${status} ${!state.completed && state.current === i ? "current" : ""}" data-jump="${i}" aria-label="Aufgabe ${i+1}: ${status || "unbeantwortet"}">${i+1}</button>`;
+      }).join("");
+      el.querySelectorAll("[data-jump]").forEach(btn => btn.addEventListener("click", () => {
+        state.completed = false;
+        state.current = Number(btn.dataset.jump);
+        saveState(); render();
+      }));
+    }
+
+    function answerMarkup(q) {
+      const disabled = isDone(q) ? "disabled" : "";
+      if (q.type === "single" || q.type === "multi") {
+        const selected = Array.isArray(state.answers[q.id]) ? state.answers[q.id] : [];
+        const inputType = q.type === "single" ? "radio" : "checkbox";
+        return `<div class="options">${q.options.map((opt, i) => `<label class="option"><input ${disabled} type="${inputType}" name="${q.id}" value="${i}" ${selected.includes(i) ? "checked" : ""}><span>${esc(opt)}</span></label>`).join("")}</div>`;
+      }
+      if (q.type === "text") {
+        return `<textarea id="textAnswer" ${disabled} placeholder="Deine Antwort...">${esc(state.answers[q.id] || "")}</textarea>`;
+      }
+      if (q.type === "order") {
+        const order = state.order[q.id] || q.initial || q.items.map((_, i) => i);
+        return `<div class="order-list">${order.map((itemIndex, pos) => `<div class="order-row"><span class="rank">${pos+1}</span><span>${esc(q.items[itemIndex])}</span><button class="icon-btn" ${disabled || pos === 0 ? "disabled" : ""} data-move="${pos},-1" aria-label="Nach oben">↑</button><button class="icon-btn" ${disabled || pos === order.length-1 ? "disabled" : ""} data-move="${pos},1" aria-label="Nach unten">↓</button></div>`).join("")}</div>`;
+      }
+      return "";
+    }
+
+    function feedbackMarkup(q) {
+      const r = resultFor(q.id);
+      if (!r) return "";
+      const extra = r.status === "skipped" ? "Diese Aufgabe wurde übersprungen und erhält 0 Punkte." : `${statusLabel(r.status)} - ${formatPoints(r.points)} von ${q.points} Punkten.`;
+      return `<div class="feedback ${r.status === "skipped" ? "wrong" : r.status}"><strong>${extra}</strong>${r.note ? `<br>${esc(r.note)}` : ""}</div>`;
+    }
+
+    function solutionMarkup(q) {
+      if (!state.revealed[q.id]) return "";
+      const rating = q.type === "text" && !isDone(q) ? `<div class="rating"><button class="btn secondary" data-rate="correct">Voll richtig</button><button class="btn secondary" data-rate="partial">Teilweise richtig</button><button class="btn secondary" data-rate="wrong">Falsch / wusste ich nicht</button></div>` : "";
+      return `<div class="solution"><h3>Lösung und Begründung</h3><p>${esc(q.solution)}</p><p class="reference"><strong>Quelle:</strong> ${esc(q.reference)}</p>${rating}</div>`;
+    }
+
+    function renderQuestion() {
+      const q = questions[state.current];
+      document.getElementById("resultView").classList.remove("show");
+      const quiz = document.getElementById("quizView");
+      quiz.classList.remove("hidden");
+      quiz.innerHTML = `
+        <div class="task-head">
+          <div><div class="task-no">Aufgabe ${state.current + 1} von ${questions.length}</div><div class="topic">${esc(q.topic)}</div></div>
+          <div class="points">${q.points} Punkte</div>
+        </div>
+        <div class="question">${esc(q.prompt)}</div>
+        ${q.hint ? `<div class="hint">${esc(q.hint)}</div>` : ""}
+        ${answerMarkup(q)}
+        <div class="actions">
+          ${q.type !== "text" && !isDone(q) ? `<button class="btn primary" id="checkBtn">Antwort prüfen</button>` : ""}
+          ${q.type === "text" && !isDone(q) ? `<button class="btn primary" id="saveTextBtn">Antwort speichern</button>` : ""}
+          <button class="btn secondary" id="solutionBtn">${state.revealed[q.id] ? "Lösung ausblenden" : "Lösung anzeigen"}</button>
+          ${!isDone(q) ? `<button class="btn ghost" id="skipBtn">Überspringen</button>` : ""}
+        </div>
+        ${feedbackMarkup(q)}
+        ${solutionMarkup(q)}
+        <nav class="nav">
+          <button class="btn ghost" id="prevBtn" ${state.current === 0 ? "disabled" : ""}>← Zurück</button>
+          <div class="nav-group">
+            <button class="btn ghost" id="overviewBtn">Übersicht</button>
+            <button class="btn primary" id="nextBtn" ${state.current === questions.length - 1 ? "disabled" : ""}>Weiter →</button>
+          </div>
+        </nav>`;
+
+      bindQuestionEvents(q);
+    }
+
+    function bindQuestionEvents(q) {
+      document.querySelectorAll(`input[name="${q.id}"]`).forEach(input => input.addEventListener("change", () => {
+        if (q.type === "single") state.answers[q.id] = [Number(input.value)];
+        else state.answers[q.id] = [...document.querySelectorAll(`input[name="${q.id}"]:checked`)].map(x => Number(x.value));
+        saveState();
+      }));
+      document.querySelectorAll("[data-move]").forEach(btn => btn.addEventListener("click", () => {
+        const [pos, delta] = btn.dataset.move.split(",").map(Number);
+        const order = [...(state.order[q.id] || q.initial || q.items.map((_, i) => i))];
+        [order[pos], order[pos + delta]] = [order[pos + delta], order[pos]];
+        state.order[q.id] = order; saveState(); render();
+      }));
+      document.getElementById("checkBtn")?.addEventListener("click", () => gradeAuto(q));
+      document.getElementById("saveTextBtn")?.addEventListener("click", () => {
+        const text = document.getElementById("textAnswer").value.trim();
+        if (!text) return alert("Schreibe zuerst eine eigene Antwort.");
+        state.answers[q.id] = text; state.revealed[q.id] = true; saveState(); render();
+      });
+      document.getElementById("solutionBtn").addEventListener("click", () => {
+        if (q.type === "text" && !isDone(q)) {
+          const text = document.getElementById("textAnswer")?.value.trim();
+          if (!text) return alert("Schreibe zuerst eine eigene Antwort, bevor du die Lösung öffnest.");
+          state.answers[q.id] = text;
+        }
+        state.revealed[q.id] = !state.revealed[q.id]; saveState(); render();
+      });
+      document.querySelectorAll("[data-rate]").forEach(btn => btn.addEventListener("click", () => {
+        const status = btn.dataset.rate;
+        const factor = status === "correct" ? 1 : status === "partial" ? .5 : 0;
+        state.results[q.id] = { status, points: q.points * factor };
+        saveState(); render();
+      }));
+      document.getElementById("skipBtn")?.addEventListener("click", () => {
+        state.results[q.id] = { status: "skipped", points: 0 }; saveState(); render();
+      });
+      document.getElementById("prevBtn").addEventListener("click", () => navigate(-1));
+      document.getElementById("nextBtn").addEventListener("click", () => navigate(1));
+      document.getElementById("overviewBtn").addEventListener("click", () => document.querySelector(".side-card").scrollIntoView({ behavior: "smooth", block: "start" }));
+    }
+
+    function gradeAuto(q) {
+      let points = 0, status = "wrong", note = "";
+      if (q.type === "single") {
+        const answer = state.answers[q.id]?.[0];
+        if (answer === undefined) return alert("Wähle zuerst eine Antwort.");
+        points = answer === q.correct ? q.points : 0;
+      } else if (q.type === "multi") {
+        const selected = state.answers[q.id] || [];
+        if (!selected.length) return alert("Wähle zuerst mindestens eine Antwort.");
+        const correctHits = selected.filter(x => q.correct.includes(x)).length;
+        const wrongHits = selected.filter(x => !q.correct.includes(x)).length;
+        const fraction = Math.max(0, (correctHits - wrongHits) / q.correct.length);
+        points = Math.round(q.points * fraction * 2) / 2;
+        note = points > 0 && points < q.points ? "Teilpunkte: korrekte Auswahl abzüglich falscher Auswahl." : "";
+      } else if (q.type === "order") {
+        const order = state.order[q.id] || q.initial || q.items.map((_, i) => i);
+        const hits = order.filter((value, i) => value === q.correct[i]).length;
+        points = Math.round(q.points * hits / q.correct.length * 2) / 2;
+        state.order[q.id] = order;
+        note = points > 0 && points < q.points ? `${hits} von ${q.correct.length} Positionen stimmen.` : "";
+      }
+      status = points === q.points ? "correct" : points > 0 ? "partial" : "wrong";
+      state.results[q.id] = { status, points, note };
+      saveState(); render();
+    }
+
+    function navigate(delta) {
+      state.current = Math.min(questions.length - 1, Math.max(0, state.current + delta));
+      saveState(); render(); window.scrollTo({ top: 0, behavior: "smooth" });
+    }
+
+    function conceptAnalysis() {
+      const map = {};
+      questions.forEach(q => {
+        const r = resultFor(q.id);
+        q.concepts.forEach(c => {
+          map[c] ||= { earned: 0, max: 0 };
+          map[c].earned += r?.points || 0;
+          map[c].max += q.points;
+        });
+      });
+      const groups = { strong: [], mixed: [], weak: [] };
+      Object.entries(map).forEach(([name, value]) => {
+        const pct = value.max ? value.earned / value.max * 100 : 0;
+        const item = `${name} (${Math.round(pct)}%)`;
+        if (pct >= 80) groups.strong.push(item);
+        else if (pct >= 55) groups.mixed.push(item);
+        else groups.weak.push(item);
+      });
+      return groups;
+    }
+
+    function classification(pct) {
+      if (pct >= 85) return { status: "Sehr gut verstanden", answer: "Später auffrischen", recommendation: "Du hast den Stoff sehr gut verstanden. Eine kurze spätere Recall-Runde kann helfen, das Wissen langfristig zu behalten." };
+      if (pct >= 70) return { status: "Grundsätzlich verstanden, aber mit Lücken", answer: "Optional gezielt üben", recommendation: "Wenn du möchtest, kannst du die unsicheren Konzepte später mit neuen Aufgaben festigen." };
+      if (pct >= 50) return { status: "Noch nicht sicher verstanden", answer: "Optional nochmals anschauen", recommendation: "Ein gezieltes Review kann dir helfen, die schwachen und teilweise verstandenen Bereiche aus anderen Blickwinkeln zu üben." };
+      return { status: "Deutliche Wissenslücken", answer: "Optional Grundlagen festigen", recommendation: "Es kann sich lohnen, die wichtigsten schwachen Konzepte kurz nachzulesen und später ein fokussiertes Review zu versuchen." };
+    }
+
+    function list(items, emptyText) { return items.length ? `<ul>${items.map(x => `<li>${esc(x)}</li>`).join("")}</ul>` : `<p>${esc(emptyText)}</p>`; }
+
+    function renderResult() {
+      if (completedCount() !== questions.length) return alert("Bearbeite oder überspringe zuerst alle Aufgaben.");
+      state.completed = true;
+      state.completedAt ||= new Date().toISOString();
+      saveState();
+      const score = earned();
+      const pct = Math.round(score / maxPoints * 100);
+      const cls = classification(pct);
+      const concepts = conceptAnalysis();
+      const counts = { correct: 0, partial: 0, wrong: 0 };
+      questions.forEach(q => {
+        const status = resultFor(q.id)?.status;
+        if (status === "correct") counts.correct++;
+        else if (status === "partial") counts.partial++;
+        else counts.wrong++;
+      });
+      document.getElementById("quizView").classList.add("hidden");
+      const view = document.getElementById("resultView");
+      view.classList.add("show");
+      view.innerHTML = `
+        <div class="result-hero"><p class="eyebrow">Ergebnis</p><h2>${esc(cls.status)}</h2><div class="result-big">${pct}%</div><p>${formatPoints(score)} / ${maxPoints} Punkte - Selbsteinschätzungsnote ${grade(score)}</p></div>
+        <div class="result-grid">
+          <div class="result-tile"><strong>${counts.correct}</strong><span>voll richtig</span></div>
+          <div class="result-tile"><strong>${counts.partial}</strong><span>teilweise richtig</span></div>
+          <div class="result-tile"><strong>${counts.wrong}</strong><span>falsch / übersprungen</span></div>
+        </div>
+        <div class="concepts">
+          <div class="concept-box"><h3>Stärken</h3>${list(concepts.strong, "Noch kein Bereich über 80%.")}</div>
+          <div class="concept-box"><h3>Unsicher</h3>${list(concepts.mixed, "Keine gemischten Bereiche.")}</div>
+          <div class="concept-box"><h3>Wiederholen</h3>${list(concepts.weak, "Keine klar schwachen Bereiche.")}</div>
+        </div>
+        <div class="recommendation"><h3>Nächster freiwilliger Schritt: ${esc(cls.answer)}</h3><p>${esc(cls.recommendation)}</p></div>
+        <div class="actions">
+          <button class="btn primary" id="exportBtn">Ergebnis als JSON exportieren</button>
+          ${pct < 85 ? `<button class="btn secondary" id="targetBtn">Gezieltes Review vorbereiten (optional)</button>` : ""}
+          <button class="btn ghost" id="backToQuiz">Antworten ansehen</button>
+        </div>`;
+      document.getElementById("exportBtn").addEventListener("click", () => exportResult(false));
+      document.getElementById("targetBtn")?.addEventListener("click", () => exportResult(true));
+      document.getElementById("backToQuiz").addEventListener("click", () => { state.completed = false; saveState(); render(); });
+      reportResultToDashboard(score, pct, concepts, cls);
+      updateHeader();
+    }
+
+    function reportResultToDashboard(score, pct, concepts, cls) {
+      const message = {
+        source: "zhaw-quiz",
+        version: 1,
+        type: "quiz-completed",
+        quizId: DASHBOARD_QUIZ_ID,
+        attempt: {
+          attemptId: state.attemptId,
+          completedAt: state.completedAt,
+          score,
+          maximumScore: maxPoints,
+          percentage: pct,
+          grade: Number(grade(score)),
+          understanding: cls.status,
+          strongConcepts: concepts.strong,
+          uncertainConcepts: concepts.mixed,
+          weakConcepts: concepts.weak
+        }
+      };
+      if (window.parent && window.parent !== window) window.parent.postMessage(message, "*");
+      if (window.opener && !window.opener.closed) window.opener.postMessage(message, "*");
+    }
+
+    function reportProgressToDashboard(manual = false) {
+      if (state.completed) return;
+      const message = {
+        source: "zhaw-quiz", version: 1, type: "quiz-progress", quizId: DASHBOARD_QUIZ_ID, manual,
+        progress: {
+          attemptId: state.attemptId,
+          currentTask: state.current + 1,
+          completedCount: completedCount(),
+          totalQuestions: questions.length,
+          score: earned(),
+          maximumScore: maxPoints,
+          updatedAt: new Date().toISOString()
+        }
+      };
+      if (window.parent && window.parent !== window) window.parent.postMessage(message, "*");
+      if (window.opener && !window.opener.closed) window.opener.postMessage(message, "*");
+    }
+
+    function saveProgressManually() {
+      const question = questions[state.current];
+      const text = document.getElementById("textAnswer");
+      if (question?.type === "text" && text) state.answers[question.id] = text.value;
+      saveState();
+      reportProgressToDashboard(true);
+      document.getElementById("saveNotice").textContent = `Zwischenstand gespeichert · ${new Date().toLocaleTimeString("de-CH", { hour: "2-digit", minute: "2-digit" })}`;
+    }
+
+    function clearDashboardProgress() {
+      const message = { source: "zhaw-quiz", version: 1, type: "quiz-progress-reset", quizId: DASHBOARD_QUIZ_ID };
+      if (window.parent && window.parent !== window) window.parent.postMessage(message, "*");
+      if (window.opener && !window.opener.closed) window.opener.postMessage(message, "*");
+    }
+
+    function exportResult(targeted) {
+      const score = earned();
+      const pct = Math.round(score / maxPoints * 100);
+      const concepts = conceptAnalysis();
+      const payload = {
+        subject: "CNS1",
+        lecture: "IPv6 - Part 2",
+        source: "W2_CNS1-sld-02-ipv6-2.pdf",
+        date: state.completedAt || new Date().toISOString(),
+        attemptId: state.attemptId,
+        totalScore: score,
+        maximumScore: maxPoints,
+        percentage: pct,
+        grade: Number(grade(score)),
+        recommendation: pct >= 85 ? "no_new_review" : pct >= 70 ? "short_targeted_review" : "targeted_review",
+        questionResults: questions.map(q => ({ id: q.id, topic: q.topic, points: resultFor(q.id)?.points || 0, maximum: q.points, status: resultFor(q.id)?.status || "unanswered" })),
+        weakConcepts: concepts.weak,
+        partiallyUnderstoodConcepts: concepts.mixed,
+        strongConcepts: concepts.strong,
+        request: targeted ? "Create a new targeted HTML review with different questions for weak and partially understood concepts." : undefined
+      };
+      const blob = new Blob([JSON.stringify(payload, null, 2)], { type: "application/json" });
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement("a");
+      link.href = url; link.download = targeted ? "CNS1_IPv6_Part2_targeted_review.json" : "CNS1_IPv6_Part2_result.json";
+      link.click(); URL.revokeObjectURL(url);
+    }
+
+    function render() {
+      if (state.completed) renderResult(); else renderQuestion();
+      updateHeader();
+    }
+
+    document.getElementById("saveBtn").addEventListener("click", saveProgressManually);
+    document.getElementById("finishBtn").addEventListener("click", renderResult);
+    document.getElementById("resetBtn").addEventListener("click", () => {
+      if (!confirm("Wirklich alle Antworten und Punkte dieses Reviews löschen?")) return;
+      localStorage.removeItem(STORAGE_KEY); clearDashboardProgress(); state = defaultState(); render();
+    });
+
+    const readyMessage = { source: "zhaw-quiz", version: 1, type: "quiz-ready", quizId: DASHBOARD_QUIZ_ID };
+    if (window.parent && window.parent !== window) window.parent.postMessage(readyMessage, "*");
+    if (window.opener && !window.opener.closed) window.opener.postMessage(readyMessage, "*");
+    render();
+    reportProgressToDashboard(false);
+  </script>
+</body>
+</html>

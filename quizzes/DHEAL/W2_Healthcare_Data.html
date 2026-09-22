@@ -1,0 +1,644 @@
+<!doctype html>
+<html lang="de">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Interaktives DHEAL-Review zu Healthcare Data: From Clinical Care to AI-Ready Data.">
+  <title>DHEAL - Healthcare Data - Lecture Review</title>
+  <style>
+    :root {
+      --ink: #17303a;
+      --muted: #60747b;
+      --teal: #236f70;
+      --teal-dark: #164f55;
+      --mint: #dff3ee;
+      --blue: #367fba;
+      --paper: #fff;
+      --wash: #edf6f4;
+      --line: #cfe0dc;
+      --green: #198754;
+      --amber: #a96c00;
+      --red: #b9343b;
+      --shadow: 0 18px 50px rgba(25, 84, 84, .13);
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      min-height: 100vh;
+      color: var(--ink);
+      font: 16px/1.5 Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      background:
+        radial-gradient(circle at 8% 0%, rgba(64, 166, 164, .16), transparent 29rem),
+        linear-gradient(145deg, #fbfdfd 0%, var(--wash) 70%, #e5f1ef 100%);
+    }
+    button, input, textarea { font: inherit; }
+    button { cursor: pointer; }
+    button:focus-visible, input:focus-visible, textarea:focus-visible { outline: 3px solid rgba(54,127,186,.3); outline-offset: 2px; }
+    .shell { width: min(1140px, calc(100% - 32px)); margin: 0 auto; padding: 28px 0 46px; }
+    .topbar {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) auto;
+      gap: 20px;
+      align-items: start;
+      padding: 25px;
+      color: #fff;
+      border-radius: 24px;
+      background: linear-gradient(120deg, #164f55, #237274 62%, #3b8f83);
+      box-shadow: var(--shadow);
+    }
+    .eyebrow { margin: 0 0 6px; color: #c8f4ed; font-size: .78rem; font-weight: 850; letter-spacing: .14em; text-transform: uppercase; }
+    h1 { margin: 0; font-size: clamp(1.55rem, 3vw, 2.4rem); line-height: 1.1; }
+    .subtitle { margin: 9px 0 0; color: #dcf6f1; }
+    .scorebox { min-width: 215px; padding: 14px 16px; border: 1px solid rgba(255,255,255,.28); border-radius: 16px; background: rgba(255,255,255,.1); }
+    .scorebox strong, .scorebox span { display: block; }
+    .scorebox strong { font-size: 1.35rem; }
+    .scorebox span { margin-top: 4px; color: #dcf6f1; font-size: .9rem; }
+    .progress-wrap { grid-column: 1 / -1; margin-top: 17px; }
+    .progress-track { height: 10px; overflow: hidden; border-radius: 999px; background: rgba(255,255,255,.2); }
+    .progress-fill { width: 0; height: 100%; border-radius: inherit; background: linear-gradient(90deg, #8ce5d7, #d9fff8); transition: width .25s ease; }
+    .progress-labels { display: flex; justify-content: space-between; gap: 12px; margin-top: 8px; color: #dcf6f1; font-size: .86rem; }
+    .layout { display: grid; grid-template-columns: minmax(0, 1fr) 270px; gap: 22px; margin-top: 22px; }
+    .card, .side-card { border: 1px solid rgba(164,195,189,.72); border-radius: 22px; background: rgba(255,255,255,.95); box-shadow: var(--shadow); }
+    .card { min-height: 570px; padding: clamp(22px, 4vw, 38px); }
+    .side-card { position: sticky; top: 18px; padding: 18px; }
+    .side-card h2 { margin: 0 0 12px; font-size: 1rem; }
+    .mini-stat { display: flex; justify-content: space-between; gap: 10px; padding: 10px 0; color: var(--muted); border-bottom: 1px solid var(--line); font-size: .9rem; }
+    .mini-stat strong { color: var(--ink); }
+    .source-note { margin: 16px 0 0; color: var(--muted); font-size: .78rem; line-height: 1.45; }
+    .save-note { min-height: 1.25em; margin: 9px 0 0; color: var(--green); font-size: .8rem; font-weight: 750; }
+    .task-head { display: flex; justify-content: space-between; gap: 16px; align-items: flex-start; }
+    .task-no { color: var(--teal); font-size: .82rem; font-weight: 850; letter-spacing: .08em; text-transform: uppercase; }
+    .topic { margin-top: 6px; color: var(--muted); font-size: .94rem; }
+    .points { flex: none; padding: 7px 11px; color: var(--teal-dark); border-radius: 999px; background: var(--mint); font-weight: 800; }
+    .question { margin: 24px 0 18px; font-size: clamp(1.15rem, 2vw, 1.4rem); line-height: 1.42; }
+    .hint { margin: -7px 0 18px; color: var(--muted); font-size: .92rem; }
+    .options, .order-list { display: grid; gap: 10px; }
+    .option { display: grid; grid-template-columns: auto 1fr; gap: 12px; align-items: start; padding: 13px 15px; border: 1px solid var(--line); border-radius: 14px; background: #fbfdfd; transition: border-color .15s, transform .15s; }
+    .option:hover { border-color: #62aaa4; transform: translateY(-1px); }
+    .option input { margin-top: 4px; accent-color: var(--teal); }
+    textarea { width: 100%; min-height: 155px; padding: 14px; resize: vertical; color: var(--ink); border: 1px solid var(--line); border-radius: 14px; background: #fbfdfd; line-height: 1.5; }
+    .order-row { display: grid; grid-template-columns: 36px 1fr auto auto; gap: 8px; align-items: center; padding: 10px; border: 1px solid var(--line); border-radius: 13px; background: #fbfdfd; }
+    .rank { display: grid; place-items: center; width: 30px; height: 30px; color: #fff; border-radius: 50%; background: var(--teal); font-weight: 800; }
+    .move { width: 34px; height: 34px; padding: 0; color: var(--teal); border: 1px solid var(--line); border-radius: 9px; background: #fff; font-weight: 900; }
+    .actions { display: flex; flex-wrap: wrap; gap: 9px; margin-top: 22px; }
+    .btn { min-height: 42px; padding: 10px 15px; border: 1px solid transparent; border-radius: 12px; font-weight: 780; }
+    .btn.primary { color: #fff; background: var(--teal); }
+    .btn.secondary { color: #fff; background: var(--blue); }
+    .btn.ghost { color: var(--ink); border-color: var(--line); background: #fff; }
+    .btn:disabled { cursor: not-allowed; opacity: .42; }
+    .feedback, .solution { margin-top: 18px; padding: 16px; border-radius: 14px; }
+    .feedback.correct { color: #0c6638; background: #e5f7eb; }
+    .feedback.partial { color: #7c5600; background: #fff4d0; }
+    .feedback.wrong, .feedback.skipped { color: #8c272d; background: #fdebed; }
+    .solution { border: 1px solid #bdd9d3; background: #eef9f6; }
+    .solution h3 { margin: 0 0 8px; font-size: 1rem; }
+    .solution p { margin: 7px 0; }
+    .reference { color: var(--muted); font-size: .85rem; }
+    .self-rate { display: flex; flex-wrap: wrap; gap: 9px; margin-top: 12px; }
+    .overview { display: grid; grid-template-columns: repeat(4, 1fr); gap: 7px; }
+    .dot { display: grid; place-items: center; aspect-ratio: 1; padding: 0; color: var(--muted); border: 1px solid var(--line); border-radius: 10px; background: #f4f7f7; font-weight: 800; }
+    .dot.current { outline: 3px solid rgba(54,127,186,.24); }
+    .dot.correct { color: #fff; border-color: var(--green); background: var(--green); }
+    .dot.partial { color: #fff; border-color: var(--amber); background: var(--amber); }
+    .dot.wrong, .dot.skipped { color: #fff; border-color: var(--red); background: var(--red); }
+    .result { display: none; }
+    .result.show { display: block; }
+    .result-hero { padding: 24px; color: #fff; border-radius: 18px; background: linear-gradient(120deg, #164f55, #2d827c); }
+    .result-hero h2 { margin: 0 0 8px; font-size: 2rem; }
+    .result-big { font-size: clamp(2.5rem, 7vw, 4.8rem); font-weight: 900; line-height: 1; }
+    .result-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin: 18px 0; }
+    .result-tile { padding: 16px; border: 1px solid var(--line); border-radius: 15px; background: #fbfdfd; }
+    .result-tile strong, .result-tile span { display: block; }
+    .result-tile strong { font-size: 1.35rem; }
+    .concepts { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; }
+    .concept-box { padding: 16px; border: 1px solid var(--line); border-radius: 15px; }
+    .concept-box h3 { margin: 0 0 8px; font-size: 1rem; }
+    .concept-box ul { margin: 0; padding-left: 18px; }
+    .recommendation { margin-top: 16px; padding: 18px; border-left: 5px solid var(--teal); border-radius: 12px; background: var(--mint); }
+    .recommendation h3, .recommendation p { margin: 0; }
+    .recommendation p { margin-top: 6px; }
+    .hidden { display: none !important; }
+    @media (max-width: 830px) {
+      .topbar { grid-template-columns: 1fr; }
+      .scorebox { min-width: 0; }
+      .layout { grid-template-columns: 1fr; }
+      .side-card { position: static; }
+    }
+    @media (max-width: 600px) {
+      .shell { width: min(100% - 20px, 1140px); padding-top: 10px; }
+      .topbar, .card, .side-card { border-radius: 17px; }
+      .result-grid, .concepts { grid-template-columns: 1fr; }
+      .order-row { grid-template-columns: 32px 1fr auto auto; }
+    }
+  </style>
+</head>
+<body>
+  <main class="shell">
+    <header class="topbar">
+      <div>
+        <p class="eyebrow">DHEAL · Lecture 02</p>
+        <h1>Healthcare Data: From Clinical Care to AI-Ready Data</h1>
+        <p class="subtitle">Aktiver Verständnischeck zu klinischen Daten, Kontext, Interoperabilität und validen Vorhersagen</p>
+      </div>
+      <div class="scorebox" aria-live="polite"><strong id="scoreText">0 / 100 Punkte</strong><span id="percentText">0 % · noch keine Endnote</span></div>
+      <div class="progress-wrap">
+        <div class="progress-track"><div class="progress-fill" id="progressFill"></div></div>
+        <div class="progress-labels"><span id="progressText">0 / 12 Aufgaben</span><span id="streakText">Streak: 0</span></div>
+      </div>
+    </header>
+
+    <div class="layout">
+      <section class="card">
+        <div id="quizView"></div>
+        <div id="resultView" class="result"></div>
+      </section>
+      <aside class="side-card">
+        <h2>Aufgabenübersicht</h2>
+        <div class="overview" id="overview"></div>
+        <div class="mini-stat"><span>Bearbeitet</span><strong id="doneSide">0 / 12</strong></div>
+        <div class="mini-stat"><span>Aktuelle Punkte</span><strong id="pointsSide">0 / 100</strong></div>
+        <div class="mini-stat"><span>Lernnote</span><strong id="gradeSide">am Ende</strong></div>
+        <div class="actions">
+          <button class="btn secondary" id="saveBtn" type="button">Zwischenstand speichern</button>
+          <button class="btn primary" id="finishBtn" type="button" disabled>Review abschliessen</button>
+          <button class="btn ghost" id="resetBtn" type="button">Fortschritt zurücksetzen</button>
+        </div>
+        <p class="save-note" id="saveNotice" aria-live="polite">Änderungen werden auch automatisch lokal gespeichert.</p>
+        <p class="source-note">Quelle: <strong>02.digital-health.healthcare-data_moodle.pdf</strong>, Folien 1–36. Die Note ist eine Selbsteinschätzung, keine offizielle Hochschulnote.</p>
+      </aside>
+    </div>
+  </main>
+
+  <script>
+    const questions = [
+      {
+        id: "care-data", type: "single", topic: "Clinical workflow", points: 6,
+        prompt: "Welche Aussage beschreibt am besten, wie aus klinischer Versorgung ein Patientendatensatz entsteht?",
+        options: [
+          "Der Patient erzeugt während der Behandlung automatisch genau eine vollständige Tabellenzeile.",
+          "Klinische Abläufe erzeugen Beobachtungen zu verschiedenen Zeiten und Zwecken; ein Datensatz ist eine für eine konkrete Frage konstruierte Repräsentation.",
+          "Alle relevanten Daten entstehen erst beim Spitalaustritt im EHR.",
+          "Ein einzelnes Informationssystem enthält normalerweise die vollständige Patient Journey."
+        ], correct: 1,
+        solution: "Klinische Versorgung erzeugt verteilte, heterogene und longitudinale Beobachtungen. Die Zeile pro Patient entsteht erst durch Auswahl und Zusammenführung für eine bestimmte klinische oder Forschungsfrage.",
+        reference: "Folien 7–8", concepts: ["Clinical workflow", "Dataset representation"]
+      },
+      {
+        id: "modalities", type: "multi", topic: "Data modalities", points: 7,
+        prompt: "Welche Zuordnungen von Datenmodalität und natürlicher Struktur sind korrekt?",
+        hint: "Wähle alle korrekten Aussagen.",
+        options: [
+          "Clinical text – Sequenz von Wörtern bzw. Tokens",
+          "Medical imaging – 3D-Volumen plus Metadaten",
+          "Physiological signals – Zeitreihe von Samples",
+          "Alle Modalitäten – identische flache Tabelle ohne Informationsverlust",
+          "ECG – räumliche Anatomie ohne zeitliche Dynamik"
+        ], correct: [0,1,2],
+        solution: "Text, Bilder und Signale kodieren Information grundsätzlich unterschiedlich: als sprachliche Sequenz, räumliches Volumen mit Metadaten beziehungsweise zeitliche Signalfolge.",
+        reference: "Folien 10 und 13", concepts: ["Data modalities", "Representation"]
+      },
+      {
+        id: "representation-chain", type: "order", topic: "From patient to model", points: 8,
+        prompt: "Bringe die Stationen von der klinischen Realität bis zum tatsächlichen Modell-Input in die richtige Reihenfolge.",
+        items: ["Clinical reality", "Care systems", "Raw data", "Analysis dataset", "Model input"],
+        initial: [2,0,4,1,3], correct: [0,1,2,3,4],
+        solution: "Clinical reality → Care systems → Raw data → Analysis dataset → Model input. Jeder Übergang enthält Modellierungsentscheidungen und verändert, was das Modell lernen kann.",
+        reference: "Folie 27", concepts: ["Dataset representation", "Modelling decisions"]
+      },
+      {
+        id: "glucose-context", type: "text", topic: "Semantics and provenance", points: 9,
+        prompt: "In einem Export steht nur „glucose = 100“. Erkläre, warum das für eine klinische Interpretation nicht genügt und welche Informationen du zusätzlich brauchst.",
+        hint: "Denke nicht nur an die Einheit, sondern auch an Entstehung und Zeitpunkt.",
+        solution: "Benötigt werden mindestens Einheit, Messzeitpunkt, klinischer Kontext beziehungsweise Messbedingung und Provenance: zum Beispiel mg/dL oder mmol/L, nüchtern oder nach einer Mahlzeit, vor oder nach Behandlung sowie Labor, Gerät/Assay und Referenzbereich. Ein Zahlenwert ohne Metadaten ist unvollständig.",
+        reference: "Folien 11 und 18", concepts: ["Clinical context", "Metadata", "Data provenance"]
+      },
+      {
+        id: "longitudinal-feature", type: "single", topic: "Longitudinal features", points: 7,
+        prompt: "Vor dem Prediction Time Point liegen Kreatininwerte 105, 118 und 127 µmol/L vor. Welche Aussage ist korrekt?",
+        options: [
+          "Der Patient hat genau einen objektiv richtigen Kreatininwert: 127.",
+          "Erster Wert, letzter Wert, Maximum, Mittelwert oder Veränderung sind mögliche Features mit unterschiedlicher Bedeutung.",
+          "Zeitpunkte sind nur Metadaten und verändern das Feature nicht.",
+          "Für Modelle muss immer der Mittelwert verwendet werden."
+        ], correct: 1,
+        solution: "Longitudinale Beobachtungen müssen durch einen Zeitpunkt, ein Zeitfenster oder eine Aggregationsregel in Features überführt werden. Jede Wahl – etwa first, last, maximum, mean oder change – verändert die Bedeutung.",
+        reference: "Folie 12", concepts: ["Longitudinal data", "Feature engineering", "Timing"]
+      },
+      {
+        id: "missingness", type: "multi", topic: "Informative missingness", points: 8,
+        prompt: "Warum kann ein fehlender Laborwert in klinischen Daten auftreten?",
+        hint: "Wähle alle von der Vorlesung gestützten Gründe.",
+        options: [
+          "Der Test war klinisch nicht angezeigt und wurde nicht angeordnet.",
+          "Der Test wurde angeordnet, aber nicht durchgeführt.",
+          "Das Resultat existiert in einem anderen Informationssystem.",
+          "Ein technischer oder betrieblicher Fehler verhinderte die Verfügbarkeit.",
+          "Fehlende Werte entstehen immer rein zufällig."
+        ], correct: [0,1,2,3],
+        solution: "Missingness kann aus Entscheidungen, Workflows, verteilten Systemen oder technischen Problemen entstehen. Deshalb kann das Fehlen selbst Information über den Versorgungsprozess tragen.",
+        reference: "Folien 16–17", concepts: ["Missingness", "Clinical workflow"]
+      },
+      {
+        id: "outlier", type: "single", topic: "Data quality", points: 7,
+        prompt: "Eine Herzfrequenz von 190 bpm fällt stark aus der Verteilung. Was ist der fachlich richtige erste Schritt?",
+        options: [
+          "Den Wert automatisch löschen, weil er statistisch extrem ist.",
+          "Den Wert durch den Mittelwert ersetzen.",
+          "Kontext prüfen: Waveform/ECG, Nachbarwerte, Notizen, Medikamente, Timestamp und Gerät.",
+          "Den gesamten Patienten aus dem Datensatz entfernen."
+        ], correct: 2,
+        solution: "Ein Ausreisser kann Artefakt oder klinisch wichtige Physiologie sein. Statistische Auffälligkeit allein reicht nicht; zuerst muss der klinische und technische Kontext untersucht werden.",
+        reference: "Folie 19", concepts: ["Data quality", "Outliers", "Clinical context"]
+      },
+      {
+        id: "proxy-label", type: "text", topic: "Targets and labels", points: 10,
+        prompt: "Ein Modell soll Patient deterioration vorhersagen. Als Label wird ICU admission verwendet. Erkläre den Proxy-Label-Risikofaktor.",
+        solution: "ICU admission ist beobachtbar und leicht aus dem EHR zu extrahieren, entspricht aber nicht allein der physiologischen Verschlechterung. Sie hängt zusätzlich von klinischen Entscheidungen, Behandlungszielen, Bettverfügbarkeit und lokaler Spitalpraxis ab. Das Modell kann dadurch Prozesse des Gesundheitssystems statt nur den Patientenzustand lernen.",
+        reference: "Folien 20–21", concepts: ["Targets and labels", "Proxy labels", "Validity"]
+      },
+      {
+        id: "systems", type: "single", topic: "Clinical information systems", points: 8,
+        prompt: "Welche Kombination beschreibt DICOM, PACS und den Radiologiebericht korrekt?",
+        options: [
+          "DICOM speichert nur den Befundtext; PACS erstellt automatisch die Diagnose.",
+          "DICOM repräsentiert Bilder plus Metadaten; PACS speichert und ruft Studien ab; der Bericht enthält die klinische Interpretation.",
+          "PACS ist ein standardisierter FHIR-Ressourcentyp für Laborwerte.",
+          "Ein DICOM Study enthält Pixelwerte, aber grundsätzlich keine Metadaten."
+        ], correct: 1,
+        solution: "DICOM standardisiert Bilddaten und interpretierbare Metadaten. PACS ist das Archivierungs- und Kommunikationssystem; die radiologische Interpretation erscheint im Report.",
+        reference: "Folie 25", concepts: ["PACS", "DICOM", "Clinical information systems"]
+      },
+      {
+        id: "fhir", type: "multi", topic: "Interoperability", points: 8,
+        prompt: "Welche Aussagen zu FHIR sind gemäss Vorlesung korrekt?",
+        options: [
+          "FHIR repräsentiert Healthcare Information als standardisierte, verlinkbare Ressourcen.",
+          "Das Ziel ist eine einzige riesige Tabelle für alle klinischen Daten.",
+          "Ressourcen wie Patient, Encounter, Observation und Condition können miteinander verknüpft werden.",
+          "Die Ressourcen helfen, Beziehungen und Bedeutung über Systeme hinweg zu bewahren.",
+          "FHIR ersetzt die klinischen Workflows, in denen Daten entstehen."
+        ], correct: [0,2,3],
+        solution: "FHIR schafft eine gemeinsame, austauschbare Struktur aus verlinkten Ressourcen. Es geht nicht um eine Giant Table und nicht darum, die klinische Entstehung der Daten zu ersetzen.",
+        reference: "Folie 26", concepts: ["FHIR", "Interoperability"]
+      },
+      {
+        id: "leakage", type: "multi", topic: "Temporal leakage", points: 10,
+        prompt: "Prediction Time ist 24 Stunden nach Aufnahme; vorhergesagt wird deterioration in den nächsten 48 Stunden. Welche Inputs sind zulässig?",
+        hint: "Wähle nur Informationen, die am Prediction Time Point tatsächlich bekannt sind.",
+        options: [
+          "Alter, bei Aufnahme dokumentiert",
+          "Erste Herzfrequenz um 08:15 Uhr",
+          "Maximale Herzfrequenz innerhalb der ersten 24 Stunden",
+          "Kreatininresultat, das erst nach 26 Stunden berichtet wurde",
+          "ICU transfer nach 36 Stunden",
+          "Discharge diagnosis",
+          "Length of stay",
+          "Medikation, die an Tag 4 gestartet wurde"
+        ], correct: [0,1,2],
+        solution: "Zulässig sind Alter, erste Herzfrequenz und das Maximum aus dem abgeschlossenen 0–24-h-Fenster. Alles, was erst nach t0 bekannt wird, leakt Information aus der Zukunft.",
+        reference: "Folien 29–31", concepts: ["Prediction time", "Temporal leakage", "Observation window"]
+      },
+      {
+        id: "boss", type: "text", topic: "Boss Question – Data Reality Check", points: 12,
+        prompt: "Ein Team will bei Spitalaufnahme ein Modell für Verschlechterung entwickeln. Formuliere einen sauberen Prediction Task und nenne mindestens vier konkrete Prüfungen aus dem Data Reality Check, bevor das Modell trainiert wird.",
+        hint: "Verbinde Population, Prediction Time, Observation Window, Target und mögliche Datenprobleme.",
+        solution: "Beispiel: Für definierte stationär aufgenommene Erwachsene soll bei t0 = 24 h nach Aufnahme mit ausschliesslich bis dahin verfügbaren Daten eine Verschlechterung in den folgenden 48 h vorhergesagt werden. Vor dem Training sind mindestens zu prüfen: Population (Ein-/Ausschlüsse und Zielpopulation), Time (Messung und Verfügbarkeit bei t0), Measurement (Gerät/Assay/Workflow/Definition), Missingness (warum fehlt etwas und ist das informativ?), Target (wie wurde deterioration operationalisiert, ist es ein Proxy?) und Setting (Unterschiede zwischen Spitälern, Populationen oder Zeitperioden). Zusätzlich müssen Provenance und Transformationen von Care Systems über Raw Data bis zu Features explizit sein.",
+        reference: "Folien 22, 29–32 und 35", concepts: ["Problem formulation", "Data Reality Check", "Validity", "Temporal leakage"]
+      }
+    ];
+
+    const STORAGE_KEY = "dheal-w2-healthcare-data-review-v1";
+    const DASHBOARD_QUIZ_ID = "dheal-w2-healthcare-data";
+    const maxPoints = questions.reduce((sum, question) => sum + question.points, 0);
+    const defaultState = () => ({
+      current: 0, answers: {}, order: {}, results: {}, revealed: {}, completed: false,
+      attemptId: createAttemptId(), startedAt: new Date().toISOString(), completedAt: null
+    });
+    let state = loadState();
+
+    function createAttemptId() {
+      if (globalThis.crypto?.randomUUID) return globalThis.crypto.randomUUID();
+      return `attempt-${Date.now()}-${Math.random().toString(16).slice(2)}`;
+    }
+    function loadState() {
+      try {
+        const saved = JSON.parse(localStorage.getItem(STORAGE_KEY));
+        return saved && typeof saved === "object" ? { ...defaultState(), ...saved } : defaultState();
+      } catch (_) { return defaultState(); }
+    }
+    function saveState() { localStorage.setItem(STORAGE_KEY, JSON.stringify(state)); }
+    function escapeHtml(value) { return String(value ?? "").replace(/[&<>"']/g, char => ({"&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;","'":"&#39;"}[char])); }
+    function resultFor(id) { return state.results[id]; }
+    function isDone(question) { return Boolean(resultFor(question.id)); }
+    function earned() { return questions.reduce((sum, question) => sum + (resultFor(question.id)?.points || 0), 0); }
+    function completedCount() { return questions.filter(isDone).length; }
+    function formatPoints(value) { return Number.isInteger(value) ? value : value.toFixed(1); }
+    function grade(score) { return (1 + 5 * score / maxPoints).toFixed(1); }
+    function statusLabel(status) { return status === "correct" ? "Richtig" : status === "partial" ? "Teilweise richtig" : status === "wrong" ? "Falsch" : "Übersprungen"; }
+
+    function streak() {
+      let best = 0, current = 0;
+      questions.forEach(question => {
+        const result = resultFor(question.id);
+        if (result?.status === "correct") { current += 1; best = Math.max(best, current); }
+        else if (result) current = 0;
+      });
+      return best;
+    }
+
+    function updateHeader() {
+      const score = earned();
+      const done = completedCount();
+      const percentage = Math.round(score / maxPoints * 100);
+      document.getElementById("scoreText").textContent = `${formatPoints(score)} / ${maxPoints} Punkte`;
+      document.getElementById("percentText").textContent = state.completed ? `${percentage} % · Note ${grade(score)}` : `${percentage} % · noch keine Endnote`;
+      document.getElementById("progressText").textContent = `${done} / ${questions.length} Aufgaben`;
+      document.getElementById("progressFill").style.width = `${done / questions.length * 100}%`;
+      document.getElementById("streakText").textContent = `Streak: ${streak()}`;
+      document.getElementById("doneSide").textContent = `${done} / ${questions.length}`;
+      document.getElementById("pointsSide").textContent = `${formatPoints(score)} / ${maxPoints}`;
+      document.getElementById("gradeSide").textContent = state.completed ? grade(score) : "am Ende";
+      document.getElementById("saveBtn").disabled = state.completed;
+      document.getElementById("finishBtn").disabled = done !== questions.length;
+      renderOverview();
+    }
+
+    function renderOverview() {
+      const overview = document.getElementById("overview");
+      overview.innerHTML = questions.map((question, index) => {
+        const status = resultFor(question.id)?.status || "";
+        return `<button class="dot ${status} ${!state.completed && state.current === index ? "current" : ""}" data-jump="${index}" aria-label="Aufgabe ${index + 1}: ${status || "unbeantwortet"}">${index + 1}</button>`;
+      }).join("");
+      overview.querySelectorAll("[data-jump]").forEach(button => button.addEventListener("click", () => {
+        state.completed = false;
+        state.current = Number(button.dataset.jump);
+        saveState(); render();
+      }));
+    }
+
+    function answerArea(question) {
+      if (question.type === "single" || question.type === "multi") {
+        const selected = state.answers[question.id] || [];
+        const inputType = question.type === "single" ? "radio" : "checkbox";
+        return `<div class="options">${question.options.map((option, index) => `<label class="option"><input type="${inputType}" name="answer" value="${index}" ${selected.includes(index) ? "checked" : ""}><span>${escapeHtml(option)}</span></label>`).join("")}</div>`;
+      }
+      if (question.type === "order") {
+        const order = state.order[question.id] || question.initial || question.items.map((_, index) => index);
+        return `<div class="order-list">${order.map((itemIndex, position) => `<div class="order-row"><span class="rank">${position + 1}</span><span>${escapeHtml(question.items[itemIndex])}</span><button class="move" data-move="${position},-1" ${position === 0 ? "disabled" : ""} aria-label="Nach oben">↑</button><button class="move" data-move="${position},1" ${position === order.length - 1 ? "disabled" : ""} aria-label="Nach unten">↓</button></div>`).join("")}</div>`;
+      }
+      return `<textarea id="textAnswer" placeholder="Formuliere deine Antwort in eigenen Worten …">${escapeHtml(state.answers[question.id] || "")}</textarea>`;
+    }
+
+    function feedback(question) {
+      const result = resultFor(question.id);
+      if (!result) return "";
+      const detail = result.status === "skipped" ? "Diese Aufgabe wurde übersprungen und erhält 0 Punkte." : `${statusLabel(result.status)} · ${formatPoints(result.points)} von ${question.points} Punkten.`;
+      return `<div class="feedback ${result.status}"><strong>${escapeHtml(detail)}</strong>${result.note ? `<div>${escapeHtml(result.note)}</div>` : ""}</div>`;
+    }
+
+    function solution(question) {
+      if (!state.revealed[question.id]) return "";
+      const rating = question.type === "text" && !isDone(question) ? `<div class="self-rate"><button class="btn primary" data-rate="correct">Voll richtig</button><button class="btn secondary" data-rate="partial">Teilweise richtig</button><button class="btn ghost" data-rate="wrong">Falsch / wusste ich nicht</button></div>` : "";
+      return `<div class="solution"><h3>Erwartete Antwort</h3><p>${escapeHtml(question.solution)}</p><p class="reference"><strong>Quelle:</strong> ${escapeHtml(question.reference)}</p>${rating}</div>`;
+    }
+
+    function renderQuestion() {
+      const question = questions[state.current];
+      document.getElementById("resultView").classList.remove("show");
+      const quiz = document.getElementById("quizView");
+      quiz.classList.remove("hidden");
+      quiz.innerHTML = `
+        <div class="task-head"><div><div class="task-no">Aufgabe ${state.current + 1} von ${questions.length}</div><div class="topic">${escapeHtml(question.topic)}</div></div><div class="points">${question.points} Punkte</div></div>
+        <div class="question">${escapeHtml(question.prompt)}</div>
+        ${question.hint ? `<p class="hint">${escapeHtml(question.hint)}</p>` : ""}
+        ${answerArea(question)}
+        ${feedback(question)}
+        ${solution(question)}
+        <div class="actions">
+          ${question.type === "text" ? `<button class="btn primary" id="saveTextBtn">Antwort speichern</button>` : `<button class="btn primary" id="checkBtn">Antwort prüfen</button>`}
+          <button class="btn secondary" id="solutionBtn">${state.revealed[question.id] ? "Lösung ausblenden" : "Lösung anzeigen"}</button>
+          ${!isDone(question) ? `<button class="btn ghost" id="skipBtn">Überspringen</button>` : ""}
+          <button class="btn ghost" id="prevBtn" ${state.current === 0 ? "disabled" : ""}>← Zurück</button>
+          <button class="btn ghost" id="nextBtn" ${state.current === questions.length - 1 ? "disabled" : ""}>Weiter →</button>
+        </div>`;
+      bindEvents(question);
+    }
+
+    function bindEvents(question) {
+      document.querySelectorAll('input[name="answer"]').forEach(input => input.addEventListener("change", () => {
+        if (question.type === "single") state.answers[question.id] = [Number(input.value)];
+        else state.answers[question.id] = [...document.querySelectorAll('input[name="answer"]:checked')].map(element => Number(element.value));
+        saveState();
+      }));
+      document.querySelectorAll("[data-move]").forEach(button => button.addEventListener("click", () => {
+        const [position, delta] = button.dataset.move.split(",").map(Number);
+        const order = [...(state.order[question.id] || question.initial || question.items.map((_, index) => index))];
+        [order[position], order[position + delta]] = [order[position + delta], order[position]];
+        state.order[question.id] = order; saveState(); render();
+      }));
+      document.getElementById("checkBtn")?.addEventListener("click", () => gradeAuto(question));
+      document.getElementById("saveTextBtn")?.addEventListener("click", () => {
+        const text = document.getElementById("textAnswer").value.trim();
+        if (!text) return alert("Schreibe zuerst eine eigene Antwort.");
+        state.answers[question.id] = text; state.revealed[question.id] = true; saveState(); render();
+      });
+      document.getElementById("solutionBtn").addEventListener("click", () => {
+        if (question.type === "text" && !isDone(question)) {
+          const text = document.getElementById("textAnswer")?.value.trim();
+          if (!text) return alert("Schreibe zuerst eine eigene Antwort, bevor du die Lösung öffnest.");
+          state.answers[question.id] = text;
+        }
+        state.revealed[question.id] = !state.revealed[question.id]; saveState(); render();
+      });
+      document.querySelectorAll("[data-rate]").forEach(button => button.addEventListener("click", () => {
+        const status = button.dataset.rate;
+        const factor = status === "correct" ? 1 : status === "partial" ? .5 : 0;
+        state.results[question.id] = { status, points: question.points * factor };
+        saveState(); render();
+      }));
+      document.getElementById("skipBtn")?.addEventListener("click", () => {
+        state.results[question.id] = { status: "skipped", points: 0 }; saveState(); render();
+      });
+      document.getElementById("prevBtn").addEventListener("click", () => navigate(-1));
+      document.getElementById("nextBtn").addEventListener("click", () => navigate(1));
+    }
+
+    function gradeAuto(question) {
+      let points = 0, note = "";
+      if (question.type === "single") {
+        const answer = state.answers[question.id]?.[0];
+        if (answer === undefined) return alert("Wähle zuerst eine Antwort.");
+        points = answer === question.correct ? question.points : 0;
+      } else if (question.type === "multi") {
+        const selected = state.answers[question.id] || [];
+        if (!selected.length) return alert("Wähle zuerst mindestens eine Antwort.");
+        const correctHits = selected.filter(value => question.correct.includes(value)).length;
+        const wrongHits = selected.filter(value => !question.correct.includes(value)).length;
+        const fraction = Math.max(0, (correctHits - wrongHits) / question.correct.length);
+        points = Math.round(question.points * fraction * 2) / 2;
+        if (points > 0 && points < question.points) note = "Teilpunkte: korrekte Auswahl abzüglich falscher Auswahl.";
+      } else if (question.type === "order") {
+        const order = state.order[question.id] || question.initial || question.items.map((_, index) => index);
+        const hits = order.filter((value, index) => value === question.correct[index]).length;
+        points = Math.round(question.points * hits / question.correct.length * 2) / 2;
+        state.order[question.id] = order;
+        if (points > 0 && points < question.points) note = `${hits} von ${question.correct.length} Positionen stimmen.`;
+      }
+      const status = points === question.points ? "correct" : points > 0 ? "partial" : "wrong";
+      state.results[question.id] = { status, points, note }; saveState(); render();
+    }
+
+    function navigate(delta) {
+      state.current = Math.min(questions.length - 1, Math.max(0, state.current + delta));
+      saveState(); render(); window.scrollTo({ top: 0, behavior: "smooth" });
+    }
+
+    function conceptAnalysis() {
+      const map = {};
+      questions.forEach(question => {
+        const result = resultFor(question.id);
+        question.concepts.forEach(concept => {
+          map[concept] ||= { earned: 0, maximum: 0 };
+          map[concept].earned += result?.points || 0;
+          map[concept].maximum += question.points;
+        });
+      });
+      const groups = { strong: [], mixed: [], weak: [] };
+      Object.entries(map).forEach(([name, value]) => {
+        const percentage = value.maximum ? value.earned / value.maximum * 100 : 0;
+        const item = `${name} (${Math.round(percentage)} %)`;
+        if (percentage >= 80) groups.strong.push(item);
+        else if (percentage >= 55) groups.mixed.push(item);
+        else groups.weak.push(item);
+      });
+      return groups;
+    }
+
+    function classification(percentage) {
+      if (percentage >= 85) return { status: "Sehr gut verstanden", next: "Später auffrischen", recommendation: "Du hast den Stoff sehr gut verstanden. Eine kurze spätere Recall-Runde kann das Wissen langfristig festigen." };
+      if (percentage >= 70) return { status: "Grundsätzlich verstanden, aber mit Lücken", next: "Optional gezielt üben", recommendation: "Wenn du möchtest, kannst du die unsicheren Konzepte später mit neuen Aufgaben festigen." };
+      if (percentage >= 50) return { status: "Noch nicht sicher verstanden", next: "Optional nochmals anschauen", recommendation: "Ein gezieltes Review kann dir helfen, schwache und teilweise verstandene Bereiche aus einem anderen Blickwinkel zu üben." };
+      return { status: "Deutliche Wissenslücken", next: "Optional Grundlagen festigen", recommendation: "Es kann sich lohnen, zuerst die wichtigsten schwachen Konzepte nachzulesen und später ein fokussiertes Review zu versuchen." };
+    }
+    function list(items, emptyText) { return items.length ? `<ul>${items.map(item => `<li>${escapeHtml(item)}</li>`).join("")}</ul>` : `<p>${escapeHtml(emptyText)}</p>`; }
+
+    function renderResult() {
+      if (completedCount() !== questions.length) return alert("Bearbeite oder überspringe zuerst alle Aufgaben.");
+      state.completed = true;
+      state.completedAt ||= new Date().toISOString();
+      saveState();
+      const score = earned();
+      const percentage = Math.round(score / maxPoints * 100);
+      const resultClass = classification(percentage);
+      const concepts = conceptAnalysis();
+      const counts = { correct: 0, partial: 0, wrong: 0 };
+      questions.forEach(question => {
+        const status = resultFor(question.id)?.status;
+        if (status === "correct") counts.correct += 1;
+        else if (status === "partial") counts.partial += 1;
+        else counts.wrong += 1;
+      });
+      document.getElementById("quizView").classList.add("hidden");
+      const view = document.getElementById("resultView");
+      view.classList.add("show");
+      view.innerHTML = `
+        <div class="result-hero"><p class="eyebrow">Ergebnis</p><h2>${escapeHtml(resultClass.status)}</h2><div class="result-big">${percentage} %</div><p>${formatPoints(score)} / ${maxPoints} Punkte · Selbsteinschätzungsnote ${grade(score)}</p></div>
+        <div class="result-grid"><div class="result-tile"><strong>${counts.correct}</strong><span>voll richtig</span></div><div class="result-tile"><strong>${counts.partial}</strong><span>teilweise richtig</span></div><div class="result-tile"><strong>${counts.wrong}</strong><span>falsch / übersprungen</span></div></div>
+        <div class="concepts"><div class="concept-box"><h3>Stärken</h3>${list(concepts.strong, "Noch kein Bereich über 80 %.")}</div><div class="concept-box"><h3>Unsicher</h3>${list(concepts.mixed, "Keine gemischten Bereiche.")}</div><div class="concept-box"><h3>Wiederholen</h3>${list(concepts.weak, "Keine klar schwachen Bereiche.")}</div></div>
+        <div class="recommendation"><h3>Nächster freiwilliger Schritt: ${escapeHtml(resultClass.next)}</h3><p>${escapeHtml(resultClass.recommendation)}</p></div>
+        <div class="actions"><button class="btn primary" id="exportBtn">Ergebnis als JSON exportieren</button>${percentage < 85 ? `<button class="btn secondary" id="targetBtn">Gezieltes Review vorbereiten (optional)</button>` : ""}<button class="btn ghost" id="backToQuiz">Antworten ansehen</button></div>`;
+      document.getElementById("exportBtn").addEventListener("click", () => exportResult(false));
+      document.getElementById("targetBtn")?.addEventListener("click", () => exportResult(true));
+      document.getElementById("backToQuiz").addEventListener("click", () => { state.completed = false; saveState(); render(); });
+      reportResultToDashboard(score, percentage, concepts, resultClass);
+      updateHeader();
+    }
+
+    function resultPayload(score, percentage, concepts, resultClass) {
+      return {
+        subject: "DHEAL", lecture: "Lecture 02 – Healthcare Data: From Clinical Care to AI-Ready Data",
+        source: "02.digital-health.healthcare-data_moodle.pdf", date: state.completedAt || new Date().toISOString(), attemptId: state.attemptId,
+        totalScore: score, maximumScore: maxPoints, percentage, grade: Number(grade(score)), understanding: resultClass.status,
+        recommendation: percentage >= 85 ? "future_recall_optional" : percentage >= 70 ? "targeted_practice_optional" : "foundation_practice_optional",
+        questionResults: questions.map(question => ({ id: question.id, topic: question.topic, points: resultFor(question.id)?.points || 0, maximum: question.points, status: resultFor(question.id)?.status || "unanswered" })),
+        weakConcepts: concepts.weak, partiallyUnderstoodConcepts: concepts.mixed, strongConcepts: concepts.strong
+      };
+    }
+
+    function reportResultToDashboard(score, percentage, concepts, resultClass) {
+      const payload = resultPayload(score, percentage, concepts, resultClass);
+      const message = { source: "zhaw-quiz", version: 1, type: "quiz-completed", quizId: DASHBOARD_QUIZ_ID, attempt: {
+        attemptId: payload.attemptId, completedAt: payload.date, score: payload.totalScore, maximumScore: payload.maximumScore,
+        percentage: payload.percentage, grade: payload.grade, understanding: payload.understanding,
+        strongConcepts: payload.strongConcepts, uncertainConcepts: payload.partiallyUnderstoodConcepts, weakConcepts: payload.weakConcepts
+      }};
+      if (window.parent && window.parent !== window) window.parent.postMessage(message, "*");
+      if (window.opener && !window.opener.closed) window.opener.postMessage(message, "*");
+    }
+
+    function reportProgressToDashboard(manual = false) {
+      if (state.completed) return;
+      const message = {
+        source: "zhaw-quiz", version: 1, type: "quiz-progress", quizId: DASHBOARD_QUIZ_ID, manual,
+        progress: {
+          attemptId: state.attemptId,
+          currentTask: state.current + 1,
+          completedCount: completedCount(),
+          totalQuestions: questions.length,
+          score: earned(),
+          maximumScore: maxPoints,
+          updatedAt: new Date().toISOString()
+        }
+      };
+      if (window.parent && window.parent !== window) window.parent.postMessage(message, "*");
+      if (window.opener && !window.opener.closed) window.opener.postMessage(message, "*");
+    }
+
+    function saveProgressManually() {
+      const question = questions[state.current];
+      const text = document.getElementById("textAnswer");
+      if (question?.type === "text" && text) state.answers[question.id] = text.value;
+      saveState();
+      reportProgressToDashboard(true);
+      document.getElementById("saveNotice").textContent = `Zwischenstand gespeichert · ${new Date().toLocaleTimeString("de-CH", { hour: "2-digit", minute: "2-digit" })}`;
+    }
+
+    function clearDashboardProgress() {
+      const message = { source: "zhaw-quiz", version: 1, type: "quiz-progress-reset", quizId: DASHBOARD_QUIZ_ID };
+      if (window.parent && window.parent !== window) window.parent.postMessage(message, "*");
+      if (window.opener && !window.opener.closed) window.opener.postMessage(message, "*");
+    }
+
+    function exportResult(targeted) {
+      const score = earned();
+      const percentage = Math.round(score / maxPoints * 100);
+      const payload = resultPayload(score, percentage, conceptAnalysis(), classification(percentage));
+      if (targeted) payload.request = "Create a new targeted HTML review with different questions for weak and partially understood concepts.";
+      const blob = new Blob([JSON.stringify(payload, null, 2)], { type: "application/json" });
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement("a");
+      link.href = url;
+      link.download = targeted ? "DHEAL_Lecture02_targeted_review.json" : "DHEAL_Lecture02_result.json";
+      link.click(); URL.revokeObjectURL(url);
+    }
+
+    function render() {
+      if (state.completed) renderResult(); else renderQuestion();
+      updateHeader();
+    }
+
+    document.getElementById("saveBtn").addEventListener("click", saveProgressManually);
+    document.getElementById("finishBtn").addEventListener("click", renderResult);
+    document.getElementById("resetBtn").addEventListener("click", () => {
+      if (!confirm("Wirklich alle Antworten und Punkte dieses Reviews löschen?")) return;
+      localStorage.removeItem(STORAGE_KEY); clearDashboardProgress(); state = defaultState(); render();
+    });
+
+    const readyMessage = { source: "zhaw-quiz", version: 1, type: "quiz-ready", quizId: DASHBOARD_QUIZ_ID };
+    if (window.parent && window.parent !== window) window.parent.postMessage(readyMessage, "*");
+    if (window.opener && !window.opener.closed) window.opener.postMessage(readyMessage, "*");
+    render();
+    reportProgressToDashboard(false);
+  </script>
+</body>
+</html>
