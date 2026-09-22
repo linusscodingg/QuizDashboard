@@ -622,7 +622,7 @@
       }
 
       function renderAttemptReview(attempt) {
-        if (attempt.reviewItems === null) return '<span class="review-unavailable">Für diesen älteren Versuch wurden noch keine Antwortdetails gespeichert.</span>';
+        if (!Array.isArray(attempt.reviewItems)) return '<span class="review-unavailable">Für diesen älteren Versuch wurden noch keine Antwortdetails gespeichert.</span>';
         if (!attempt.reviewItems.length) return '<span class="review-unavailable">Keine falschen Antworten in diesem Versuch.</span>';
         return `<details class="attempt-review">
           <summary>Fehler ansehen (${attempt.reviewItems.length})</summary>

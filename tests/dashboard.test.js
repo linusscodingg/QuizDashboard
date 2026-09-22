@@ -14,6 +14,7 @@ assert.equal(inlineScripts.length, 1, "Dashboard should contain one inline appli
 assert.match(dashboardHtml, /\[hidden\]\s*\{\s*display:\s*none\s*!important;/, "Hidden account controls must stay hidden despite button display styles");
 assert.doesNotMatch(dashboardHtml, /cloudEmail|cloudPassword|cloudLoginBtn|cloudRegisterBtn/, "Dashboard must not expose the removed email/password login");
 assert.doesNotMatch(dashboardHtml, /leaderboardName|leaderboardToggle|leaderboardRemove|Mich anzeigen/, "Leaderboard must publish automatically under the GitHub username");
+assert.match(dashboardHtml, /!Array\.isArray\(attempt\.reviewItems\)/, "Legacy attempts without review details must remain renderable");
 
 class FakeElement {
   constructor(id) {
