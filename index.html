@@ -163,13 +163,18 @@
     }
     .subject-head {
       display: grid;
-      grid-template-columns: minmax(0, 1fr) auto;
+      grid-template-columns: minmax(0, 1fr) auto auto;
       gap: 20px;
       align-items: center;
       padding: 22px 24px;
       border-top: 5px solid var(--accent, var(--blue));
       border-bottom: 1px solid var(--line);
+      cursor: pointer;
+      user-select: none;
     }
+    .subject-head:hover { background: var(--wash); }
+    .subject-chevron { display: grid; place-items: center; width: 26px; height: 26px; color: var(--muted); font-size: 1.1rem; transition: transform .15s ease; }
+    .subject-head[aria-expanded="false"] .subject-chevron { transform: rotate(-90deg); }
     .subject-title { display: flex; gap: 13px; align-items: center; }
     .subject-mark { display: grid; place-items: center; width: 45px; height: 45px; border-radius: 13px; color: #fff; background: var(--accent, var(--blue)); font-size: .78rem; font-weight: 900; letter-spacing: .04em; }
     .subject h2 { margin: 0; font-size: 1.35rem; }
@@ -178,6 +183,7 @@
     .subject-score strong { display: block; color: var(--muted); font-size: .83rem; font-weight: 700; }
     .subject-score span { display: block; margin-top: 2px; color: var(--navy); font-size: 1.35rem; font-weight: 850; }
     .subject-body { padding: 18px; }
+    .subject-body[hidden] { display: none; }
     .quiz-list { display: grid; gap: 12px; }
     .quiz-card {
       display: grid;
@@ -370,6 +376,9 @@
       "use strict";
 
       const STORAGE_KEY = "quiz-dashboard-v1";
+      const COLLAPSE_KEY = "quiz-dashboard-collapsed-v1";
+      let collapsedSubjects = new Set();
+      try { collapsedSubjects = new Set(JSON.parse(localStorage.getItem(COLLAPSE_KEY) || "[]")); } catch (_) {}
       const catalog = window.QUIZ_CATALOG || { version: 1, subjects: [], quizzes: [] };
       const quizMap = new Map(catalog.quizzes.map(quiz => [quiz.id, quiz]));
       const player = document.getElementById("player");
@@ -572,9 +581,10 @@
           const quizzes = catalog.quizzes.filter(quiz => quiz.subject === subject.id).sort((a, b) => a.week - b.week || a.title.localeCompare(b.title));
           const totals = totalsFor(quizzes);
           const cards = quizzes.length ? quizzes.map(renderQuiz).join("") : '<div class="empty"><strong>Noch kein Quiz vorhanden.</strong>Das erste Review erscheint hier automatisch nach der Registrierung.</div>';
+          const collapsed = collapsedSubjects.has(subject.id);
           return `
             <section class="subject" style="--accent:${escapeHtml(subject.accent)}">
-              <header class="subject-head">
+              <header class="subject-head" data-toggle-subject="${escapeHtml(subject.id)}" role="button" tabindex="0" aria-expanded="${collapsed ? "false" : "true"}">
                 <div class="subject-title">
                   <div class="subject-mark">${escapeHtml(subject.id.slice(0, 4))}</div>
                   <div><h2>${escapeHtml(subject.name)}</h2><p class="subject-description">${escapeHtml(subject.description)}</p></div>
@@ -583,13 +593,29 @@
                   <strong>${totals.completed} / ${quizzes.length} bearbeitet</strong>
                   <span>${totals.percentage === null ? "Noch kein Ergebnis" : `${totals.percentage} % · Lernnote ${totals.grade}`}</span>
                 </div>
+                <span class="subject-chevron" aria-hidden="true">▾</span>
               </header>
-              <div class="subject-body"><div class="quiz-list">${cards}</div></div>
+              <div class="subject-body" ${collapsed ? "hidden" : ""}><div class="quiz-list">${cards}</div></div>
             </section>`;
         }).join("");
 
         root.querySelectorAll("[data-open-quiz]").forEach(button => button.addEventListener("click", () => openQuiz(button.dataset.openQuiz)));
         root.querySelectorAll("[data-delete-attempt]").forEach(button => button.addEventListener("click", () => deleteAttempt(button.dataset.quizId, button.dataset.deleteAttempt)));
+        root.querySelectorAll("[data-toggle-subject]").forEach(header => {
+          header.addEventListener("click", () => toggleSubject(header.dataset.toggleSubject));
+          header.addEventListener("keydown", event => {
+            if (event.key !== "Enter" && event.key !== " ") return;
+            event.preventDefault();
+            toggleSubject(header.dataset.toggleSubject);
+          });
+        });
+      }
+
+      function toggleSubject(subjectId) {
+        if (collapsedSubjects.has(subjectId)) collapsedSubjects.delete(subjectId);
+        else collapsedSubjects.add(subjectId);
+        try { localStorage.setItem(COLLAPSE_KEY, JSON.stringify([...collapsedSubjects])); } catch (_) {}
+        render();
       }
 
       function renderQuiz(quiz) {
