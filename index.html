@@ -240,9 +240,6 @@
     .leaderboard-head { display: flex; flex-wrap: wrap; gap: 16px; align-items: flex-end; justify-content: space-between; }
     .leaderboard h2 { margin: 0; }
     .leaderboard-intro { max-width: 720px; margin: 5px 0 0; color: var(--muted); font-size: .86rem; }
-    .leaderboard-controls { display: flex; flex-wrap: wrap; gap: 8px; align-items: end; }
-    .leaderboard-controls label { color: var(--muted); font-size: .76rem; font-weight: 750; }
-    .leaderboard-controls input { display: block; min-height: 38px; margin-top: 3px; padding: 7px 10px; border: 1px solid var(--line); border-radius: 9px; }
     .leaderboard-status { margin: 10px 0 0; color: var(--muted); font-size: .8rem; }
     .leaderboard-subjects { display: grid; gap: 12px; margin-top: 16px; }
     .leaderboard-subject { overflow: hidden; border: 1px solid var(--line); border-radius: 14px; }
@@ -338,12 +335,7 @@
       <div class="leaderboard-head">
         <div>
           <h2 id="leaderboardTitle">Lernvergleich</h2>
-          <p class="leaderboard-intro">Vergleiche freiwillig aggregierte Lernnoten. Quiz-Bestnote = bester Versuch; Quiz-Ø und Fach-Gesamt-Ø enthalten alle Wiederholungen. Der Vergleich dient nur der Lernmotivation und ist keine manipulationssichere Rangliste.</p>
-        </div>
-        <div class="leaderboard-controls">
-          <label for="leaderboardName">Anzeigename<input id="leaderboardName" maxlength="30" autocomplete="nickname" placeholder="Dein Anzeigename"></label>
-          <button class="button small" id="leaderboardToggle" type="button">Mich anzeigen</button>
-          <button class="button small danger" id="leaderboardRemove" type="button" hidden>Nicht mehr anzeigen</button>
+          <p class="leaderboard-intro">Vergleiche automatisch aggregierte Lernnoten unter dem GitHub-Benutzernamen. Quiz-Bestnote = bester Versuch; Quiz-Ø und Fach-Gesamt-Ø enthalten alle Wiederholungen. Der Vergleich dient nur der Lernmotivation und ist keine manipulationssichere Rangliste.</p>
         </div>
       </div>
       <p class="leaderboard-status" id="leaderboardStatus">Rangliste wird geladen …</p>
@@ -379,7 +371,6 @@
       let cloudUser = null;
       let cloudInitialised = false;
       let leaderboardEntries = [];
-      let leaderboardEnabled = false;
       let store = loadStore();
 
       function emptyStore() { return { version: 1, attempts: {}, progress: {} }; }
@@ -452,12 +443,10 @@
         cloudSaveTimer = setTimeout(async () => {
           try {
             await window.quizCloud.save(store);
-            if (leaderboardEnabled) {
-              const displayName = document.getElementById("leaderboardName").value.trim();
-              const subjects = buildLeaderboardSubjects();
-              await window.quizCloud.publishLeaderboard(displayName, subjects);
-              updateOwnLeaderboardEntry(displayName, subjects);
-            }
+            const githubUsername = githubUsernameFor(cloudUser);
+            const subjects = buildLeaderboardSubjects();
+            await window.quizCloud.publishLeaderboard(githubUsername, subjects);
+            updateOwnLeaderboardEntry(githubUsername, subjects);
             setCloudStatus(`Mit Firebase synchronisiert · ${new Date().toLocaleTimeString("de-CH", { hour: "2-digit", minute: "2-digit" })}`);
           } catch (error) {
             setCloudStatus("Cloud-Speicherung fehlgeschlagen – lokal weiterhin sicher gespeichert.", true);
@@ -771,20 +760,22 @@
         renderLeaderboard();
       }
 
+      function githubUsernameFor(user) {
+        const storedUsername = localStorage.getItem("quiz-github-username")?.trim();
+        if (storedUsername) return storedUsername.slice(0, 30);
+        const provider = user?.providerData?.find(item => item.providerId === "github.com");
+        return String(provider?.displayName || user?.displayName || `github-${provider?.uid || user?.uid || "user"}`).trim().slice(0, 30);
+      }
+
       async function loadLeaderboard(user) {
         const status = document.getElementById("leaderboardStatus");
         try {
+          const githubUsername = githubUsernameFor(user);
+          const subjects = buildLeaderboardSubjects();
+          await window.quizCloud.publishLeaderboard(githubUsername, subjects);
           const rawEntries = await window.quizCloud.loadLeaderboard();
           leaderboardEntries = rawEntries.map(normaliseLeaderboardEntry).filter(Boolean);
-          const ownEntry = leaderboardEntries.find(entry => entry.userId === user.uid);
-          leaderboardEnabled = Boolean(ownEntry);
-          document.getElementById("leaderboardName").value = ownEntry?.displayName
-            || String(user.displayName || user.providerData?.find(provider => provider.providerId === "github.com")?.displayName || "GitHub-Nutzer").slice(0, 30);
-          if (leaderboardEnabled) {
-            const subjects = buildLeaderboardSubjects();
-            await window.quizCloud.publishLeaderboard(ownEntry.displayName, subjects);
-            updateOwnLeaderboardEntry(ownEntry.displayName, subjects);
-          }
+          updateOwnLeaderboardEntry(githubUsername, subjects);
           renderLeaderboard();
         } catch (_) {
           status.textContent = "Der Lernvergleich konnte momentan nicht geladen werden.";
@@ -794,13 +785,7 @@
       function renderLeaderboard() {
         const root = document.getElementById("leaderboardSubjects");
         const status = document.getElementById("leaderboardStatus");
-        const toggle = document.getElementById("leaderboardToggle");
-        const remove = document.getElementById("leaderboardRemove");
-        toggle.textContent = leaderboardEnabled ? "Anzeigename aktualisieren" : "Mich anzeigen";
-        remove.hidden = !leaderboardEnabled;
-        status.textContent = leaderboardEnabled
-          ? "Du nimmst freiwillig teil. Sichtbar sind nur dein Anzeigename und zusammengefasste Lernnoten."
-          : "Du bist nicht sichtbar. Du kannst die Ergebnisse anderer angemeldeter Teilnehmer trotzdem ansehen.";
+        status.textContent = "Sichtbar sind automatisch der GitHub-Benutzername und zusammengefasste Lernnoten aller angemeldeten Nutzer.";
         const sections = catalog.subjects.map(subject => {
           const rows = leaderboardEntries
             .filter(entry => entry.subjects[subject.id])
@@ -827,7 +812,7 @@
             }).join("")}
           </article>`;
         }).join("");
-        root.innerHTML = sections || '<div class="empty"><strong>Noch keine sichtbaren Ergebnisse</strong>Die Rangliste füllt sich, sobald jemand freiwillig teilnimmt.</div>';
+        root.innerHTML = sections || '<div class="empty"><strong>Noch keine Ergebnisse</strong>Die Rangliste füllt sich automatisch, sobald angemeldete Nutzer Quizversuche abgeschlossen haben.</div>';
       }
 
       function normaliseReviewItems(raw) {
@@ -953,43 +938,6 @@
       document.getElementById("exportBtn").addEventListener("click", exportBackup);
       document.getElementById("importBtn").addEventListener("click", () => document.getElementById("importInput").click());
       document.getElementById("importInput").addEventListener("change", event => event.target.files[0] && importBackup(event.target.files[0]));
-      document.getElementById("leaderboardToggle").addEventListener("click", async () => {
-        const name = document.getElementById("leaderboardName").value.trim();
-        const button = document.getElementById("leaderboardToggle");
-        if (!cloudUser) return showToast("Melde dich zuerst mit GitHub an.");
-        if (!name) return showToast("Gib einen Anzeigenamen ein.");
-        if (name.length > 30) return showToast("Der Anzeigename darf höchstens 30 Zeichen lang sein.");
-        button.disabled = true;
-        try {
-          const subjects = buildLeaderboardSubjects();
-          await window.quizCloud.publishLeaderboard(name, subjects);
-          leaderboardEnabled = true;
-          updateOwnLeaderboardEntry(name, subjects);
-          showToast("Deine zusammengefassten Lernnoten sind jetzt im Lernvergleich sichtbar.");
-        } catch (_) {
-          showToast("Der Lernvergleich konnte nicht aktualisiert werden.");
-        } finally {
-          button.disabled = false;
-        }
-      });
-      document.getElementById("leaderboardRemove").addEventListener("click", async () => {
-        if (!confirm("Deinen Eintrag aus dem Lernvergleich entfernen? Deine privaten Quizresultate bleiben erhalten.")) return;
-        const button = document.getElementById("leaderboardRemove");
-        button.disabled = true;
-        leaderboardEnabled = false;
-        try {
-          await window.quizCloud.removeLeaderboard();
-          leaderboardEntries = leaderboardEntries.filter(entry => entry.userId !== cloudUser?.uid);
-          renderLeaderboard();
-          showToast("Du wirst nicht mehr im Lernvergleich angezeigt.");
-        } catch (_) {
-          leaderboardEnabled = true;
-          renderLeaderboard();
-          showToast("Der Eintrag konnte momentan nicht entfernt werden.");
-        } finally {
-          button.disabled = false;
-        }
-      });
       document.getElementById("cloudLogoutBtn").addEventListener("click", async () => {
         try {
           await window.quizCloud.logout();

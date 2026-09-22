@@ -13,6 +13,7 @@ const inlineScripts = [...dashboardHtml.matchAll(/<script(?:\s[^>]*)?>([\s\S]*?)
 assert.equal(inlineScripts.length, 1, "Dashboard should contain one inline application script");
 assert.match(dashboardHtml, /\[hidden\]\s*\{\s*display:\s*none\s*!important;/, "Hidden account controls must stay hidden despite button display styles");
 assert.doesNotMatch(dashboardHtml, /cloudEmail|cloudPassword|cloudLoginBtn|cloudRegisterBtn/, "Dashboard must not expose the removed email/password login");
+assert.doesNotMatch(dashboardHtml, /leaderboardName|leaderboardToggle|leaderboardRemove|Mich anzeigen/, "Leaderboard must publish automatically under the GitHub username");
 
 class FakeElement {
   constructor(id) {
@@ -43,7 +44,7 @@ const ids = [
   "importInput", "toast", "playerStatus"
   , "cloudTitle", "cloudStatus", "cloudLogoutBtn", "cloudDeleteToggle",
   "cloudDeletePanel", "cloudDeleteConfirm", "cloudDeleteCancel", "cloudDeleteError"
-  , "leaderboardName", "leaderboardToggle", "leaderboardRemove", "leaderboardStatus", "leaderboardSubjects"
+  , "leaderboardStatus", "leaderboardSubjects"
 ];
 const elements = Object.fromEntries(ids.map(id => [id, new FakeElement(id)]));
 const openQuizButton = new FakeElement("openQuiz");

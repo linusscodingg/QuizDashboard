@@ -64,10 +64,6 @@ const cloud = {
       updatedAt: serverTimestamp()
     });
   },
-  async removeLeaderboard() {
-    if (!cloud.currentUser) return;
-    await deleteDoc(leaderboardDocument(cloud.currentUser.uid));
-  },
   async deleteAccountAndData() {
     const user = cloud.currentUser;
     if (!user) throw Object.assign(new Error("No signed-in user"), { code: "auth/requires-recent-login" });

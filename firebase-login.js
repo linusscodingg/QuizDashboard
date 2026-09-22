@@ -1,7 +1,7 @@
 (async () => {
 const { initializeApp } = await import("https://www.gstatic.com/firebasejs/12.19.0/firebase-app.js");
 const {
-  getAuth, GithubAuthProvider, onAuthStateChanged, signInWithPopup, signOut
+  getAdditionalUserInfo, getAuth, GithubAuthProvider, onAuthStateChanged, signInWithPopup, signOut
 } = await import("https://www.gstatic.com/firebasejs/12.19.0/firebase-auth.js");
 const firebaseConfig = window.FIREBASE_CONFIG;
 
@@ -45,7 +45,9 @@ githubButton.addEventListener("click", async () => {
   setBusy(true);
   showMessage("GitHub-Anmeldung wird geöffnet …", "info");
   try {
-    await signInWithPopup(auth, new GithubAuthProvider());
+    const credential = await signInWithPopup(auth, new GithubAuthProvider());
+    const githubUsername = getAdditionalUserInfo(credential)?.username;
+    if (githubUsername) localStorage.setItem("quiz-github-username", githubUsername);
   } catch (error) {
     showMessage(friendlyError(error));
     setBusy(false);

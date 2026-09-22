@@ -30,14 +30,14 @@ Neue Quiz werden in `quizzes/<FACH>/` gespeichert und zusätzlich in `quiz-catal
 
 Neue abgeschlossene Versuche speichern zusätzlich die falsch oder teilweise richtig beantworteten Aufgaben mit eigener Antwort, richtiger Antwort und Erklärung. Diese Details lassen sich in der Versuchshistorie über **Fehler ansehen** öffnen. Bei älteren Versuchen können Details nur nachgetragen werden, wenn der dazugehörige abgeschlossene Quizstand noch lokal vorhanden ist.
 
-Der freiwillige **Lernvergleich** veröffentlicht ausschliesslich einen frei gewählten Anzeigenamen und aggregierte Noten. Pro Quiz zeigt er Bestnote, Durchschnitt aller Versuche und Anzahl Versuche. Pro Fach zeigt der Bestleistungs-Durchschnitt den Mittelwert der jeweiligen Quiz-Bestnoten; der Gesamt-Durchschnitt umfasst alle Versuche einschliesslich Wiederholungen. Private Antworten und Fehler bleiben im persönlichen Dashboard.
+Der **Lernvergleich** veröffentlicht nach der GitHub-Anmeldung automatisch den GitHub-Benutzernamen und aggregierte Noten. Pro Quiz zeigt er Bestnote, Durchschnitt aller Versuche und Anzahl Versuche. Pro Fach zeigt der Bestleistungs-Durchschnitt den Mittelwert der jeweiligen Quiz-Bestnoten; der Gesamt-Durchschnitt umfasst alle Versuche einschliesslich Wiederholungen. Private Antworten und Fehler bleiben im persönlichen Dashboard.
 
 ## Firebase
 
 Das Firebase-Projekt ist in `firebase-config.js` konfiguriert. In der Firebase Console müssen folgende Einstellungen aktiv sein:
 
 1. `Authentication` → `Anmeldemethode` → ausschliesslich `GitHub` aktivieren. `E-Mail/Passwort` deaktivieren. In der GitHub OAuth App muss die von Firebase angezeigte Callback-URL eingetragen sein.
-2. Cloud Firestore erstellen und die mitgelieferte Datei `firestore.rules` veröffentlichen. Sie schützt den privaten Datensatz `users/<uid>/dashboard/state`; die freiwilligen Zusammenfassungen unter `leaderboard/<uid>` sind nur für angemeldete GitHub-Nutzer lesbar und nur vom jeweiligen Eigentümer änderbar.
+2. Cloud Firestore erstellen und die mitgelieferte Datei `firestore.rules` veröffentlichen. Sie schützt den privaten Datensatz `users/<uid>/dashboard/state`; die automatischen Zusammenfassungen unter `leaderboard/<uid>` sind nur für angemeldete GitHub-Nutzer lesbar und nur vom jeweiligen Eigentümer änderbar.
 3. Vor der Veröffentlichung über GitHub Pages unter `Authentication` → `Einstellungen` → `Autorisierte Domains` die Domain `linusscodingg.github.io` ergänzen.
 4. In der Google Cloud Console prüfen, dass der Firebase-Browser-Key nur für die notwendigen Firebase-APIs zugelassen ist. Keine anderen kostenpflichtigen Google-APIs an denselben öffentlichen Schlüssel hängen.
 
