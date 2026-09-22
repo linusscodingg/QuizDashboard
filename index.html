@@ -236,7 +236,12 @@
     .icon-button:hover { background: var(--red-bg); }
     .empty { padding: 24px; color: var(--muted); border: 1px dashed #b8ccd5; border-radius: 14px; text-align: center; }
     .empty strong { display: block; margin-bottom: 3px; color: var(--ink); }
-    .leaderboard { margin-top: 22px; padding: 20px; border: 1px solid var(--line); border-radius: 20px; background: rgba(255,255,255,.92); box-shadow: 0 10px 28px rgba(18,65,88,.07); }
+    .leaderboard-overlay[hidden] { display: none; }
+    .leaderboard-overlay { position: fixed; inset: 0; z-index: 25; display: grid; grid-template-rows: auto 1fr; background: rgba(8,42,64,.55); }
+    .leaderboard-overlay-bar { display: flex; gap: 14px; align-items: center; padding: 12px 18px; color: #fff; background: var(--navy); box-shadow: 0 4px 18px rgba(0,0,0,.16); }
+    .leaderboard-overlay-bar h2 { flex: 1; margin: 0; font-size: 1rem; }
+    .leaderboard-overlay-inner { overflow-y: auto; padding: clamp(16px, 3vw, 32px); display: flex; justify-content: center; }
+    .leaderboard { width: min(920px, 100%); align-self: start; margin: 0; padding: 20px; border: 1px solid var(--line); border-radius: 20px; background: rgba(255,255,255,.96); box-shadow: 0 10px 28px rgba(18,65,88,.07); }
     .leaderboard-head { display: flex; flex-wrap: wrap; gap: 16px; align-items: flex-end; justify-content: space-between; }
     .leaderboard h2 { margin: 0; }
     .leaderboard-intro { max-width: 720px; margin: 5px 0 0; color: var(--muted); font-size: .86rem; }
@@ -297,6 +302,7 @@
         <p class="intro">Alle Vorlesungsreviews an einem Ort – mit Punkten, Schweizer Lernnote und deinem persönlichen Verlauf.</p>
       </div>
       <div class="head-actions">
+        <button class="button" id="compareBtn" type="button">Noten vergleichen</button>
         <button class="button" id="exportBtn" type="button">Sicherung exportieren</button>
         <button class="button secondary" id="importBtn" type="button">Sicherung importieren</button>
         <input id="importInput" type="file" accept="application/json,.json">
@@ -331,18 +337,22 @@
     </aside>
 
     <div class="subjects" id="subjects"></div>
-    <section class="leaderboard" aria-labelledby="leaderboardTitle">
-      <div class="leaderboard-head">
-        <div>
-          <h2 id="leaderboardTitle">Lernvergleich</h2>
-          <p class="leaderboard-intro">Vergleiche automatisch aggregierte Lernnoten unter dem GitHub-Benutzernamen. Quiz-Bestnote = bester Versuch; Quiz-Ø und Fach-Gesamt-Ø enthalten alle Wiederholungen. Der Vergleich dient nur der Lernmotivation und ist keine manipulationssichere Rangliste.</p>
-        </div>
-      </div>
-      <p class="leaderboard-status" id="leaderboardStatus">Rangliste wird geladen …</p>
-      <div class="leaderboard-subjects" id="leaderboardSubjects"></div>
-    </section>
     <p class="footnote">Die Lernnote dient deiner Motivation und Selbsteinschätzung. Sie ist keine offizielle Bewertung. · <a href="privacy.html">Datenschutzerklärung</a></p>
   </main>
+
+  <section class="leaderboard-overlay" id="leaderboardOverlay" hidden aria-label="Lernvergleich">
+    <div class="leaderboard-overlay-bar">
+      <h2 id="leaderboardTitle">Lernvergleich</h2>
+      <button class="button small" id="closeLeaderboard" type="button">✕ Schliessen</button>
+    </div>
+    <div class="leaderboard-overlay-inner">
+      <section class="leaderboard" aria-labelledby="leaderboardTitle">
+        <p class="leaderboard-intro">Vergleiche automatisch aggregierte Lernnoten unter dem GitHub-Benutzernamen. Quiz-Bestnote = bester Versuch; Quiz-Ø und Fach-Gesamt-Ø enthalten alle Wiederholungen. Der Vergleich dient nur der Lernmotivation und ist keine manipulationssichere Rangliste.</p>
+        <p class="leaderboard-status" id="leaderboardStatus">Rangliste wird geladen …</p>
+        <div class="leaderboard-subjects" id="leaderboardSubjects"></div>
+      </section>
+    </div>
+  </section>
 
   <section class="player" id="player" hidden aria-label="Quiz-Player">
     <div class="player-bar">
@@ -364,6 +374,7 @@
       const quizMap = new Map(catalog.quizzes.map(quiz => [quiz.id, quiz]));
       const player = document.getElementById("player");
       const frame = document.getElementById("quizFrame");
+      const leaderboardOverlay = document.getElementById("leaderboardOverlay");
       let activeQuizId = null;
       let toastTimer = null;
       let loadTimer = null;
@@ -934,7 +945,21 @@
         toastTimer = setTimeout(() => { toast.hidden = true; }, 4500);
       }
 
+      function openLeaderboard() {
+        leaderboardOverlay.hidden = false;
+        if (cloudUser) loadLeaderboard(cloudUser);
+        else document.getElementById("leaderboardStatus").textContent = "Melde dich mit GitHub an, um den Lernvergleich zu sehen.";
+        document.getElementById("closeLeaderboard").focus();
+      }
+
+      function closeLeaderboard() {
+        leaderboardOverlay.hidden = true;
+        document.getElementById("compareBtn").focus();
+      }
+
       document.getElementById("closePlayer").addEventListener("click", closeQuiz);
+      document.getElementById("compareBtn").addEventListener("click", openLeaderboard);
+      document.getElementById("closeLeaderboard").addEventListener("click", closeLeaderboard);
       document.getElementById("exportBtn").addEventListener("click", exportBackup);
       document.getElementById("importBtn").addEventListener("click", () => document.getElementById("importInput").click());
       document.getElementById("importInput").addEventListener("change", event => event.target.files[0] && importBackup(event.target.files[0]));
@@ -965,7 +990,11 @@
           error.hidden = false;
         }
       });
-      document.addEventListener("keydown", event => { if (event.key === "Escape" && !player.hidden) closeQuiz(); });
+      document.addEventListener("keydown", event => {
+        if (event.key !== "Escape") return;
+        if (!player.hidden) closeQuiz();
+        else if (!leaderboardOverlay.hidden) closeLeaderboard();
+      });
 
       window.addEventListener("quiz-cloud-ready", initCloud);
       window.addEventListener("quiz-cloud-unavailable", () => setCloudStatus("Firebase konnte nicht geladen werden – lokale Speicherung bleibt aktiv.", true));

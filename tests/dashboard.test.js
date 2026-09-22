@@ -45,7 +45,7 @@ const ids = [
   "importInput", "toast", "playerStatus"
   , "cloudTitle", "cloudStatus", "cloudLogoutBtn", "cloudDeleteToggle",
   "cloudDeletePanel", "cloudDeleteConfirm", "cloudDeleteCancel", "cloudDeleteError"
-  , "leaderboardStatus", "leaderboardSubjects"
+  , "leaderboardStatus", "leaderboardSubjects", "leaderboardOverlay", "compareBtn", "closeLeaderboard"
 ];
 const elements = Object.fromEntries(ids.map(id => [id, new FakeElement(id)]));
 const openQuizButton = new FakeElement("openQuiz");
