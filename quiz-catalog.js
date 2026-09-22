@@ -41,7 +41,7 @@ window.QUIZ_CATALOG = {
       title: "Software Security Errors",
       source: "W3_SoftwareSecurityErrors.pdf",
       path: "quizzes/SWS1/W3_Software_Security_Errors.html",
-      maximumScore: 100
+      maximumScore: 124
     }
   ]
 };

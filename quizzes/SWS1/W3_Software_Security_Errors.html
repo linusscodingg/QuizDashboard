@@ -521,6 +521,57 @@
           "Encapsulation",
           "Time and State"
         ]
+      },
+      {
+        "id": "case-file-upload",
+        "type": "multi",
+        "topic": "Case study: profile picture upload",
+        "points": 12,
+        "prompt": "A web application lets users upload a profile picture. The server (1) trusts the file's declared MIME type without inspecting the actual file content, (2) builds the storage path by appending the user-supplied file name directly to a fixed upload folder without checking for path components such as `../`, (3) remembers the picture's owner ID in a hidden form field that a later \"replace picture\" request reads back from the client, and (4) returns the complete stack trace including the internal storage path whenever saving the file fails. Select every correct statement.",
+        "options": [
+          "The unchecked file name allows Path Traversal and is an Input Validation and Representation error.",
+          "Trusting the client-supplied owner ID from the hidden field instead of the server-side session is an Encapsulation error.",
+          "Returning the full stack trace is only a problem if the connection is not using HTTPS.",
+          "Trusting the declared MIME type without checking the actual file content is best classified under the Security Features kingdom.",
+          "If the hosting platform's file system permissions were misconfigured, that specific weakness would fall under the Environment kingdom rather than the application's own code."
+        ],
+        "correct": [
+          0,
+          1,
+          4
+        ],
+        "optionExplanations": [
+          "A crafted file name such as `../../etc/passwd` can escape the intended upload directory because the path is not validated before use.",
+          "Session-relevant, authoritative state (who owns this resource) must live on the server; a client-controlled hidden field can be changed by the user before the request is sent.",
+          "Leaking internal paths and stack traces is an Error Handling problem regardless of transport encryption; HTTPS protects data in transit, not what the response body reveals.",
+          "Not checking the actual file content is a missing input check, so it belongs to Input Validation and Representation, not Security Features.",
+          "The application code did not cause this; a misconfiguration of something the application merely relies on (the file system it runs on) is exactly what the Environment kingdom covers."
+        ],
+        "solution": "This single feature already touches three kingdoms: the unsanitized file name is a Path Traversal case under Input Validation and Representation, trusting client-supplied owner data instead of server-side session state is an Encapsulation error, and exposing the stack trace is an Error Handling information leak. A misconfigured hosting environment around the correctly written application would additionally be an Environment issue.",
+        "reference": "Original transfer case, combining Kingdoms 1, 5 and 7 plus Environment",
+        "concepts": [
+          "Path Traversal",
+          "Input Validation",
+          "Encapsulation",
+          "Error Handling",
+          "Environment"
+        ]
+      },
+      {
+        "id": "case-login-throttle",
+        "type": "text",
+        "topic": "Case study: login attempt counter",
+        "points": 12,
+        "prompt": "A login endpoint is supposed to lock an account after 5 failed attempts. On every request, the server first reads the current failed-attempt counter for that account from the database; if it is below 5, the server checks the password and, on failure, writes back counter + 1. Two login requests for the same account arrive from an attacker at almost the same time. Explain why both requests can still get a full guess at the password even though the counter logic looks correct, name the kingdom this belongs to, and describe a fix.",
+        "hint": "Think about what happens between the moment the counter is read and the moment it is written back, if two requests run this logic at the same time.",
+        "solution": "Reading the counter and later writing it back are two separate, non-atomic steps. If two requests execute concurrently, both can read the counter while it is still below 5, and both are allowed to try a password before either write happens - so the lockout is bypassed even though every single request individually respects the rule. This is a Time and State problem, structurally the same TOCTOU pattern as a file being replaced between a check and its use, just applied to a database counter instead of a file. The fix is to make the check-and-increment a single atomic operation, e.g. an atomic database increment with a condition (UPDATE ... SET counter = counter + 1 WHERE counter < 5), or by serializing access to that account's counter with a lock/transaction.",
+        "reference": "Original transfer case for Kingdom 4 (Time and State / TOCTOU)",
+        "concepts": [
+          "Time and State",
+          "TOCTOU",
+          "Race Condition",
+          "Concurrency"
+        ]
       }
     ];
 
