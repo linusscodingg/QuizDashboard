@@ -17,6 +17,15 @@ window.QUIZ_CATALOG = {
       maximumScore: 100
     },
     {
+      id: "cns1-w1-ipv6-exercise-01a",
+      subject: "CNS1",
+      week: 1,
+      title: "IPv6 – Exercise 01a",
+      source: "CNS1-exr-01a-ipv6 (2).pdf",
+      path: "quizzes/CNS1/W1_IPv6_Exercise_01a.html",
+      maximumScore: 100
+    },
+    {
       id: "dheal-w2-healthcare-data",
       subject: "DHEAL",
       week: 2,

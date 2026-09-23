@@ -1,0 +1,662 @@
+<!doctype html>
+<html lang="de">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>CNS1 - Exercise 01a IPv6 - Lecture Review</title>
+  <style>
+    :root {
+      --ink: #132238;
+      --muted: #5d6b7e;
+      --blue: #07689f;
+      --blue-dark: #034f7d;
+      --cyan: #38bdf8;
+      --green: #15803d;
+      --amber: #b45309;
+      --red: #b91c1c;
+      --paper: #ffffff;
+      --wash: #eef7fb;
+      --line: #cfdee8;
+      --shadow: 0 18px 50px rgba(13, 66, 95, .13);
+    }
+
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      min-height: 100vh;
+      color: var(--ink);
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      background:
+        radial-gradient(circle at 8% 2%, rgba(56,189,248,.18), transparent 28rem),
+        linear-gradient(145deg, #f8fcfe 0%, #eef7fb 65%, #e5f3f8 100%);
+    }
+    button, input, textarea { font: inherit; }
+    button { cursor: pointer; }
+    .shell { width: min(1120px, calc(100% - 32px)); margin: 0 auto; padding: 28px 0 44px; }
+    .topbar {
+      display: grid;
+      grid-template-columns: 1fr auto;
+      gap: 20px;
+      align-items: start;
+      padding: 24px;
+      color: white;
+      border-radius: 24px;
+      background: linear-gradient(120deg, #034f7d, #0879ad 62%, #0d91b2);
+      box-shadow: var(--shadow);
+    }
+    .eyebrow { margin: 0 0 6px; font-size: .78rem; font-weight: 800; letter-spacing: .14em; text-transform: uppercase; color: #bcecff; }
+    h1 { margin: 0; font-size: clamp(1.55rem, 3vw, 2.45rem); line-height: 1.08; }
+    .subtitle { margin: 9px 0 0; color: #dff6ff; }
+    .scorebox { min-width: 205px; padding: 14px 16px; border: 1px solid rgba(255,255,255,.28); border-radius: 16px; background: rgba(255,255,255,.1); }
+    .scorebox strong { display: block; font-size: 1.4rem; }
+    .scorebox span { display: block; margin-top: 4px; color: #dff6ff; font-size: .9rem; }
+    .progress-wrap { margin-top: 18px; grid-column: 1 / -1; }
+    .progress-track { height: 10px; overflow: hidden; border-radius: 999px; background: rgba(255,255,255,.2); }
+    .progress-fill { width: 0; height: 100%; border-radius: inherit; background: linear-gradient(90deg, #80e1ff, #e1fbff); transition: width .25s ease; }
+    .progress-labels { display: flex; justify-content: space-between; gap: 12px; margin-top: 8px; font-size: .87rem; color: #dff6ff; }
+
+    .layout { display: grid; grid-template-columns: minmax(0, 1fr) 265px; gap: 22px; margin-top: 22px; }
+    .card, .side-card {
+      background: rgba(255,255,255,.94);
+      border: 1px solid rgba(171, 201, 218, .72);
+      border-radius: 22px;
+      box-shadow: var(--shadow);
+    }
+    .card { padding: clamp(22px, 4vw, 38px); min-height: 560px; }
+    .side-card { padding: 18px; position: sticky; top: 18px; }
+    .side-card h2 { margin: 0 0 12px; font-size: 1rem; }
+    .mini-stat { display: flex; justify-content: space-between; gap: 10px; padding: 10px 0; border-bottom: 1px solid var(--line); color: var(--muted); font-size: .92rem; }
+    .mini-stat strong { color: var(--ink); }
+    .source-note { margin: 16px 0 0; font-size: .78rem; line-height: 1.45; color: var(--muted); }
+    .save-note { min-height: 1.25em; margin: 9px 0 0; color: var(--green); font-size: .8rem; font-weight: 750; }
+
+    .task-head { display: flex; justify-content: space-between; gap: 16px; align-items: flex-start; }
+    .task-no { color: var(--blue); font-size: .82rem; font-weight: 850; letter-spacing: .08em; text-transform: uppercase; }
+    .points { flex: none; padding: 7px 11px; border-radius: 999px; font-weight: 800; color: var(--blue-dark); background: #e0f3fb; }
+    .topic { margin: 7px 0 0; color: var(--muted); font-size: .94rem; }
+    .question { margin: 24px 0 18px; font-size: clamp(1.15rem, 2vw, 1.42rem); line-height: 1.42; white-space: pre-line; }
+    .hint { margin: -6px 0 18px; color: var(--muted); font-size: .92rem; }
+    .options { display: grid; gap: 10px; }
+    .option {
+      display: grid;
+      grid-template-columns: auto 1fr;
+      gap: 12px;
+      align-items: start;
+      padding: 13px 15px;
+      border: 1px solid var(--line);
+      border-radius: 14px;
+      background: #fbfdfe;
+      transition: border-color .15s, background .15s, transform .15s;
+    }
+    .option:hover { border-color: #72bddc; transform: translateY(-1px); }
+    .option input { margin-top: 3px; accent-color: var(--blue); }
+    .option.answer-correct { border-color: #49a96b; background: #e8f8ee; }
+    .option.answer-wrong { border-color: #dc7070; background: #fff0f0; }
+    .answer-label { display: block; margin-top: 5px; font-size: .78rem; font-weight: 850; }
+    .answer-correct .answer-label { color: #14642f; }
+    .answer-wrong .answer-label { color: #922020; }
+    textarea {
+      width: 100%; min-height: 150px; resize: vertical;
+      padding: 14px; border: 1px solid var(--line); border-radius: 14px;
+      color: var(--ink); background: #fbfdfe; line-height: 1.5;
+    }
+    textarea:focus, button:focus-visible, input:focus-visible { outline: 3px solid rgba(56,189,248,.35); outline-offset: 2px; }
+    .order-list { display: grid; gap: 9px; }
+    .order-row { display: grid; grid-template-columns: 36px 1fr auto auto; gap: 9px; align-items: center; padding: 10px; border: 1px solid var(--line); border-radius: 13px; background: #fbfdfe; }
+    .order-row.answer-correct { border-color: #49a96b; background: #e8f8ee; }
+    .order-row.answer-wrong { border-color: #dc7070; background: #fff0f0; }
+    .rank { display: grid; place-items: center; width: 30px; height: 30px; border-radius: 50%; color: white; background: var(--blue); font-weight: 800; }
+    .icon-btn { width: 35px; height: 35px; border: 1px solid var(--line); border-radius: 10px; background: white; color: var(--blue-dark); font-weight: 900; }
+    .actions { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 22px; }
+    .btn { border: 0; border-radius: 12px; padding: 11px 15px; font-weight: 800; }
+    .primary { color: white; background: var(--blue); }
+    .primary:hover { background: var(--blue-dark); }
+    .secondary { color: var(--blue-dark); background: #e3f3fa; }
+    .ghost { color: var(--muted); background: #f1f5f7; }
+    .danger { color: var(--red); background: #fff0f0; }
+    .btn:disabled { cursor: not-allowed; opacity: .5; }
+    .feedback, .solution { margin-top: 18px; padding: 15px 17px; border-radius: 14px; line-height: 1.52; }
+    .feedback.correct { border-left: 5px solid var(--green); background: #ecfdf3; color: #135c2d; }
+    .feedback.partial { border-left: 5px solid var(--amber); background: #fff8e8; color: #85470b; }
+    .feedback.wrong { border-left: 5px solid var(--red); background: #fff1f1; color: #891b1b; }
+    .solution { border: 1px solid #b9dce9; background: #eef9fd; }
+    .solution h3 { margin: 0 0 8px; font-size: 1rem; color: var(--blue-dark); }
+    .solution p { margin: 6px 0; white-space: pre-line; }
+    .answer-analysis { display: grid; gap: 8px; margin: 12px 0; }
+    .analysis-item { padding: 10px 12px; border-radius: 10px; }
+    .analysis-item.correct { border-left: 4px solid var(--green); background: #e8f8ee; }
+    .analysis-item.wrong { border-left: 4px solid var(--red); background: #fff0f0; }
+    .analysis-item strong { display: block; margin-bottom: 3px; }
+    .reference { color: var(--muted); font-size: .88rem; }
+    .rating { display: flex; flex-wrap: wrap; gap: 9px; margin-top: 14px; }
+    .rating .selected { color: white; background: var(--blue); }
+    .nav { display: flex; justify-content: space-between; gap: 12px; margin-top: 28px; padding-top: 20px; border-top: 1px solid var(--line); }
+    .nav-group { display: flex; gap: 9px; }
+
+    .overview { margin-top: 14px; display: grid; grid-template-columns: repeat(5, 1fr); gap: 7px; }
+    .dot { aspect-ratio: 1; display: grid; place-items: center; border: 0; border-radius: 10px; color: #536270; background: #edf2f5; font-weight: 850; }
+    .dot.current { box-shadow: 0 0 0 3px rgba(56,189,248,.35); }
+    .dot.correct { color: #14642f; background: #dcfce7; }
+    .dot.partial { color: #8a4a08; background: #fef3c7; }
+    .dot.wrong { color: #922020; background: #fee2e2; }
+
+    .result { display: none; }
+    .result.show { display: block; }
+    .result-hero { padding: 24px; border-radius: 18px; color: white; background: linear-gradient(120deg, #034f7d, #0792ae); }
+    .result-hero h2 { margin: 0 0 8px; font-size: 2rem; }
+    .result-big { font-size: clamp(2.2rem, 6vw, 4.5rem); font-weight: 900; line-height: 1; }
+    .result-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin: 18px 0; }
+    .result-tile { padding: 16px; border: 1px solid var(--line); border-radius: 15px; background: #fbfdfe; }
+    .result-tile strong { display: block; font-size: 1.35rem; }
+    .concepts { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; margin-top: 18px; }
+    .concept-box { padding: 16px; border-radius: 15px; background: #f5f8fa; }
+    .concept-box h3 { margin: 0 0 9px; font-size: 1rem; }
+    .concept-box ul { margin: 0; padding-left: 19px; color: var(--muted); }
+    .hidden { display: none !important; }
+
+    @media (max-width: 820px) {
+      .topbar { grid-template-columns: 1fr; }
+      .scorebox { min-width: 0; }
+      .layout { grid-template-columns: 1fr; }
+      .side-card { position: static; }
+      .result-grid, .concepts { grid-template-columns: 1fr; }
+    }
+    @media (max-width: 520px) {
+      .shell { width: min(100% - 18px, 1120px); padding-top: 9px; }
+      .topbar, .card, .side-card { border-radius: 16px; }
+      .card { padding: 19px; }
+      .task-head { align-items: center; }
+      .nav { flex-direction: column; }
+      .nav-group { justify-content: space-between; }
+      .nav .btn { flex: 1; }
+    }
+  </style>
+</head>
+<body>
+  <main class="shell">
+    <header class="topbar">
+      <div>
+        <p class="eyebrow">CNS1 - Lecture Review</p>
+        <h1>Exercise 01a - IPv6</h1>
+        <p class="subtitle">Die sechs Originalaufgaben aus dem Exercise - mit Lösung und Begründung nach deiner Antwort</p>
+      </div>
+      <div class="scorebox" aria-live="polite">
+        <strong id="scoreText">0 / 100 Punkte</strong>
+        <span id="percentText">0% - noch keine Endnote</span>
+      </div>
+      <div class="progress-wrap">
+        <div class="progress-track"><div class="progress-fill" id="progressFill"></div></div>
+        <div class="progress-labels"><span id="progressText">0 / 6 Aufgaben</span><span id="streakText">Streak: 0</span></div>
+      </div>
+    </header>
+
+    <section class="layout">
+      <article class="card">
+        <div id="quizView"></div>
+        <div id="resultView" class="result"></div>
+      </article>
+
+      <aside>
+        <div class="side-card">
+          <h2>Aufgabenübersicht</h2>
+          <div class="mini-stat"><span>Bearbeitet</span><strong id="doneSide">0 / 6</strong></div>
+          <div class="mini-stat"><span>Aktuelle Punkte</span><strong id="pointsSide">0 / 100</strong></div>
+          <div class="mini-stat"><span>Selbsteinschätzung</span><strong id="gradeSide">am Ende</strong></div>
+          <div class="overview" id="overview"></div>
+          <div class="actions">
+            <button class="btn primary" id="saveBtn">Zwischenstand speichern</button>
+            <button class="btn ghost" id="finishBtn">Auswertung</button>
+            <button class="btn danger" id="newQuizBtn">Neues Quiz starten</button>
+          </div>
+          <p class="save-note" id="saveNotice" aria-live="polite">Änderungen werden auch automatisch lokal gespeichert.</p>
+          <p class="source-note">Aufgaben: „CNS1-exr-01a-ipv6“. Lösungen geprüft mit den offiziellen CNS1-Folien „IPv6 - Part 1“, insbesondere Folien 10, 17-28 und 31-48. Die Lösung erscheint erst nach „Antwort prüfen“.</p>
+        </div>
+      </aside>
+    </section>
+  </main>
+
+  <script>
+    const questions = [
+      {
+        id: "exercise-1", type: "text", topic: "IPv4 vs. IPv6", points: 14,
+        prompt: "1. Note the main differences if IPv6 compared to IPv4.",
+        hint: "Beantworte die Originalfrage stichwortartig. Vergleiche Adressen, Header, Fragmentierung, Broadcast/NAT und neue IPv6-Funktionen.",
+        solution: "Erwartete Hauptpunkte:\n• IPv6 nutzt 128-Bit-Adressen statt 32 Bit und Hexadezimalnotation statt dotted decimal.\n• Der IPv6-Basisheader ist fest 40 Byte gross, einfacher aufgebaut und hat keine Header Checksum oder Options; optionale Angaben stehen in Extension Headers.\n• Router fragmentieren IPv6-Pakete nicht. Der Sender nutzt Path MTU Discovery und bei Bedarf den Fragment Header; nur das Ziel setzt Fragmente zusammen.\n• IPv6 hat kein Broadcast; Multicast und Anycast werden verwendet.\n• Flow Label und Traffic Class unterstützen die Behandlung von Datenflüssen/QoS.\n• Neighbor Discovery mit ICMPv6 ersetzt unter anderem ARP und Router Discovery.\n• SLAAC/DHCPv6 ermöglichen Autokonfiguration.\n• Der grosse Adressraum erlaubt End-to-End-Adressierung ohne den bei IPv4 verbreiteten NAT-Zwang.",
+        reference: "Exercise S. 1; IPv6 Part 1, Folien 7, 10-28, 31-35 und 43-47", concepts: ["IPv4/IPv6-Vergleich", "IPv6 Header"]
+      },
+      {
+        id: "exercise-2", type: "text", topic: "IPv6 Address Types", points: 18,
+        prompt: "2. Assign the following addresses to a network range/type:\n• 2001:620:190::fff1:15/64\n• fe80::e309:bcc:fd3b:f6a0:10\n• 2001:0620:0190:0000:0000:0000:fff1:0015/64\n• ff10::2/12\n• FC00::17/8\n• ::1/128",
+        hint: "Ordne jede Adresse einzeln zu. Achte auch darauf, ob zwei Schreibweisen dieselbe Adresse darstellen.",
+        solution: "• 2001:620:190::fff1:15/64: Global Unicast Address aus 2000::/3; ZHAW-Bereich, verkürzte Schreibweise.\n• fe80::e309:bcc:fd3b:f6a0:10: Link-Local Unicast Address aus FE80::/10; nicht über Router weiterleitbar.\n• 2001:0620:0190:0000:0000:0000:fff1:0015/64: Global Unicast Address. Sie ist exakt dieselbe Adresse wie die erste, nur vollständig ausgeschrieben.\n• ff10::2/12: Transient Multicast Address aus FF10::/12.\n• FC00::17/8: Unique Local Unicast Address (ULA), FC00::/8 als Teil von FC00::/7.\n• ::1/128: Loopback Address.",
+        reference: "Exercise S. 1; IPv6 Part 1, Folien 31-35 und 39-41", concepts: ["IPv6 Address Types", "IPv6 Notation"]
+      },
+      {
+        id: "exercise-3", type: "text", topic: "Fragmentation and Flow Label", points: 18,
+        prompt: "3. Draw the headers of a fragmented TPC-packet that is sent via Flow label.",
+        hint: "Im Exercise steht „TPC“; fachlich ist ein TCP-Paket gemeint. Gib für mindestens zwei Fragmente die Header-Kette und die wichtigen Felder an.",
+        solution: "Für jedes Fragment wird ein eigener IPv6-Basisheader gesendet. Der gleiche, vom Sender gewählte Flow Label kennzeichnet alle Pakete desselben Flows.\n\nFragment 1:\nIPv6 Basic Header [Flow Label = X, Next Header = 44]\n→ Fragment Header [Next Header = 6 (TCP), Offset = 0, M = 1, Identification = Y]\n→ TCP Header + erster Teil der TCP-Daten\n\nWeiteres Fragment:\nIPv6 Basic Header [Flow Label = X, Next Header = 44]\n→ Fragment Header [Next Header = 6 (TCP), Offset > 0, M = 1 bzw. beim letzten Fragment 0, Identification = Y]\n→ weiterer Teil des fragmentierbaren TCP-Pakets\n\nX bleibt für den Flow gleich; Y bleibt für alle Fragmente dieses Originalpakets gleich. Fragmentierung erfolgt nur beim Sender, Reassembly nur beim Ziel.",
+        reference: "Exercise S. 1; IPv6 Part 1, Folien 17-18 und 20-28", concepts: ["Extension Headers", "Fragmentation", "Flow Label"]
+      },
+      {
+        id: "exercise-4", type: "text", topic: "Global Unicast Allocation", points: 16,
+        prompt: "4. Describe how the IPv6 global unicast address space 2000::/3 is structured in practice and how it is allocated to organizations.",
+        hint: "Beschreibe /48, /64, PA/PI und die hierarchische Vergabe. Das ZHAW-Beispiel hilft.",
+        solution: "In der Praxis erhält eine Organisation typischerweise einen /48 Global Routing Prefix. Danach folgen 16 Bit Subnet ID; damit kann die Organisation 65'536 /64-Subnetze bilden. Die unteren 64 Bit sind die Interface ID.\n\nProvider Aggregatable (PA): Ein Regional Internet Registry wie RIPE teilt einen aggregierbaren Block einem ISP zu; der ISP vergibt daraus Präfixe an Organisationen. Das verbessert Route Aggregation und hält Routingtabellen kleiner. Beispiel: 2001:620::/32 ging an SWITCH, 2001:620:190::/48 an die ZHAW.\n\nProvider Independent (PI): Das RIR vergibt den Block direkt an die Organisation. Er ist providerunabhängig und unterstützt Providerwechsel oder Multihoming, verschlechtert aber die Route Aggregation und vergrössert Routingtabellen.",
+        reference: "Exercise S. 1; IPv6 Part 1, Folien 34 und 36-38", concepts: ["Global Unicast", "PA/PI", "Subnetting"]
+      },
+      {
+        id: "exercise-5", type: "text", topic: "Neighbor Discovery", points: 18,
+        prompt: "5. An application wants to send an IPv6 packet to the destination address fe80::1322:33ff:fe44:5568. Initially, all caches are empty. How is the neighbours MAC-address retrieved? Fill out the missing addresses in the figure below.\n\nHost A: IPv6 fe80::1322:33ff:fe44:5566, MAC 11:22:33:44:55:66\nHost C / Ziel im Diagramm: IPv6 fe80::1322:33ff:fe44:5588, MAC 11:22:33:44:55:88\n\nNeighbor Solicitation - gesucht: IPv6 destination und MAC destination.\nNeighbor Advertisement - gesucht: MAC in der Aussage sowie IPv6 destination und MAC destination.",
+        hint: "Achtung: Der Fliesstext nennt am Ende …5568, das Diagramm und Host C dagegen …5588. Löse die im Diagramm dargestellte Kommunikation mit Host C.",
+        solution: "Neighbor Solicitation von Host A:\n• IPv6 source: fe80::1322:33ff:fe44:5566\n• IPv6 destination: ff02::1:ff44:5588 (Solicited-Node Multicast des Ziels)\n• MAC source: 11:22:33:44:55:66\n• MAC destination: 33:33:ff:44:55:88\n\nNeighbor Advertisement von Host C:\n• Aussage: fe80::1322:33ff:fe44:5588 is at 11:22:33:44:55:88\n• IPv6 source: fe80::1322:33ff:fe44:5588\n• IPv6 destination: fe80::1322:33ff:fe44:5566\n• MAC source: 11:22:33:44:55:88\n• MAC destination: 11:22:33:44:55:66\n\nDanach kann A den eigentlichen Ethernet-Frame direkt an 11:22:33:44:55:88 senden. Hinweis zur Vorlage: …5568 im Fliesstext ist sehr wahrscheinlich ein Tippfehler, weil Diagramm, Host C und die gesuchten Multicast-Adressen eindeutig …5588 voraussetzen.",
+        reference: "Exercise S. 2; IPv6 Part 1, Folien 43-48", concepts: ["Neighbor Discovery", "Solicited-Node Multicast", "MAC Resolution"]
+      },
+      {
+        id: "exercise-6", type: "text", topic: "SLAAC / Router Advertisement", points: 16,
+        prompt: "6. Host A wants to send an IPv6 packet to a destination outside the local segment and is asking for a router to forward the packets. The request is sent via IPv6 multicast address ff02::2 and all routers on the local segment can answer. What is the stateless autoconfigured address of Host A after the Router Advertisement?\n\nHost A: Link-Local IPv6 fe80::1322:33ff:fe44:5566, MAC 11:22:33:44:55:66\nRouter Advertisement prefix: 2a02:168:fbbe:1::/64",
+        hint: "Kombiniere das /64-Präfix aus dem Router Advertisement mit der bereits erkennbaren 64-Bit Interface ID von Host A.",
+        solution: "Die Interface ID von Host A lautet 1322:33ff:fe44:5566. Mit dem angekündigten Präfix 2a02:168:fbbe:1::/64 ergibt sich:\n\n2a02:168:fbbe:1:1322:33ff:fe44:5566\n\nDer Router Solicitation wird an ff02::2 gesendet; die zugehörige Ethernet-Multicast-Adresse ist 33:33:00:00:00:02. Das Router Advertisement liefert das /64-Präfix. Host A kombiniert es bei SLAAC mit seiner Interface ID und führt anschliessend Duplicate Address Detection durch.",
+        reference: "Exercise S. 2; IPv6 Part 1, Folien 16-18 und 47-48", concepts: ["SLAAC", "Router Solicitation", "Router Advertisement", "EUI-64"]
+      }
+    ];
+
+    const STORAGE_KEY = "cns1-ipv6-exercise-01a-review-v1";
+    const DASHBOARD_QUIZ_ID = "cns1-w1-ipv6-exercise-01a";
+    const maxPoints = questions.reduce((sum, q) => sum + q.points, 0);
+    const defaultState = () => ({
+      current: 0,
+      answers: {},
+      order: {},
+      results: {},
+      revealed: {},
+      completed: false,
+      attemptId: createAttemptId(),
+      startedAt: new Date().toISOString(),
+      completedAt: null
+    });
+    let state = loadState();
+
+    function createAttemptId() {
+      if (globalThis.crypto?.randomUUID) return globalThis.crypto.randomUUID();
+      return `attempt-${Date.now()}-${Math.random().toString(16).slice(2)}`;
+    }
+
+    function loadState() {
+      try {
+        const saved = JSON.parse(localStorage.getItem(STORAGE_KEY));
+        return saved && typeof saved === "object" ? { ...defaultState(), ...saved } : defaultState();
+      } catch { return defaultState(); }
+    }
+    function saveState() { localStorage.setItem(STORAGE_KEY, JSON.stringify(state)); }
+    const esc = value => String(value ?? "").replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;","'":"&#39;"}[c]));
+    const resultFor = id => state.results[id];
+    const isDone = q => Boolean(resultFor(q.id));
+    const isSubmitted = q => isDone(q) || (q.type === "text" && state.revealed[q.id] && Boolean(state.answers[q.id]));
+    const earned = () => questions.reduce((sum, q) => sum + (resultFor(q.id)?.points || 0), 0);
+    const completedCount = () => questions.filter(isDone).length;
+
+    function statusLabel(status) {
+      return status === "correct" ? "Richtig" : status === "partial" ? "Teilweise richtig" : status === "wrong" ? "Falsch" : "Übersprungen";
+    }
+
+    function updateHeader() {
+      const score = earned();
+      const done = completedCount();
+      const pct = Math.round(score / maxPoints * 100);
+      document.getElementById("scoreText").textContent = `${formatPoints(score)} / ${maxPoints} Punkte`;
+      document.getElementById("percentText").textContent = state.completed ? `${pct}% - Note ${grade(score)}` : `${pct}% - noch keine Endnote`;
+      document.getElementById("progressText").textContent = `${done} / ${questions.length} Aufgaben`;
+      document.getElementById("progressFill").style.width = `${done / questions.length * 100}%`;
+      document.getElementById("streakText").textContent = `Streak: ${streak()}`;
+      document.getElementById("doneSide").textContent = `${done} / ${questions.length}`;
+      document.getElementById("pointsSide").textContent = `${formatPoints(score)} / ${maxPoints}`;
+      document.getElementById("gradeSide").textContent = state.completed ? grade(score) : "am Ende";
+      document.getElementById("saveBtn").disabled = state.completed;
+      document.getElementById("finishBtn").disabled = done !== questions.length;
+      renderOverview();
+    }
+
+    function formatPoints(value) { return Number.isInteger(value) ? value : value.toFixed(1); }
+    function grade(score) { return (1 + 5 * (score / maxPoints)).toFixed(1); }
+    function streak() {
+      let best = 0, current = 0;
+      questions.forEach(q => {
+        const r = resultFor(q.id);
+        if (r?.status === "correct") { current += 1; best = Math.max(best, current); }
+        else if (r) current = 0;
+      });
+      return best;
+    }
+
+    function renderOverview() {
+      const el = document.getElementById("overview");
+      el.innerHTML = questions.map((q, i) => {
+        const status = resultFor(q.id)?.status || "";
+        return `<button class="dot ${status} ${!state.completed && state.current === i ? "current" : ""}" data-jump="${i}" aria-label="Aufgabe ${i+1}: ${status || "unbeantwortet"}">${i+1}</button>`;
+      }).join("");
+      el.querySelectorAll("[data-jump]").forEach(btn => btn.addEventListener("click", () => {
+        state.completed = false;
+        state.current = Number(btn.dataset.jump);
+        saveState(); render();
+      }));
+    }
+
+    function answerMarkup(q) {
+      const disabled = isSubmitted(q) ? "disabled" : "";
+      if (q.type === "single" || q.type === "multi") {
+        const selected = Array.isArray(state.answers[q.id]) ? state.answers[q.id] : [];
+        const inputType = q.type === "single" ? "radio" : "checkbox";
+        return `<div class="options">${q.options.map((opt, i) => {
+          const correct = Array.isArray(q.correct) ? q.correct.includes(i) : q.correct === i;
+          const chosen = selected.includes(i);
+          const reviewClass = isDone(q) ? (correct ? "answer-correct" : "answer-wrong") : "";
+          const label = !isDone(q) ? "" : correct ? (chosen ? "✓ Richtig gewählt" : "✓ Richtige Antwort – nicht gewählt") : (chosen ? "✕ Falsch gewählt" : "✕ Nicht korrekt");
+          return `<label class="option ${reviewClass}"><input ${disabled} type="${inputType}" name="${q.id}" value="${i}" ${chosen ? "checked" : ""}><span>${esc(opt)}${label ? `<small class="answer-label">${label}</small>` : ""}</span></label>`;
+        }).join("")}</div>`;
+      }
+      if (q.type === "text") {
+        return `<textarea id="textAnswer" ${disabled} placeholder="Deine Antwort...">${esc(state.answers[q.id] || "")}</textarea>`;
+      }
+      if (q.type === "order") {
+        const order = state.order[q.id] || q.initial || q.items.map((_, i) => i);
+        return `<div class="order-list">${order.map((itemIndex, pos) => {
+          const correctPosition = q.correct.indexOf(itemIndex);
+          const correct = correctPosition === pos;
+          const reviewClass = isDone(q) ? (correct ? "answer-correct" : "answer-wrong") : "";
+          const label = !isDone(q) ? "" : correct ? "✓ Position richtig" : `✕ Gehört auf Position ${correctPosition + 1}`;
+          return `<div class="order-row ${reviewClass}"><span class="rank">${pos+1}</span><span>${esc(q.items[itemIndex])}${label ? `<small class="answer-label">${label}</small>` : ""}</span><button class="icon-btn" ${disabled || pos === 0 ? "disabled" : ""} data-move="${pos},-1" aria-label="Nach oben">↑</button><button class="icon-btn" ${disabled || pos === order.length-1 ? "disabled" : ""} data-move="${pos},1" aria-label="Nach unten">↓</button></div>`;
+        }).join("")}</div>`;
+      }
+      return "";
+    }
+
+    function feedbackMarkup(q) {
+      const r = resultFor(q.id);
+      if (!r) return "";
+      const extra = r.status === "skipped" ? "Diese Aufgabe wurde übersprungen und erhält 0 Punkte." : `${statusLabel(r.status)} - ${formatPoints(r.points)} von ${q.points} Punkten.`;
+      return `<div class="feedback ${r.status === "skipped" ? "wrong" : r.status}"><strong>${extra}</strong>${r.note ? `<br>${esc(r.note)}` : ""}</div>`;
+    }
+
+    function solutionMarkup(q) {
+      if (!state.revealed[q.id]) return "";
+      const rating = q.type === "text" && !isDone(q) ? `<div class="rating"><button class="btn secondary" data-rate="correct">Voll richtig</button><button class="btn secondary" data-rate="partial">Teilweise richtig</button><button class="btn secondary" data-rate="wrong">Falsch / wusste ich nicht</button></div>` : "";
+      const analysis = q.optionExplanations ? `<div class="answer-analysis">${q.optionExplanations.map((reason, i) => {
+        const correct = Array.isArray(q.correct) ? q.correct.includes(i) : q.correct === i;
+        return `<div class="analysis-item ${correct ? "correct" : "wrong"}"><strong>${correct ? "✓ Aussage ist richtig" : "✕ Aussage ist falsch"}</strong>${esc(reason)}</div>`;
+      }).join("")}</div>` : "";
+      return `<div class="solution"><h3>Lösung und Begründung</h3>${analysis}<p>${esc(q.solution)}</p><p class="reference"><strong>Quelle:</strong> ${esc(q.reference)}</p>${rating}</div>`;
+    }
+
+    function renderQuestion() {
+      const q = questions[state.current];
+      document.getElementById("resultView").classList.remove("show");
+      const quiz = document.getElementById("quizView");
+      quiz.classList.remove("hidden");
+      quiz.innerHTML = `
+        <div class="task-head">
+          <div><div class="task-no">Aufgabe ${state.current + 1} von ${questions.length}</div><div class="topic">${esc(q.topic)}</div></div>
+          <div class="points">${q.points} Punkte</div>
+        </div>
+        <div class="question">${esc(q.prompt)}</div>
+        ${q.hint ? `<div class="hint">${esc(q.hint)}</div>` : ""}
+        ${answerMarkup(q)}
+        <div class="actions">
+          ${q.type !== "text" && !isDone(q) ? `<button class="btn primary" id="checkBtn">Antwort prüfen</button>` : ""}
+          ${q.type === "text" && !isSubmitted(q) ? `<button class="btn primary" id="saveTextBtn">Antwort prüfen</button>` : ""}
+          ${!isSubmitted(q) ? `<button class="btn ghost" id="skipBtn">Überspringen</button>` : ""}
+        </div>
+        ${feedbackMarkup(q)}
+        ${solutionMarkup(q)}
+        <nav class="nav">
+          <button class="btn ghost" id="prevBtn" ${state.current === 0 ? "disabled" : ""}>← Zurück</button>
+          <div class="nav-group">
+            <button class="btn ghost" id="overviewBtn">Übersicht</button>
+            <button class="btn primary" id="nextBtn" ${state.current === questions.length - 1 ? "disabled" : ""}>Weiter →</button>
+          </div>
+        </nav>`;
+
+      bindQuestionEvents(q);
+    }
+
+    function bindQuestionEvents(q) {
+      document.querySelectorAll(`input[name="${q.id}"]`).forEach(input => input.addEventListener("change", () => {
+        if (q.type === "single") state.answers[q.id] = [Number(input.value)];
+        else state.answers[q.id] = [...document.querySelectorAll(`input[name="${q.id}"]:checked`)].map(x => Number(x.value));
+        saveState();
+      }));
+      document.querySelectorAll("[data-move]").forEach(btn => btn.addEventListener("click", () => {
+        const [pos, delta] = btn.dataset.move.split(",").map(Number);
+        const order = [...(state.order[q.id] || q.initial || q.items.map((_, i) => i))];
+        [order[pos], order[pos + delta]] = [order[pos + delta], order[pos]];
+        state.order[q.id] = order; saveState(); render();
+      }));
+      document.getElementById("checkBtn")?.addEventListener("click", () => gradeAuto(q));
+      document.getElementById("saveTextBtn")?.addEventListener("click", () => {
+        const text = document.getElementById("textAnswer").value.trim();
+        if (!text) return alert("Schreibe zuerst eine eigene Antwort.");
+        state.answers[q.id] = text; state.revealed[q.id] = true; saveState(); render();
+      });
+      document.querySelectorAll("[data-rate]").forEach(btn => btn.addEventListener("click", () => {
+        const status = btn.dataset.rate;
+        const factor = status === "correct" ? 1 : status === "partial" ? .5 : 0;
+        state.results[q.id] = { status, points: q.points * factor };
+        saveState(); render();
+      }));
+      document.getElementById("skipBtn")?.addEventListener("click", () => {
+        state.results[q.id] = { status: "skipped", points: 0 }; saveState(); render();
+      });
+      document.getElementById("prevBtn").addEventListener("click", () => navigate(-1));
+      document.getElementById("nextBtn").addEventListener("click", () => navigate(1));
+      document.getElementById("overviewBtn").addEventListener("click", () => document.querySelector(".side-card").scrollIntoView({ behavior: "smooth", block: "start" }));
+    }
+
+    function gradeAuto(q) {
+      if (isDone(q)) return;
+      let points = 0, status = "wrong", note = "";
+      if (q.type === "single") {
+        const answer = state.answers[q.id]?.[0];
+        if (answer === undefined) return alert("Wähle zuerst eine Antwort.");
+        points = answer === q.correct ? q.points : 0;
+      } else if (q.type === "multi") {
+        const selected = state.answers[q.id] || [];
+        if (!selected.length) return alert("Wähle zuerst mindestens eine Antwort.");
+        const correctHits = selected.filter(x => q.correct.includes(x)).length;
+        const wrongHits = selected.filter(x => !q.correct.includes(x)).length;
+        const fraction = Math.max(0, (correctHits - wrongHits) / q.correct.length);
+        points = Math.round(q.points * fraction * 2) / 2;
+        note = points > 0 && points < q.points ? "Teilpunkte: korrekte Auswahl abzüglich falscher Auswahl." : "";
+      } else if (q.type === "order") {
+        const order = state.order[q.id] || q.initial || q.items.map((_, i) => i);
+        const hits = order.filter((value, i) => value === q.correct[i]).length;
+        points = Math.round(q.points * hits / q.correct.length * 2) / 2;
+        state.order[q.id] = order;
+        note = points > 0 && points < q.points ? `${hits} von ${q.correct.length} Positionen stimmen.` : "";
+      }
+      status = points === q.points ? "correct" : points > 0 ? "partial" : "wrong";
+      state.results[q.id] = { status, points, note };
+      state.revealed[q.id] = true;
+      saveState(); render();
+    }
+
+    function navigate(delta) {
+      state.current = Math.min(questions.length - 1, Math.max(0, state.current + delta));
+      saveState(); render(); window.scrollTo({ top: 0, behavior: "smooth" });
+    }
+
+    function conceptAnalysis() {
+      const map = {};
+      questions.forEach(q => {
+        const r = resultFor(q.id);
+        q.concepts.forEach(c => {
+          map[c] ||= { earned: 0, max: 0 };
+          map[c].earned += r?.points || 0;
+          map[c].max += q.points;
+        });
+      });
+      const groups = { strong: [], mixed: [], weak: [] };
+      Object.entries(map).forEach(([name, value]) => {
+        const pct = value.max ? value.earned / value.max * 100 : 0;
+        const item = `${name} (${Math.round(pct)}%)`;
+        if (pct >= 80) groups.strong.push(item);
+        else if (pct >= 55) groups.mixed.push(item);
+        else groups.weak.push(item);
+      });
+      return groups;
+    }
+
+    function classification(pct) {
+      if (pct >= 85) return { status: "Sehr gut verstanden" };
+      if (pct >= 70) return { status: "Grundsätzlich verstanden, aber mit Lücken" };
+      if (pct >= 50) return { status: "Noch nicht sicher verstanden" };
+      return { status: "Deutliche Wissenslücken" };
+    }
+
+    function list(items, emptyText) { return items.length ? `<ul>${items.map(x => `<li>${esc(x)}</li>`).join("")}</ul>` : `<p>${esc(emptyText)}</p>`; }
+
+    function renderResult() {
+      if (completedCount() !== questions.length) return alert("Bearbeite oder überspringe zuerst alle Aufgaben.");
+      state.completed = true;
+      state.completedAt ||= new Date().toISOString();
+      saveState();
+      const score = earned();
+      const pct = Math.round(score / maxPoints * 100);
+      const cls = classification(pct);
+      const concepts = conceptAnalysis();
+      const counts = { correct: 0, partial: 0, wrong: 0 };
+      questions.forEach(q => {
+        const status = resultFor(q.id)?.status;
+        if (status === "correct") counts.correct++;
+        else if (status === "partial") counts.partial++;
+        else counts.wrong++;
+      });
+      document.getElementById("quizView").classList.add("hidden");
+      const view = document.getElementById("resultView");
+      view.classList.add("show");
+      view.innerHTML = `
+        <div class="result-hero"><p class="eyebrow">Ergebnis</p><h2>${esc(cls.status)}</h2><div class="result-big">${pct}%</div><p>${formatPoints(score)} / ${maxPoints} Punkte - Selbsteinschätzungsnote ${grade(score)}</p></div>
+        <div class="result-grid">
+          <div class="result-tile"><strong>${counts.correct}</strong><span>voll richtig</span></div>
+          <div class="result-tile"><strong>${counts.partial}</strong><span>teilweise richtig</span></div>
+          <div class="result-tile"><strong>${counts.wrong}</strong><span>falsch / übersprungen</span></div>
+        </div>
+        <div class="concepts">
+          <div class="concept-box"><h3>Stärken</h3>${list(concepts.strong, "Noch kein Bereich über 80%.")}</div>
+          <div class="concept-box"><h3>Unsicher</h3>${list(concepts.mixed, "Keine gemischten Bereiche.")}</div>
+          <div class="concept-box"><h3>Wiederholen</h3>${list(concepts.weak, "Keine klar schwachen Bereiche.")}</div>
+        </div>
+        <div class="actions">
+          <button class="btn ghost" id="backToQuiz">Antworten ansehen</button>
+          <button class="btn danger" id="retakeBtn">Neues Quiz starten</button>
+        </div>`;
+      document.getElementById("backToQuiz").addEventListener("click", () => { state.completed = false; saveState(); render(); });
+      document.getElementById("retakeBtn").addEventListener("click", startNewQuiz);
+      reportResultToDashboard(score, pct, concepts, cls);
+      updateHeader();
+    }
+
+    function buildReviewItems() {
+      const label = value => value === undefined || value === null || value === "" ? "Keine Antwort" : String(value);
+      const answerText = (q, correct) => {
+        if (q.type === "text") return correct ? label(q.solution) : label(state.answers[q.id]);
+        if (q.type === "order") {
+          const order = correct ? q.correct : (state.order[q.id] || q.initial || []);
+          return order.length ? order.map(index => q.items[index]).join(" → ") : "Keine Antwort";
+        }
+        const values = correct ? (Array.isArray(q.correct) ? q.correct : [q.correct]) : (state.answers[q.id] || []);
+        return values.length ? values.map(index => q.options[index]).join(" · ") : "Keine Antwort";
+      };
+      return questions.map(q => {
+        const result = resultFor(q.id) || { status: "skipped", points: 0 };
+        if (result.status === "correct") return null;
+        return {
+          status: result.status,
+          prompt: q.prompt,
+          yourAnswer: answerText(q, false),
+          correctAnswer: answerText(q, true),
+          explanation: q.type === "text" ? "" : q.solution,
+          points: result.points || 0,
+          maximum: q.points
+        };
+      }).filter(Boolean);
+    }
+
+    function reportResultToDashboard(score, pct, concepts, cls) {
+      const message = {
+        source: "quiz-dashboard",
+        version: 1,
+        type: "quiz-completed",
+        quizId: DASHBOARD_QUIZ_ID,
+        attempt: {
+          attemptId: state.attemptId,
+          completedAt: state.completedAt,
+          score,
+          maximumScore: maxPoints,
+          percentage: pct,
+          grade: Number(grade(score)),
+          understanding: cls.status,
+          strongConcepts: concepts.strong,
+          uncertainConcepts: concepts.mixed,
+          weakConcepts: concepts.weak,
+          reviewItems: buildReviewItems()
+        }
+      };
+      if (window.parent && window.parent !== window) window.parent.postMessage(message, "*");
+      if (window.opener && !window.opener.closed) window.opener.postMessage(message, "*");
+    }
+
+    function reportProgressToDashboard(manual = false) {
+      if (state.completed) return;
+      const message = {
+        source: "quiz-dashboard", version: 1, type: "quiz-progress", quizId: DASHBOARD_QUIZ_ID, manual,
+        progress: {
+          attemptId: state.attemptId,
+          currentTask: state.current + 1,
+          completedCount: completedCount(),
+          totalQuestions: questions.length,
+          score: earned(),
+          maximumScore: maxPoints,
+          updatedAt: new Date().toISOString()
+        }
+      };
+      if (window.parent && window.parent !== window) window.parent.postMessage(message, "*");
+      if (window.opener && !window.opener.closed) window.opener.postMessage(message, "*");
+    }
+
+    function saveProgressManually() {
+      const question = questions[state.current];
+      const text = document.getElementById("textAnswer");
+      if (question?.type === "text" && text) state.answers[question.id] = text.value;
+      saveState();
+      reportProgressToDashboard(true);
+      document.getElementById("saveNotice").textContent = `Zwischenstand gespeichert · ${new Date().toLocaleTimeString("de-CH", { hour: "2-digit", minute: "2-digit" })}`;
+    }
+
+    function clearDashboardProgress() {
+      const message = { source: "quiz-dashboard", version: 1, type: "quiz-progress-reset", quizId: DASHBOARD_QUIZ_ID };
+      if (window.parent && window.parent !== window) window.parent.postMessage(message, "*");
+      if (window.opener && !window.opener.closed) window.opener.postMessage(message, "*");
+    }
+
+    function render() {
+      if (state.completed) renderResult(); else renderQuestion();
+      updateHeader();
+    }
+
+    document.getElementById("saveBtn").addEventListener("click", saveProgressManually);
+    document.getElementById("finishBtn").addEventListener("click", renderResult);
+    function startNewQuiz() {
+      if (!confirm("Neues Quiz beginnen? Ein noch nicht abgeschlossener Zwischenstand wird verworfen. Bereits abgeschlossene Versuche bleiben im Dashboard erhalten.")) return;
+      localStorage.removeItem(STORAGE_KEY); clearDashboardProgress(); state = defaultState(); render();
+    }
+
+    document.getElementById("newQuizBtn").addEventListener("click", startNewQuiz);
+
+    const readyMessage = { source: "quiz-dashboard", version: 1, type: "quiz-ready", quizId: DASHBOARD_QUIZ_ID };
+    if (window.parent && window.parent !== window) window.parent.postMessage(readyMessage, "*");
+    if (window.opener && !window.opener.closed) window.opener.postMessage(readyMessage, "*");
+    render();
+    reportProgressToDashboard(false);
+  </script>
+</body>
+</html>

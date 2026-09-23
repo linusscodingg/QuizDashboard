@@ -86,13 +86,13 @@ context.window.addEventListener = (type, handler) => { windowListeners[type] = h
 
 vm.runInContext(catalogCode, context, { filename: "quiz-catalog.js" });
 const catalog = context.window.QUIZ_CATALOG;
-assert.equal(catalog.quizzes.length, 4);
+assert.equal(catalog.quizzes.length, 5);
 for (const quiz of catalog.quizzes) {
   assert.ok(fs.existsSync(path.resolve(dashboardDirectory, quiz.path)), `Missing quiz file: ${quiz.path}`);
 }
 
 vm.runInContext(inlineScripts[0], context, { filename: "dashboard-inline.js" });
-assert.equal(elements.completedTotal.textContent, "0 / 4");
+assert.equal(elements.completedTotal.textContent, "0 / 5");
 assert.equal(elements.averageGrade.textContent, "–");
 
 openQuizButton.click();
@@ -125,7 +125,7 @@ assert.match(elements.subjects.innerHTML, /In Bearbeitung/);
 assert.match(elements.subjects.innerHTML, /Quiz fortsetzen/);
 
 report("attempt-1", 70);
-assert.equal(elements.completedTotal.textContent, "1 / 4");
+assert.equal(elements.completedTotal.textContent, "1 / 5");
 assert.equal(elements.averagePercent.textContent, "70 %");
 assert.equal(elements.averageGrade.textContent, "4.5");
 assert.equal(String(elements.attemptTotal.textContent), "1");
@@ -147,8 +147,8 @@ assert.equal(elements.averagePercent.textContent, "85 %", "Best attempt must rem
 assert.match(elements.subjects.innerHTML, /Ø Lernnote<\/span><strong>4\.2/);
 assert.match(elements.subjects.innerHTML, /Beste Lernnote<\/span><strong>5\.3/);
 assert.match(elements.subjects.innerHTML, /Fehler ansehen \(1\)/);
-assert.match(elements.subjects.innerHTML, /Deine Antwort<\/span>Falsch/);
-assert.match(elements.subjects.innerHTML, /Richtige Antwort<\/span>Richtig/);
+assert.match(elements.subjects.innerHTML, /Deine Antwort:<\/b> Falsch/);
+assert.match(elements.subjects.innerHTML, /Richtige Antwort:<\/b> Richtig/);
 
 for (const quiz of catalog.quizzes) {
   const quizHtml = fs.readFileSync(path.resolve(dashboardDirectory, quiz.path), "utf8");
