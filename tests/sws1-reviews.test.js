@@ -17,8 +17,8 @@ const cases = [
     quizId: "sws1-w3-software-security-errors",
     source: "W3_SoftwareSecurityErrors.pdf",
     title: "Software Security Errors",
-    questionCount: 12,
-    maximumScore: 100
+    questionCount: 14,
+    maximumScore: 124
   }
 ];
 

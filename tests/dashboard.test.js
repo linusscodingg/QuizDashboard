@@ -28,7 +28,10 @@ class FakeElement {
     this.style = {};
     this.dataset = {};
     this.listeners = {};
-    this.contentWindow = {};
+    this.contentWindow = {
+      postedMessages: [],
+      postMessage(message) { this.postedMessages.push(message); }
+    };
   }
   addEventListener(type, handler) { this.listeners[type] = handler; }
   querySelectorAll(selector) {
@@ -116,13 +119,31 @@ windowListeners.message({
   source: elements.quizFrame.contentWindow,
   data: {
     source: "quiz-dashboard", version: 1, type: "quiz-progress", quizId: "cns1-w2-ipv6-part2", manual: true,
-    progress: { attemptId: "attempt-1", currentTask: 4, completedCount: 3, totalQuestions: 13, score: 18, maximumScore: 100, updatedAt: "2026-09-21T11:00:00.000Z" }
+    progress: {
+      attemptId: "attempt-1", currentTask: 4, completedCount: 3, totalQuestions: 13,
+      score: 18, maximumScore: 100, updatedAt: "2026-09-21T11:00:00.000Z",
+      quizState: {
+        current: 3, answers: { "icmp-role": [1, 2] }, order: {}, results: {},
+        revealed: {}, completed: false, attemptId: "attempt-1",
+        startedAt: "2026-09-21T10:00:00.000Z", completedAt: null,
+        updatedAt: "2026-09-21T11:00:00.000Z"
+      }
+    }
   }
 });
 let storedDashboard = JSON.parse(storage.get("quiz-dashboard-v1"));
 assert.equal(storedDashboard.progress["cns1-w2-ipv6-part2"].completedCount, 3);
+assert.deepEqual(storedDashboard.progress["cns1-w2-ipv6-part2"].quizState.answers["icmp-role"], [1, 2]);
 assert.match(elements.subjects.innerHTML, /In Bearbeitung/);
 assert.match(elements.subjects.innerHTML, /Quiz fortsetzen/);
+
+windowListeners.message({
+  source: elements.quizFrame.contentWindow,
+  data: { source: "quiz-dashboard", version: 1, type: "quiz-ready", quizId: "cns1-w2-ipv6-part2" }
+});
+const resumeMessage = elements.quizFrame.contentWindow.postedMessages.at(-1);
+assert.equal(resumeMessage.type, "quiz-resume");
+assert.deepEqual(resumeMessage.progress.quizState.answers["icmp-role"], [1, 2]);
 
 report("attempt-1", 70);
 assert.equal(elements.completedTotal.textContent, "1 / 5");
@@ -155,6 +176,8 @@ for (const quiz of catalog.quizzes) {
   assert.match(quizHtml, /source:\s*"quiz-dashboard"/);
   assert.match(quizHtml, /quizId:\s*DASHBOARD_QUIZ_ID/);
   assert.match(quizHtml, /type:\s*"quiz-progress"/);
+  assert.match(quizHtml, /quizState:\s*snapshotQuizState\(\)/);
+  assert.match(quizHtml, /type !== "quiz-resume"/);
   assert.match(quizHtml, /Zwischenstand speichern|Save progress/);
   const questionsLiteral = quizHtml.match(/const questions = (\[[\s\S]*?\n\s*\]);\n\n\s*const STORAGE_KEY/);
   assert.ok(questionsLiteral, `Questions array should remain readable for ${quiz.id}`);

@@ -425,9 +425,9 @@
         return { version: 1, attempts: value.attempts || {}, progress: value.progress || {} };
       }
 
-      function saveStore() {
+      function saveStore(immediateCloudSave = false) {
         localStorage.setItem(STORAGE_KEY, JSON.stringify(store));
-        queueCloudSave();
+        queueCloudSave(immediateCloudSave);
       }
 
       function mergeStores(localValue, remoteValue) {
@@ -456,22 +456,28 @@
         return merged;
       }
 
-      function queueCloudSave() {
+      async function writeCloudStore() {
+        try {
+          await window.quizCloud.save(store);
+          const githubUsername = githubUsernameFor(cloudUser);
+          const subjects = buildLeaderboardSubjects();
+          await window.quizCloud.publishLeaderboard(githubUsername, subjects);
+          updateOwnLeaderboardEntry(githubUsername, subjects);
+          setCloudStatus(`Mit Firebase synchronisiert · ${new Date().toLocaleTimeString("de-CH", { hour: "2-digit", minute: "2-digit" })}`);
+        } catch (error) {
+          setCloudStatus("Cloud-Speicherung fehlgeschlagen – lokal weiterhin sicher gespeichert.", true);
+        }
+      }
+
+      function queueCloudSave(immediate = false) {
         if (!cloudUser || !window.quizCloud) return;
         clearTimeout(cloudSaveTimer);
         setCloudStatus("Synchronisierung ausstehend …");
-        cloudSaveTimer = setTimeout(async () => {
-          try {
-            await window.quizCloud.save(store);
-            const githubUsername = githubUsernameFor(cloudUser);
-            const subjects = buildLeaderboardSubjects();
-            await window.quizCloud.publishLeaderboard(githubUsername, subjects);
-            updateOwnLeaderboardEntry(githubUsername, subjects);
-            setCloudStatus(`Mit Firebase synchronisiert · ${new Date().toLocaleTimeString("de-CH", { hour: "2-digit", minute: "2-digit" })}`);
-          } catch (error) {
-            setCloudStatus("Cloud-Speicherung fehlgeschlagen – lokal weiterhin sicher gespeichert.", true);
-          }
-        }, 650);
+        if (immediate) {
+          void writeCloudStore();
+          return;
+        }
+        cloudSaveTimer = setTimeout(writeCloudStore, 650);
       }
 
       function setCloudStatus(message, isError = false) {
@@ -875,6 +881,7 @@
         const totalQuestions = Number(raw.totalQuestions);
         const score = Number(raw.score);
         if (!raw.attemptId || !Number.isFinite(completedCount) || !Number.isFinite(totalQuestions) || totalQuestions <= 0 || !Number.isFinite(score)) return null;
+        const updatedAt = Number.isNaN(new Date(raw.updatedAt).getTime()) ? new Date().toISOString() : new Date(raw.updatedAt).toISOString();
         return {
           attemptId: String(raw.attemptId),
           currentTask: clamp(Number(raw.currentTask) || 1, 1, totalQuestions),
@@ -882,8 +889,32 @@
           totalQuestions,
           score: clamp(score, 0, Number(raw.maximumScore || quiz.maximumScore)),
           maximumScore: Number(raw.maximumScore || quiz.maximumScore),
-          updatedAt: Number.isNaN(new Date(raw.updatedAt).getTime()) ? new Date().toISOString() : new Date(raw.updatedAt).toISOString()
+          updatedAt,
+          quizState: normaliseQuizState(raw.quizState, totalQuestions, String(raw.attemptId), updatedAt)
         };
+      }
+
+      function normaliseQuizState(raw, totalQuestions, attemptId, updatedAt) {
+        if (!raw || typeof raw !== "object" || Array.isArray(raw)) return null;
+        const record = value => value && typeof value === "object" && !Array.isArray(value)
+          ? JSON.parse(JSON.stringify(value)) : {};
+        const state = {
+          current: clamp(Math.floor(Number(raw.current) || 0), 0, totalQuestions - 1),
+          answers: record(raw.answers),
+          order: record(raw.order),
+          results: record(raw.results),
+          revealed: record(raw.revealed),
+          completed: false,
+          attemptId: String(raw.attemptId || attemptId).slice(0, 120),
+          startedAt: Number.isNaN(new Date(raw.startedAt).getTime()) ? updatedAt : new Date(raw.startedAt).toISOString(),
+          completedAt: null,
+          updatedAt
+        };
+        try {
+          return JSON.stringify(state).length <= 400000 ? state : null;
+        } catch (_) {
+          return null;
+        }
       }
 
       window.addEventListener("message", event => {
@@ -892,7 +923,14 @@
         if (message.quizId !== activeQuizId) return;
         if (message.type === "quiz-ready") {
           clearTimeout(loadTimer);
-          document.getElementById("playerStatus").textContent = "Dein Zwischenstand bleibt lokal gespeichert.";
+          const savedProgress = store.progress[message.quizId] || null;
+          frame.contentWindow.postMessage({
+            source: "quiz-dashboard", version: 1, type: "quiz-resume",
+            quizId: message.quizId, progress: savedProgress
+          }, "*");
+          document.getElementById("playerStatus").textContent = savedProgress?.quizState
+            ? "Cloud-Zwischenstand wurde an das Quiz übertragen."
+            : "Dein Zwischenstand bleibt lokal und in Firebase gespeichert.";
           return;
         }
         if (message.type === "quiz-progress") {
@@ -900,7 +938,7 @@
           const progress = normaliseProgress(message.progress, quiz);
           if (!progress) return showToast("Der Zwischenstand konnte nicht gespeichert werden.");
           store.progress[quiz.id] = progress;
-          saveStore();
+          saveStore(Boolean(message.manual));
           render();
           document.getElementById("playerStatus").textContent = `${progress.completedCount} / ${progress.totalQuestions} Aufgaben gespeichert.`;
           if (message.manual) showToast("Zwischenstand gespeichert.");
@@ -908,7 +946,7 @@
         }
         if (message.type === "quiz-progress-reset") {
           delete store.progress[message.quizId];
-          saveStore();
+          saveStore(true);
           render();
           document.getElementById("playerStatus").textContent = "Fortschritt zurückgesetzt.";
           return;
@@ -922,7 +960,7 @@
         if (existing >= 0) list[existing] = attempt; else list.push(attempt);
         store.attempts[quiz.id] = list;
         delete store.progress[quiz.id];
-        saveStore();
+        saveStore(true);
         render();
         showToast(`Gespeichert: ${attempt.percentage} % · Lernnote ${attempt.grade.toFixed(1)}`);
       });

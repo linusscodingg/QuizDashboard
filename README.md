@@ -26,7 +26,7 @@ QuizDashboard/
 └── tests/
 ```
 
-Neue Quiz werden in `quizzes/<FACH>/` gespeichert und zusätzlich in `quiz-catalog.js` registriert. Der lokale Verlauf und unfertige Zwischenstände werden im Browser gespeichert. Nach einer Anmeldung wird derselbe Dashboard-Datensatz zusätzlich unter `users/<uid>/dashboard/state` in Cloud Firestore gespeichert. Lokaler und entfernter Stand werden beim Login zusammengeführt.
+Neue Quiz werden in `quizzes/<FACH>/` gespeichert und zusätzlich in `quiz-catalog.js` registriert. Der lokale Verlauf und unfertige Zwischenstände werden im Browser gespeichert. Nach **Zwischenstand speichern** wird der vollständige Quiz-Zustand einschliesslich Antworten, Reihenfolgen und Bewertungen unter `users/<uid>/dashboard/state` in Cloud Firestore gespeichert und kann mit demselben GitHub-Konto auf einem anderen Gerät fortgesetzt werden. Lokaler und entfernter Stand werden beim Login zusammengeführt.
 
 Eine vollständige Schritt-für-Schritt-Anleitung für neue Autorinnen und Autoren steht in [`QUIZ_ERSTELLEN.md`](QUIZ_ERSTELLEN.md). Sie beschreibt auch Lösungsschutz, Fortschritt, Katalogeintrag, Tests und die Integration in den Lernvergleich.
 

@@ -36,6 +36,7 @@ const element = id => {
 const storage = new Map();
 const dashboardMessages = [];
 const parent = { postMessage: message => dashboardMessages.push(message) };
+const windowListeners = {};
 
 const context = vm.createContext({
   console,
@@ -67,6 +68,7 @@ context.window = context;
 context.window.parent = parent;
 context.window.opener = null;
 context.window.scrollTo = () => {};
+context.window.addEventListener = (type, handler) => { windowListeners[type] = handler; };
 
 vm.runInContext(scripts[0], context, { filename: "W2_Healthcare_Data.html" });
 
@@ -76,6 +78,24 @@ assert.match(element("quizView").innerHTML, /Aufgabe 1 von 12/);
 assert.doesNotMatch(element("quizView").innerHTML, /Lösung anzeigen/, "Automatic tasks must not reveal the solution before submission");
 assert.equal(dashboardMessages[0].type, "quiz-ready");
 assert.equal(dashboardMessages[0].quizId, "dheal-w2-healthcare-data");
+
+windowListeners.message({
+  source: parent,
+  data: {
+    source: "quiz-dashboard", version: 1, type: "quiz-resume", quizId: "dheal-w2-healthcare-data",
+    progress: {
+      updatedAt: "2099-01-01T12:00:00.000Z",
+      quizState: {
+        current: 4, answers: { "glucose-context": "Cloud answer" }, order: {}, results: {}, revealed: {},
+        completed: false, attemptId: "cloud-attempt", startedAt: "2099-01-01T10:00:00.000Z",
+        completedAt: null, updatedAt: "2099-01-01T12:00:00.000Z"
+      }
+    }
+  }
+});
+assert.equal(vm.runInContext("state.current", context), 4, "Cloud progress should restore the current task");
+assert.equal(vm.runInContext("state.answers['glucose-context']", context), "Cloud answer", "Cloud progress should restore answers");
+assert.equal(JSON.parse(storage.get("dheal-w2-healthcare-data-review-v1")).attemptId, "cloud-attempt");
 
 vm.runInContext("state.current = 1; state.answers.modalities = [0, 1]; gradeAuto(questions[1]);", context);
 assert.equal(vm.runInContext("state.revealed.modalities", context), true, "Checking must reveal the explanation");

@@ -116,13 +116,14 @@ Bei Freitextlösungen sollen nicht nur Stichwörter stehen. Die Musterlösung mu
 
 ## 5. Fortschritt und Abschluss
 
-Das Quiz muss Antworten, Punkte, aktuelle Aufgabe, geöffnete Lösungen und Selbsteinschätzungen in `localStorage` sichern. Ein Neuladen darf den Zwischenstand nicht verlieren.
+Das Quiz muss Antworten, Punkte, aktuelle Aufgabe, Reihenfolgen, geöffnete Lösungen und Selbsteinschätzungen sowohl in `localStorage` als auch über das Dashboard in Firebase sichern. Ein Neuladen oder Gerätewechsel nach dem manuellen Speichern darf den Zwischenstand nicht verlieren.
 
 Erforderliche Funktionen:
 
 - automatische Speicherung bei Änderungen
-- Button **Zwischenstand speichern**
+- Button **Zwischenstand speichern**, der den vollständigen Zustand als `quizState` an das Dashboard überträgt
 - Wiederaufnahme bei der zuletzt geöffneten Aufgabe
+- Empfang von `quiz-resume`, damit der neuere Firebase-Zwischenstand in einem anderen Browser wiederhergestellt wird
 - bestätigter Reset des aktuellen Versuchs
 - neue `attemptId` nach dem Reset
 - abgeschlossene ältere Versuche im Dashboard nicht löschen
@@ -178,7 +179,7 @@ Ein Katalogeintrag allein genügt nicht. Das Quiz muss nach Abschluss eine Nachr
 }
 ```
 
-Für unfertige Versuche werden entsprechend `quiz-progress` und beim Reset `quiz-progress-reset` gesendet.
+Für unfertige Versuche wird `quiz-progress` gesendet. `progress.quizState` muss dabei mindestens `current`, `answers`, `order`, `results`, `revealed`, `attemptId`, `startedAt` und `updatedAt` enthalten. Beim Öffnen antwortet das Dashboard mit `quiz-resume` und dem gespeicherten Zustand. Beim Reset wird `quiz-progress-reset` gesendet.
 
 Damit ein neues Quiz im Lernvergleich beziehungsweise in der Rangliste erscheint, müssen alle folgenden Bedingungen erfüllt sein:
 
@@ -199,6 +200,7 @@ Vor dem Abschluss mindestens Folgendes prüfen:
 - Nach der Abgabe sind Eingaben gesperrt.
 - Zurück, Weiter und Aufgabenübersicht funktionieren.
 - Neuladen erhält den Zwischenstand.
+- Nach **Zwischenstand speichern** lässt sich das Quiz in einem zweiten Browser mit demselben GitHub-Konto an derselben Stelle fortsetzen.
 - Reset erzeugt einen neuen Versuch.
 - Punktesumme und `maximumScore` stimmen überein.
 - Abschluss zeigt Prozent, Lernnote und Verständnisstatus korrekt.
@@ -238,4 +240,3 @@ Ein neues Quiz ist fertig, wenn:
 - der Versuch im persönlichen Verlauf und Lernvergleich erscheint,
 - die relevanten Tests bestanden sind und
 - keine persönlichen Notizen verändert wurden, sofern beim Lernen keine echte Wissenslücke entstanden ist.
-
