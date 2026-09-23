@@ -1,0 +1,790 @@
+<!doctype html>
+<html lang="de">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Anspruchsvoller interaktiver Open-Book-Review zur ersten IT-Recht-Vorlesung.">
+  <title>IT-Recht - Einführung - Open-Book-Review</title>
+  <style>
+    :root {
+      --ink: #241a35;
+      --muted: #70667e;
+      --teal: #6d4bc3;
+      --teal-dark: #493080;
+      --mint: #eee8fb;
+      --blue: #8865d3;
+      --paper: #fff;
+      --wash: #f4f0fb;
+      --line: #ddd2ef;
+      --green: #198754;
+      --amber: #a96c00;
+      --red: #b9343b;
+      --shadow: 0 18px 50px rgba(73, 48, 128, .15);
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      min-height: 100vh;
+      color: var(--ink);
+      font: 16px/1.5 Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      background:
+        radial-gradient(circle at 8% 0%, rgba(109, 75, 195, .16), transparent 29rem),
+        linear-gradient(145deg, #fbfdfd 0%, var(--wash) 70%, #e5f1ef 100%);
+    }
+    button, input, textarea { font: inherit; }
+    button { cursor: pointer; }
+    button:focus-visible, input:focus-visible, textarea:focus-visible { outline: 3px solid rgba(54,127,186,.3); outline-offset: 2px; }
+    .shell { width: min(1140px, calc(100% - 32px)); margin: 0 auto; padding: 28px 0 46px; }
+    .topbar {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) auto;
+      gap: 20px;
+      align-items: start;
+      padding: 25px;
+      color: #fff;
+      border-radius: 24px;
+      background: linear-gradient(120deg, #493080, #237274 62%, #3b8f83);
+      box-shadow: var(--shadow);
+    }
+    .eyebrow { margin: 0 0 6px; color: #c8f4ed; font-size: .78rem; font-weight: 850; letter-spacing: .14em; text-transform: uppercase; }
+    h1 { margin: 0; font-size: clamp(1.55rem, 3vw, 2.4rem); line-height: 1.1; }
+    .subtitle { margin: 9px 0 0; color: #dcf6f1; }
+    .scorebox { min-width: 215px; padding: 14px 16px; border: 1px solid rgba(255,255,255,.28); border-radius: 16px; background: rgba(255,255,255,.1); }
+    .scorebox strong, .scorebox span { display: block; }
+    .scorebox strong { font-size: 1.35rem; }
+    .scorebox span { margin-top: 4px; color: #dcf6f1; font-size: .9rem; }
+    .progress-wrap { grid-column: 1 / -1; margin-top: 17px; }
+    .progress-track { height: 10px; overflow: hidden; border-radius: 999px; background: rgba(255,255,255,.2); }
+    .progress-fill { width: 0; height: 100%; border-radius: inherit; background: linear-gradient(90deg, #8ce5d7, #d9fff8); transition: width .25s ease; }
+    .progress-labels { display: flex; justify-content: space-between; gap: 12px; margin-top: 8px; color: #dcf6f1; font-size: .86rem; }
+    .layout { display: grid; grid-template-columns: minmax(0, 1fr) 270px; gap: 22px; margin-top: 22px; }
+    .card, .side-card { border: 1px solid rgba(164,195,189,.72); border-radius: 22px; background: rgba(255,255,255,.95); box-shadow: var(--shadow); }
+    .card { min-height: 570px; padding: clamp(22px, 4vw, 38px); }
+    .side-card { position: sticky; top: 18px; padding: 18px; }
+    .side-card h2 { margin: 0 0 12px; font-size: 1rem; }
+    .mini-stat { display: flex; justify-content: space-between; gap: 10px; padding: 10px 0; color: var(--muted); border-bottom: 1px solid var(--line); font-size: .9rem; }
+    .mini-stat strong { color: var(--ink); }
+    .source-note { margin: 16px 0 0; color: var(--muted); font-size: .78rem; line-height: 1.45; }
+    .save-note { min-height: 1.25em; margin: 9px 0 0; color: var(--green); font-size: .8rem; font-weight: 750; }
+    .openbook { margin: 0 0 24px; padding: 16px 18px; color: #3a245f; border: 2px solid #9d7cdb; border-radius: 16px; background: linear-gradient(120deg, #f1eafd, #fbf9ff); }
+    .openbook strong, .openbook span { display: block; }
+    .openbook strong { font-size: 1.02rem; }
+    .openbook span { margin-top: 5px; color: #5d4d72; font-size: .9rem; }
+    .task-head { display: flex; justify-content: space-between; gap: 16px; align-items: flex-start; }
+    .task-no { color: var(--teal); font-size: .82rem; font-weight: 850; letter-spacing: .08em; text-transform: uppercase; }
+    .topic { margin-top: 6px; color: var(--muted); font-size: .94rem; }
+    .points { flex: none; padding: 7px 11px; color: var(--teal-dark); border-radius: 999px; background: var(--mint); font-weight: 800; }
+    .question { margin: 24px 0 18px; font-size: clamp(1.15rem, 2vw, 1.4rem); line-height: 1.42; }
+    .hint { margin: -7px 0 18px; color: var(--muted); font-size: .92rem; }
+    .options, .order-list { display: grid; gap: 10px; }
+    .option { display: grid; grid-template-columns: auto 1fr; gap: 12px; align-items: start; padding: 13px 15px; border: 1px solid var(--line); border-radius: 14px; background: #fbfdfd; transition: border-color .15s, transform .15s; }
+    .option:hover { border-color: #62aaa4; transform: translateY(-1px); }
+    .option input { margin-top: 4px; accent-color: var(--teal); }
+    .option.answer-correct { border-color: #49a96b; background: #e8f8ee; }
+    .option.answer-wrong { border-color: #dc7070; background: #fff0f0; }
+    .answer-label { display: block; margin-top: 5px; font-size: .78rem; font-weight: 850; }
+    .answer-correct .answer-label { color: #14642f; }
+    .answer-wrong .answer-label { color: #922020; }
+    textarea { width: 100%; min-height: 155px; padding: 14px; resize: vertical; color: var(--ink); border: 1px solid var(--line); border-radius: 14px; background: #fbfdfd; line-height: 1.5; }
+    .order-row { display: grid; grid-template-columns: 36px 1fr auto auto; gap: 8px; align-items: center; padding: 10px; border: 1px solid var(--line); border-radius: 13px; background: #fbfdfd; }
+    .order-row.answer-correct { border-color: #49a96b; background: #e8f8ee; }
+    .order-row.answer-wrong { border-color: #dc7070; background: #fff0f0; }
+    .category-list { display: grid; gap: 12px; }
+    .category-row { padding: 14px; border: 1px solid var(--line); border-radius: 14px; background: #fbfdfd; }
+    .category-row.answer-correct { border-color: #49a96b; background: #e8f8ee; }
+    .category-row.answer-wrong { border-color: #dc7070; background: #fff0f0; }
+    .category-row label { display: block; margin-bottom: 9px; font-weight: 700; }
+    .category-row select { width: 100%; padding: 10px 12px; color: var(--ink); border: 1px solid var(--line); border-radius: 10px; background: #fff; }
+    .category-row small { display: block; margin-top: 8px; line-height: 1.4; }
+    .rank { display: grid; place-items: center; width: 30px; height: 30px; color: #fff; border-radius: 50%; background: var(--teal); font-weight: 800; }
+    .move { width: 34px; height: 34px; padding: 0; color: var(--teal); border: 1px solid var(--line); border-radius: 9px; background: #fff; font-weight: 900; }
+    .actions { display: flex; flex-wrap: wrap; gap: 9px; margin-top: 22px; }
+    .btn { min-height: 42px; padding: 10px 15px; border: 1px solid transparent; border-radius: 12px; font-weight: 780; }
+    .btn.primary { color: #fff; background: var(--teal); }
+    .btn.secondary { color: #fff; background: var(--blue); }
+    .btn.ghost { color: var(--ink); border-color: var(--line); background: #fff; }
+    .btn:disabled { cursor: not-allowed; opacity: .42; }
+    .feedback, .solution { margin-top: 18px; padding: 16px; border-radius: 14px; }
+    .feedback.correct { color: #0c6638; background: #e5f7eb; }
+    .feedback.partial { color: #7c5600; background: #fff4d0; }
+    .feedback.wrong, .feedback.skipped { color: #8c272d; background: #fdebed; }
+    .solution { border: 1px solid #bdd9d3; background: #eef9f6; }
+    .solution h3 { margin: 0 0 8px; font-size: 1rem; }
+    .solution p { margin: 7px 0; }
+    .answer-analysis { display: grid; gap: 8px; margin: 12px 0; }
+    .analysis-item { padding: 10px 12px; border-radius: 10px; }
+    .analysis-item.correct { border-left: 4px solid var(--green); background: #e8f8ee; }
+    .analysis-item.wrong { border-left: 4px solid var(--red); background: #fff0f0; }
+    .analysis-item strong { display: block; margin-bottom: 3px; }
+    .reference { color: var(--muted); font-size: .85rem; }
+    .self-rate { display: flex; flex-wrap: wrap; gap: 9px; margin-top: 12px; }
+    .overview { display: grid; grid-template-columns: repeat(4, 1fr); gap: 7px; }
+    .dot { display: grid; place-items: center; aspect-ratio: 1; padding: 0; color: var(--muted); border: 1px solid var(--line); border-radius: 10px; background: #f4f7f7; font-weight: 800; }
+    .dot.current { outline: 3px solid rgba(54,127,186,.24); }
+    .dot.correct { color: #fff; border-color: var(--green); background: var(--green); }
+    .dot.partial { color: #fff; border-color: var(--amber); background: var(--amber); }
+    .dot.wrong, .dot.skipped { color: #fff; border-color: var(--red); background: var(--red); }
+    .result { display: none; }
+    .result.show { display: block; }
+    .result-hero { padding: 24px; color: #fff; border-radius: 18px; background: linear-gradient(120deg, #493080, #2d827c); }
+    .result-hero h2 { margin: 0 0 8px; font-size: 2rem; }
+    .result-big { font-size: clamp(2.5rem, 7vw, 4.8rem); font-weight: 900; line-height: 1; }
+    .result-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin: 18px 0; }
+    .result-tile { padding: 16px; border: 1px solid var(--line); border-radius: 15px; background: #fbfdfd; }
+    .result-tile strong, .result-tile span { display: block; }
+    .result-tile strong { font-size: 1.35rem; }
+    .concepts { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; }
+    .concept-box { padding: 16px; border: 1px solid var(--line); border-radius: 15px; }
+    .concept-box h3 { margin: 0 0 8px; font-size: 1rem; }
+    .concept-box ul { margin: 0; padding-left: 18px; }
+    .hidden { display: none !important; }
+    @media (max-width: 830px) {
+      .topbar { grid-template-columns: 1fr; }
+      .scorebox { min-width: 0; }
+      .layout { grid-template-columns: 1fr; }
+      .side-card { position: static; }
+    }
+    @media (max-width: 600px) {
+      .shell { width: min(100% - 20px, 1140px); padding-top: 10px; }
+      .topbar, .card, .side-card { border-radius: 17px; }
+      .result-grid, .concepts { grid-template-columns: 1fr; }
+      .order-row { grid-template-columns: 32px 1fr auto auto; }
+    }
+  </style>
+</head>
+<body>
+  <main class="shell">
+    <header class="topbar">
+      <div>
+        <p class="eyebrow">IT-RECHT · Vorlesung 01</p>
+        <h1>Einführung ins Informatikrecht</h1>
+        <p class="subtitle">Schwieriger Open-Book-Test zu Rechtsrahmen, Anspruchsdenken und Verfahrenswegen</p>
+      </div>
+      <div class="scorebox" aria-live="polite"><strong id="scoreText">0 / 100 Punkte</strong><span id="percentText">0 % · noch keine Endnote</span></div>
+      <div class="progress-wrap">
+        <div class="progress-track"><div class="progress-fill" id="progressFill"></div></div>
+        <div class="progress-labels"><span id="progressText">0 / 12 Aufgaben</span><span id="streakText">Streak: 0</span></div>
+      </div>
+    </header>
+
+    <div class="layout">
+      <section class="card"><div class="openbook"><strong>OPEN BOOK – Nachschlagen ist Teil der Aufgabe.</strong><span>Arbeite wie an der Modulendprüfung: Nutze die Vorlesungsfolien aktiv, suche die passende Stelle und begründe präzise. Die Lösungen bleiben bis zur Abgabe gesperrt.</span></div>
+        <div id="quizView"></div>
+        <div id="resultView" class="result"></div>
+      </section>
+      <aside class="side-card">
+        <h2>Aufgabenübersicht</h2>
+        <div class="overview" id="overview"></div>
+        <div class="mini-stat"><span>Bearbeitet</span><strong id="doneSide">0 / 12</strong></div>
+        <div class="mini-stat"><span>Aktuelle Punkte</span><strong id="pointsSide">0 / 100</strong></div>
+        <div class="mini-stat"><span>Lernnote</span><strong id="gradeSide">am Ende</strong></div>
+        <div class="actions">
+          <button class="btn secondary" id="saveBtn" type="button">Zwischenstand speichern</button>
+          <button class="btn primary" id="finishBtn" type="button" disabled>Review abschliessen</button>
+          <button class="btn ghost" id="newQuizBtn" type="button">Quiz nochmals machen</button>
+        </div>
+        <p class="save-note" id="saveNotice" aria-live="polite">Änderungen werden auch automatisch lokal gespeichert.</p>
+        <p class="source-note">Quelle: <strong>W1_Einfuerhung.pdf</strong>, Folien 1–25. Format: anspruchsvoller Open-Book-Review. Die Note ist eine Selbsteinschätzung, keine offizielle Hochschulnote.</p>
+      </aside>
+    </div>
+  </main>
+
+  <script>
+    const questions = [
+      {
+        id: "anspruch-vierfragen", type: "order", topic: "Anspruchsprüfung", points: 6,
+        prompt: "Bringe die vier Leitfragen einer obligationsrechtlichen Anspruchsprüfung in die Reihenfolge der Vorlesung.",
+        hint: "Open Book: Suche die Folie mit der zentralen obligationsrechtlichen Frage. Die Reihenfolge zählt.",
+        items: ["WORAUS?", "WER?", "WAS?", "von WEM?"],
+        initial: [0, 2, 3, 1], correct: [1, 3, 2, 0],
+        solution: "WER will von WEM WAS WORAUS? Der Aufbau zwingt dazu, Anspruchsteller, Anspruchsgegner, verlangte Leistung und Rechtsgrundlage sauber auseinanderzuhalten. Im Einzelfall entstehen daraus weitere Unterfragen, die nicht immer eindeutig mit Ja oder Nein beantwortbar sind.",
+        reference: "Folie 11 – Zentrale (obligationen-)rechtliche Frage", concepts: ["Anspruchsprüfung", "Rechtliche Strukturierung"]
+      },
+      {
+        id: "argumentation-beweis", type: "text", topic: "Juristische Argumentation", points: 9,
+        prompt: "Ein Projektleiter behauptet: «Der Lieferant muss den Ausfallschaden ersetzen.» Formuliere, wie diese Behauptung nach dem in der Vorlesung gezeigten Schema juristisch tragfähig gemacht werden müsste. Benenne auch, was ohne konkrete Akten noch offenbleibt.",
+        hint: "Eine überzeugende Antwort verbindet Schlussfolgerung, Rechtsgrundlage und Beweis – und trennt Behauptung von belegtem Ergebnis.",
+        solution: "Vollständig ist eine Antwort, wenn sie die behauptete Rechtsfolge X (Ersatz des konkret bezeichneten Schadens) auf eine einschlägige Grundlage, etwa eine Vertragsbestimmung oder einen Gesetzesartikel, UND auf die notwendigen Beweise Y stützt. Zu beweisen wären je nach Anspruch unter anderem Vertragsinhalt/Pflicht, Pflichtverletzung, Schaden und Zusammenhang. Ohne Vertrag, anwendbare Norm und Belege ist der Satz nur eine Behauptung; die konkrete Rechtsgrundlage und die erforderlichen Tatsachenbeweise bleiben offen. Schema der Folie: X = f(Art. XXX) + Beweis YYY.",
+        reference: "Folie 12 – Juristische Argumentation", concepts: ["Juristische Argumentation", "Rechtsgrundlage", "Beweis"]
+      },
+      {
+        id: "privat-oeffentlich", type: "multi", topic: "Privatrecht und öffentliches Recht", points: 8,
+        prompt: "Welche Schlussfolgerungen sind gemäss Vorlesung zulässig? Wähle alle richtigen Aussagen.",
+        options: [
+          "Privatrecht wird unter anderem durch Koalitions- und Vertragsfreiheit geprägt.",
+          "Öffentliches Recht wird vom Legalitätsprinzip als Form der Gewaltenkontrolle geprägt.",
+          "Die Einteilung hat praktische Folgen, weil Gerichtsbarkeit, Prozessabläufe und Prozessrechte verschieden sind.",
+          "Sobald eine Informatikfrage technisch komplex ist, gehört sie automatisch zum öffentlichen Recht.",
+          "Vertragsfreiheit bedeutet, dass zwingendes Recht durch jede private Vereinbarung aufgehoben werden kann."
+        ], correct: [0, 1, 2],
+        optionExplanations: [
+          "Das nennt Folie 18 ausdrücklich als prägenden Grundsatz des Privatrechts.",
+          "Das Legalitätsprinzip bindet staatliches Handeln an eine gesetzliche Grundlage und dient damit der Gewaltenkontrolle.",
+          "Die Vorlesung betont die unterschiedlichen Zuständigkeiten und Verfahren von Zivil- und Verwaltungsgerichtsbarkeit.",
+          "Technische Komplexität ist kein Einteilungskriterium. Entscheidend sind unter anderem die beteiligten Personen und die rechtliche Beziehung.",
+          "Zwingendes Recht kann gerade nicht beliebig wegbedungen werden; die Vertragsfreiheit wirkt innerhalb des rechtlichen Rahmens."
+        ],
+        solution: "Richtig sind die ersten drei Aussagen. Die Unterscheidung ist nicht bloss theoretisch: Sie beeinflusst Prinzipien, zuständige Gerichte, Verfahren und Rechte der Parteien.",
+        reference: "Folien 17–19 – Privat-/öffentliches Recht und Rechtsbegriffe", concepts: ["Privatrecht", "Öffentliches Recht", "Legalitätsprinzip", "Vertragsfreiheit"]
+      },
+      {
+        id: "normenhierarchie", type: "order", topic: "Hierarchie des Rechts", points: 6,
+        prompt: "Ordne die Normstufen von der höchsten zur tieferen Stufe.",
+        hint: "Achtung: Eine Verfügung ist keine Verordnung.",
+        items: ["Verordnungen", "Verfassung", "Gesetze"],
+        initial: [0, 2, 1], correct: [1, 2, 0],
+        solution: "Verfassung → Gesetze → Verordnungen. Die Folie warnt ausdrücklich vor der Verwechslung von Verordnung und Verfügung.",
+        reference: "Folie 16 – Hierarchie des Rechts", concepts: ["Normenhierarchie", "Verordnung und Verfügung"]
+      },
+      {
+        id: "foederalismus-kompetenz", type: "multi", topic: "Föderalismus und Gesetzgebungskompetenz", points: 8,
+        prompt: "Ein Bundesamt möchte für alle Gemeinden eine neue IT-Pflicht einführen. Welche Prüfschritte oder Aussagen folgen aus der Vorlesung?",
+        options: [
+          "Es ist zu prüfen, ob für das Handeln eine verfassungsmässige Legitimation beziehungsweise Kompetenz besteht.",
+          "Auch Kantone und Gemeinden handeln innerhalb ihrer jeweiligen rechtlichen Kompetenzordnung.",
+          "Gemeindeautonomie bedeutet vollständige Unabhängigkeit von kantonalem und Bundesrecht.",
+          "Die Schweiz ist föderal aufgebaut; Kantone besitzen eigene Organisation und Verfassung.",
+          "Ein Bundesamt darf jede technisch sinnvolle Regel ohne gesetzliche oder verfassungsmässige Grundlage erlassen."
+        ], correct: [0, 1, 3],
+        optionExplanations: [
+          "Folie 15 verlangt für jedes Gemeinwesen eine verfassungsmässige Legitimation zum Erlass von Regeln und zum Handeln im Rechtsbereich.",
+          "Kompetenzen sind auf Bund, Kantone und Gemeinden verteilt; keine Ebene handelt ausserhalb des rechtlichen Rahmens.",
+          "Die Gemeindeautonomie ist ausdrücklich beschränkt und besteht nur innerhalb des rechtlichen Rahmens.",
+          "Die Folie beschreibt die 26 Kantone als weitgehend souveräne Gliedstaaten mit eigener Organisation und Verfassung.",
+          "Technische Zweckmässigkeit ersetzt keine Kompetenz- und Rechtsgrundlage."
+        ],
+        solution: "Vor jeder materiellen Bewertung ist die Zuständigkeit zu klären. Föderalismus verteilt Regelungskompetenzen; Autonomie ist rechtlich begrenzt und staatliches Handeln braucht Legitimation.",
+        reference: "Folien 13–16 – Gewaltenteilung, Rechtsordnung und Bund/Kantone/Gemeinden", concepts: ["Föderalismus", "Kompetenzordnung", "Gemeindeautonomie"]
+      },
+      {
+        id: "compliance-risikomanagement", type: "text", topic: "Recht als Risk Management", points: 9,
+        prompt: "Ein Start-up entwickelt ein medizinisches KI-System. Die Rechtsprüfung ist erst zwei Tage vor dem Go-live geplant. Analysiere diese Planung anhand der Vorlesung und formuliere ein angemessenes Massnahmenpaket.",
+        hint: "Eine vollständige Antwort deckt mehrere Massnahmenarten sowie Verantwortung und Nachweisbarkeit ab.",
+        solution: "Die Planung ist riskant, weil rechtliche Probleme das Projekt in letzter Minute stoppen können. Rechtliche Unterstützung soll früh einbezogen werden. Risiken sind kombiniert durch technische Massnahmen (z. B. security by design), organisatorische Massnahmen und rechtliche Massnahmen zu behandeln. Das Management ist persönlich dafür verantwortlich, die Einhaltung rechtlicher Vorschriften zu organisieren und zu kontrollieren. Compliance umfasst deshalb auch Dokumentationspflichten: Entscheidungen, Kontrollen, Zuständigkeiten und Nachweise müssen nachvollziehbar sein. Standards/Best Practices können das Recht ergänzen, ersetzen es aber nicht.",
+        reference: "Folien 7–8 – Recht im technischen Umfeld und Risk Management", concepts: ["Compliance", "Risk Management", "Managementverantwortung", "Standards"]
+      },
+      {
+        id: "zivilprozess-durchsetzung", type: "text", topic: "Zivilprozess", points: 10,
+        prompt: "Eine Kundin verlangt CHF 180'000 Schadenersatz von einem Softwarelieferanten. Sie hat einen Anspruch auf Papier, aber kaum geordnete Belege und kein Budget für einen Vorschuss. Erkläre anhand der Vorlesung die prozessualen Hürden vom Start bis zur tatsächlichen Zahlung.",
+        hint: "Open Book: Rekonstruiere nicht nur den Gerichtstermin, sondern Vorstufe, Kosten, Beweis und Vollstreckungsproblem.",
+        solution: "Zu prüfen sind zunächst örtlich und sachlich zuständiges Gericht und in der Regel eine vorgängige Schlichtungsverhandlung/Friedensrichter. Regelmässig ist ein vom Streitwert abhängiger Gerichtskostenvorschuss zu leisten; ohne Zahlung kein Prozess. Die Klägerin muss den behaupteten Anspruch beweisen, denn das Gericht sucht im Zivilverfahren die Beweise nicht für sie. Bei Unterliegen trägt sie grundsätzlich Gerichtskosten sowie Parteikosten der Gegenseite. Selbst ein gewonnenes Forderungsurteil führt noch nicht automatisch zur Zahlung; die Forderung muss nötigenfalls vollstreckt werden. Der Instanzenzug ist gesondert mitzudenken.",
+        reference: "Folien 21–22 – Instanzenzug und Essentials Zivilprozess", concepts: ["Zivilprozess", "Beweislast", "Kostenrisiko", "Rechtsdurchsetzung"]
+      },
+      {
+        id: "strafverfahren", type: "multi", topic: "Strafverfahren", points: 8,
+        prompt: "Nach einem mutmasslichen Cyberdelikt überlegt ein Unternehmen, wie das Strafverfahren abläuft. Welche Aussagen entsprechen der Vorlesung?",
+        options: [
+          "Die örtliche Zuständigkeit kann sich aus Tat- oder Erfolgsort ergeben.",
+          "Bei Antragsdelikten gilt gemäss Vorlesung eine Frist von drei Monaten.",
+          "Die Staatsanwaltschaft muss nur belastende Aspekte sammeln.",
+          "Eine geschädigte Person erhält automatisch uneingeschränkte Einsicht in alle Untersuchungsmassnahmen.",
+          "Die Staatsanwaltschaft kann einstellen, im genannten Rahmen selbst bestrafen oder den Fall dem Strafgericht überweisen.",
+          "Die Rolle als Privatstrafkläger kann für die Verfahrensbeteiligung relevant sein."
+        ], correct: [0, 1, 4, 5],
+        optionExplanations: [
+          "Die Folie nennt Tat- oder Erfolgsort als Anknüpfung für die örtliche Zuständigkeit.",
+          "Die Dreimonatsfrist für Antragsdelikte wird ausdrücklich hervorgehoben.",
+          "Die Staatsanwaltschaft muss belastende UND entlastende Aspekte sammeln.",
+          "Als Opfer besteht nur begrenzte Einsicht; die Beteiligung als Privatstrafkläger wird als wichtige Ausnahme beziehungsweise Erweiterung genannt.",
+          "Diese drei Wege nennt die Folie, einschliesslich des dort angegebenen Strafrahmens für die eigene Sanktion der Staatsanwaltschaft.",
+          "Die Vorlesung weist darauf hin, dass man sich als Privatstrafkläger einbringen kann."
+        ],
+        solution: "Richtig sind Tat-/Erfolgsort, Dreimonatsfrist, die möglichen Entscheide der Staatsanwaltschaft und die Bedeutung der Privatstrafklägerschaft. Die Staatsanwaltschaft ermittelt belastend und entlastend; Opfer haben nicht automatisch volle Einsicht.",
+        reference: "Folie 23 – Essentials Strafverfahren", concepts: ["Strafverfahren", "Staatsanwaltschaft", "Antragsdelikt", "Privatstrafkläger"]
+      },
+      {
+        id: "verwaltungsverfuegung", type: "text", topic: "Verwaltungsverfahren", points: 10,
+        prompt: "Eine Behörde sperrt einem Rechenzentrum den Betrieb per Schreiben. Das Schreiben stammt möglicherweise von der falschen Stelle, nennt kein Verfahren und keine Rechtsmittel. Drei Jahre später tauchen neue Tatsachen auf. Welche Punkte musst du anhand der Vorlesung prüfen und welche Reaktionswege kommen in Betracht?",
+        hint: "Trenne Wirksamkeitsmängel, ordentliche Rechtsmittel und spätere neue Tatsachen.",
+        solution: "Zu prüfen ist, ob die Verfügung von der richtigen Behörde, im richtigen Verfahren und mit Angabe der Rechtsmittel erlassen wurde. Die Vorlesung bezeichnet eine Verfügung bei solchen Mängeln als nichtig. Gegen Verfügungen kann in der Regel innert 10/20/30 Tagen Beschwerde geführt werden; die konkrete Frist ist der einschlägigen Grundlage/Rechtsmittelbelehrung zu entnehmen. Bei neuen Tatsachen ist grundsätzlich Wiedererwägung beziehungsweise Einsprache möglich, laut Folie auch Jahre später. Der höchste Rechtsmittelweg hängt von der Gesetzesgrundlage ab; bei Verletzung verfassungsmässiger Rechte nennt die Folie das Bundesgericht.",
+        reference: "Folie 24 – Essentials Verwaltungsverfahren", concepts: ["Verwaltungsverfahren", "Verfügung", "Rechtsmittel", "Wiedererwägung"]
+      },
+      {
+        id: "iprg", type: "single", topic: "Internationales Privatrecht", points: 6,
+        prompt: "Ein Schweizer Unternehmen streitet mit einem ausländischen Cloud-Anbieter. Welche Funktion weist die Vorlesung dem IPRG primär zu?",
+        options: [
+          "Es entscheidet direkt, welche Partei technisch schuld am Ausfall ist.",
+          "Es regelt als Schnittstelle, wann schweizerisches oder ausländisches Recht anwendbar ist und welche Gerichte zuständig sein sollen.",
+          "Es macht internationale Verträge und Völkerrecht überflüssig.",
+          "Es verpflichtet die Schweiz, jedes EU-Recht unverändert zu übernehmen."
+        ], correct: 1,
+        optionExplanations: [
+          "Die technische und materielle Verantwortlichkeit wird nicht allein durch die Kollisionsregeln des IPRG entschieden.",
+          "Genau diese Fragen – anwendbares Recht und internationale Zuständigkeit – beschreibt die Folie als Hauptschnittstelle.",
+          "Die Vorlesung nennt Völkerrecht und internationale Verträge zusätzlich; das IPRG ersetzt sie nicht.",
+          "Die Folie beschreibt wirtschaftlich/praktisch motivierte freiwillige Anpassungen, nicht eine pauschale unveränderte Übernahmepflicht."
+        ],
+        solution: "Das IPRG ist die zentrale Schnittstelle zwischen schweizerischem und ausländischem Recht: Es hilft zu bestimmen, welches Recht anwendbar ist und welche Gerichte zuständig sein sollen.",
+        reference: "Folie 20 – Schweiz ist keine Insel", concepts: ["IPRG", "Anwendbares Recht", "Internationale Zuständigkeit"]
+      },
+      {
+        id: "verfahrensvergleich", type: "multi", topic: "Verfahrensvergleich", points: 8,
+        prompt: "Welche Zuordnungen sind auf Basis der Vorlesung korrekt? Wähle alle richtigen Aussagen.",
+        options: [
+          "Zivilprozess: Kläger trägt die Beweisführung für den behaupteten Anspruch; das Gericht sucht die Beweise nicht.",
+          "Strafverfahren: Staatsanwaltschaft leitet die Untersuchung und sammelt belastende sowie entlastende Aspekte.",
+          "Verwaltungsverfahren: Gegen Verfügungen bestehen je nach Grundlage Rechtsmittel mit Fristen.",
+          "Alle drei Verfahren haben identische Prozessabläufe und Prozessrechte, weil grundsätzlich drei Instanzen bestehen.",
+          "Ein gewonnener Zivilprozess garantiert ohne weitere Schritte den Zahlungseingang.",
+          "Die Unterscheidung der Verfahren ist für IT-Fälle nebensächlich, solange der technische Sachverhalt gleich bleibt."
+        ], correct: [0, 1, 2],
+        optionExplanations: [
+          "Das ist ein Kernpunkt der Folie zum Zivilprozess und macht geordnete Belege entscheidend.",
+          "Im Strafverfahren gilt die Pflicht, beide Richtungen zu untersuchen.",
+          "Die Vorlesung nennt Beschwerdefristen und weitere Reaktionsmöglichkeiten gegen Verfügungen.",
+          "Trotz eines grundsätzlich dreistufigen Instanzenzugs sind Verfahren und Prozessrechte ausdrücklich weitgehend unterschiedlich.",
+          "Die Folie warnt: Wer den Forderungsprozess gewinnt, hat das Geld noch nicht automatisch.",
+          "Gerade die rechtliche Qualifikation entscheidet über Zuständigkeit, Verfahren und Rechte."
+        ],
+        solution: "Richtig sind die ersten drei Aussagen. Der ähnliche Instanzenzug beseitigt die grundlegenden Unterschiede zwischen Zivil-, Straf- und Verwaltungsverfahren nicht.",
+        reference: "Folien 18 und 21–24 – Gerichtsbarkeit und Verfahrens-Essentials", concepts: ["Zivilprozess", "Strafverfahren", "Verwaltungsverfahren", "Instanzenzug"]
+      },
+      {
+        id: "boss-cloud-migration", type: "text", topic: "Boss Question – IT-Recht als Querschnittsgebiet", points: 12,
+        prompt: "Ein Kanton migriert sensible Daten zu einem internationalen Cloud-Anbieter. Kurz vor Go-live fallen Vendor-Lock-in, unklare Datenströme über mehrere Länder, fehlende Exit-Regeln und starke Abhängigkeit von Drittsystemen auf. Erstelle eine juristische Ersttriage, die mindestens fünf Konzepte der Vorlesung sinnvoll verbindet.",
+        hint: "Open Book: Eine starke Antwort strukturiert Beteiligte und Ansprüche, Zuständigkeit/Recht, Risiko, Vertrag, Beweise und Verfahren – nicht nur Datenschutz.",
+        solution: "Eine überzeugende Triage beginnt mit WER will von WEM WAS WORAUS und identifiziert Kanton, Anbieter, Unterauftragnehmer, betroffene Personen, verlangte Leistungen und mögliche Rechtsgrundlagen. Als Querschnittsgebiet verlangt Informatikrecht technische Sachverhaltskenntnis und rechtliche Qualifikation. Zu klären sind Privat-/öffentlich-rechtliche Beziehungen, staatliche Kompetenz und Legalitätsprinzip, Vertragsinhalt (Leistung, Verantwortlichkeiten, Haftung, Exit/Support, Datenflüsse), zwingendes und dispositives Recht sowie internationale Fragen nach anwendbarem Recht und Gerichtsstand/IPRG. Risiken sind technisch, organisatorisch und rechtlich früh zu behandeln; Standards ergänzen, ersetzen aber das Recht nicht. Management/Behörde muss Compliance organisieren, kontrollieren und dokumentieren. Für mögliche Ansprüche müssen Rechtsgrundlage und Beweise gesichert werden. Schliesslich ist zu bestimmen, ob Zivil-, Verwaltungs- oder Strafverfahren einschlägig ist und wie Rechte tatsächlich durchgesetzt werden. Mindestens fünf dieser Punkte müssen konkret auf den Fall angewendet sein.",
+        reference: "Folien 6–12, 15, 18, 20–24 – technischer Rechtsrahmen, Risiken, Anspruch, internationale und prozessuale Einordnung", concepts: ["IT-Recht als Querschnittsgebiet", "Cloud-Risiken", "Vertragsgestaltung", "Compliance", "IPRG", "Rechtsdurchsetzung"]
+      }
+    ];
+
+    const STORAGE_KEY = "itrecht-w1-einfuehrung-open-book-review-v1";
+    const DASHBOARD_QUIZ_ID = "itrecht-w1-einfuehrung";
+    const maxPoints = questions.reduce((sum, question) => sum + question.points, 0);
+    const defaultState = () => ({
+      current: 0, answers: {}, order: {}, results: {}, revealed: {}, completed: false,
+      attemptId: createAttemptId(), startedAt: new Date().toISOString(), completedAt: null, updatedAt: null
+    });
+    let state = loadState();
+
+    function createAttemptId() {
+      if (globalThis.crypto?.randomUUID) return globalThis.crypto.randomUUID();
+      return `attempt-${Date.now()}-${Math.random().toString(16).slice(2)}`;
+    }
+    function loadState() {
+      try {
+        const saved = JSON.parse(localStorage.getItem(STORAGE_KEY));
+        return saved && typeof saved === "object" ? { ...defaultState(), ...saved } : defaultState();
+      } catch (_) { return defaultState(); }
+    }
+    function saveState() {
+      state.updatedAt = new Date().toISOString();
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+    }
+    function escapeHtml(value) { return String(value ?? "").replace(/[&<>"']/g, char => ({"&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;","'":"&#39;"}[char])); }
+    function resultFor(id) { return state.results[id]; }
+    function isDone(question) { return Boolean(resultFor(question.id)); }
+    function isSubmitted(question) { return isDone(question) || (question.type === "text" && state.revealed[question.id] && Boolean(state.answers[question.id])); }
+    function earned() { return questions.reduce((sum, question) => sum + (resultFor(question.id)?.points || 0), 0); }
+    function completedCount() { return questions.filter(isDone).length; }
+    function formatPoints(value) { return Number.isInteger(value) ? value : value.toFixed(1); }
+    function grade(score) { return (1 + 5 * score / maxPoints).toFixed(1); }
+    function statusLabel(status) { return status === "correct" ? "Richtig" : status === "partial" ? "Teilweise richtig" : status === "wrong" ? "Falsch" : "Übersprungen"; }
+
+    function streak() {
+      let best = 0, current = 0;
+      questions.forEach(question => {
+        const result = resultFor(question.id);
+        if (result?.status === "correct") { current += 1; best = Math.max(best, current); }
+        else if (result) current = 0;
+      });
+      return best;
+    }
+
+    function updateHeader() {
+      const score = earned();
+      const done = completedCount();
+      const percentage = Math.round(score / maxPoints * 100);
+      document.getElementById("scoreText").textContent = `${formatPoints(score)} / ${maxPoints} Punkte`;
+      document.getElementById("percentText").textContent = state.completed ? `${percentage} % · Note ${grade(score)}` : `${percentage} % · noch keine Endnote`;
+      document.getElementById("progressText").textContent = `${done} / ${questions.length} Aufgaben`;
+      document.getElementById("progressFill").style.width = `${done / questions.length * 100}%`;
+      document.getElementById("streakText").textContent = `Streak: ${streak()}`;
+      document.getElementById("doneSide").textContent = `${done} / ${questions.length}`;
+      document.getElementById("pointsSide").textContent = `${formatPoints(score)} / ${maxPoints}`;
+      document.getElementById("gradeSide").textContent = state.completed ? grade(score) : "am Ende";
+      document.getElementById("saveBtn").disabled = state.completed;
+      document.getElementById("finishBtn").disabled = done !== questions.length;
+      renderOverview();
+    }
+
+    function renderOverview() {
+      const overview = document.getElementById("overview");
+      overview.innerHTML = questions.map((question, index) => {
+        const status = resultFor(question.id)?.status || "";
+        return `<button class="dot ${status} ${!state.completed && state.current === index ? "current" : ""}" data-jump="${index}" aria-label="Aufgabe ${index + 1}: ${status || "unbeantwortet"}">${index + 1}</button>`;
+      }).join("");
+      overview.querySelectorAll("[data-jump]").forEach(button => button.addEventListener("click", () => {
+        state.completed = false;
+        state.current = Number(button.dataset.jump);
+        saveState(); render();
+      }));
+    }
+
+    function answerArea(question) {
+      const disabled = isSubmitted(question) ? "disabled" : "";
+      if (question.type === "single" || question.type === "multi") {
+        const selected = state.answers[question.id] || [];
+        const inputType = question.type === "single" ? "radio" : "checkbox";
+        return `<div class="options">${question.options.map((option, index) => {
+          const correct = Array.isArray(question.correct) ? question.correct.includes(index) : question.correct === index;
+          const chosen = selected.includes(index);
+          const reviewClass = isDone(question) ? (correct ? "answer-correct" : "answer-wrong") : "";
+          const label = !isDone(question) ? "" : correct ? (chosen ? "✓ Richtig gewählt" : "✓ Richtige Antwort – nicht gewählt") : (chosen ? "✕ Falsch gewählt" : "✕ Nicht korrekt");
+          return `<label class="option ${reviewClass}"><input ${disabled} type="${inputType}" name="answer" value="${index}" ${chosen ? "checked" : ""}><span>${escapeHtml(option)}${label ? `<small class="answer-label">${label}</small>` : ""}</span></label>`;
+        }).join("")}</div>`;
+      }
+      if (question.type === "order") {
+        const order = state.order[question.id] || question.initial || question.items.map((_, index) => index);
+        return `<div class="order-list">${order.map((itemIndex, position) => {
+          const correctPosition = question.correct.indexOf(itemIndex);
+          const correct = correctPosition === position;
+          const reviewClass = isDone(question) ? (correct ? "answer-correct" : "answer-wrong") : "";
+          const label = !isDone(question) ? "" : correct ? "✓ Position richtig" : `✕ Gehört auf Position ${correctPosition + 1}`;
+          return `<div class="order-row ${reviewClass}"><span class="rank">${position + 1}</span><span>${escapeHtml(question.items[itemIndex])}${label ? `<small class="answer-label">${label}</small>` : ""}</span><button class="move" data-move="${position},-1" ${disabled || position === 0 ? "disabled" : ""} aria-label="Nach oben">↑</button><button class="move" data-move="${position},1" ${disabled || position === order.length - 1 ? "disabled" : ""} aria-label="Nach unten">↓</button></div>`;
+        }).join("")}</div>`;
+      }
+      if (question.type === "categorize") {
+        const selected = state.answers[question.id] || Array(question.statements.length).fill("");
+        return `<div class="category-list">${question.statements.map((statement, index) => {
+          const chosen = selected[index];
+          const correct = chosen !== "" && Number(chosen) === question.correct[index];
+          const reviewClass = isDone(question) ? (correct ? "answer-correct" : "answer-wrong") : "";
+          const resultLabel = !isDone(question) ? "" : correct
+            ? `✓ Richtig zugeordnet: ${escapeHtml(question.options[question.correct[index]])}`
+            : `✕ Deine Antwort: ${escapeHtml(chosen === "" ? "Noch nicht gewählt" : question.options[Number(chosen)])} · Richtig: ${escapeHtml(question.options[question.correct[index]])}`;
+          const explanation = isDone(question) ? `<small>${escapeHtml(question.explanations[index])}</small>` : "";
+          return `<div class="category-row ${reviewClass}"><label for="category-${index}">${index + 1}. ${escapeHtml(statement)}</label><select id="category-${index}" data-category-index="${index}" ${disabled}><option value="">Select your answer</option>${question.options.map((option, optionIndex) => `<option value="${optionIndex}" ${String(chosen) === String(optionIndex) ? "selected" : ""}>${escapeHtml(option)}</option>`).join("")}</select>${resultLabel ? `<small class="answer-label">${resultLabel}</small>` : ""}${explanation}</div>`;
+        }).join("")}</div>`;
+      }
+      return `<textarea id="textAnswer" ${disabled} placeholder="Formuliere deine Antwort in eigenen Worten …">${escapeHtml(state.answers[question.id] || "")}</textarea>`;
+    }
+
+    function feedback(question) {
+      const result = resultFor(question.id);
+      if (!result) return "";
+      const detail = result.status === "skipped" ? "Diese Aufgabe wurde übersprungen und erhält 0 Punkte." : `${statusLabel(result.status)} · ${formatPoints(result.points)} von ${question.points} Punkten.`;
+      return `<div class="feedback ${result.status}"><strong>${escapeHtml(detail)}</strong>${result.note ? `<div>${escapeHtml(result.note)}</div>` : ""}</div>`;
+    }
+
+    function solution(question) {
+      if (!state.revealed[question.id]) return "";
+      const rating = question.type === "text" && !isDone(question) ? `<div class="self-rate"><button class="btn primary" data-rate="correct">Voll richtig</button><button class="btn secondary" data-rate="partial">Teilweise richtig</button><button class="btn ghost" data-rate="wrong">Falsch / wusste ich nicht</button></div>` : "";
+      const analysis = question.optionExplanations ? `<div class="answer-analysis">${question.optionExplanations.map((reason, index) => {
+        const correct = Array.isArray(question.correct) ? question.correct.includes(index) : question.correct === index;
+        return `<div class="analysis-item ${correct ? "correct" : "wrong"}"><strong>${correct ? "✓ Aussage ist richtig" : "✕ Aussage ist falsch"}</strong>${escapeHtml(reason)}</div>`;
+      }).join("")}</div>` : "";
+      return `<div class="solution"><h3>Auswertung und Begründung</h3>${analysis}<p>${escapeHtml(question.solution)}</p><p class="reference"><strong>Quelle:</strong> ${escapeHtml(question.reference)}</p>${rating}</div>`;
+    }
+
+    function renderQuestion() {
+      const question = questions[state.current];
+      document.getElementById("resultView").classList.remove("show");
+      const quiz = document.getElementById("quizView");
+      quiz.classList.remove("hidden");
+      quiz.innerHTML = `
+        <div class="task-head"><div><div class="task-no">Aufgabe ${state.current + 1} von ${questions.length}</div><div class="topic">${escapeHtml(question.topic)}</div></div><div class="points">${question.points} Punkte</div></div>
+        <div class="question">${escapeHtml(question.prompt)}</div>
+        ${question.hint ? `<p class="hint">${escapeHtml(question.hint)}</p>` : ""}
+        ${answerArea(question)}
+        ${feedback(question)}
+        ${solution(question)}
+        <div class="actions">
+          ${question.type === "text" && !isSubmitted(question) ? `<button class="btn primary" id="saveTextBtn">Antwort prüfen</button>` : ""}
+          ${question.type !== "text" && !isDone(question) ? `<button class="btn primary" id="checkBtn">Antwort prüfen</button>` : ""}
+          ${!isSubmitted(question) ? `<button class="btn ghost" id="skipBtn">Überspringen</button>` : ""}
+          <button class="btn ghost" id="prevBtn" ${state.current === 0 ? "disabled" : ""}>← Zurück</button>
+          <button class="btn ghost" id="nextBtn" ${state.current === questions.length - 1 ? "disabled" : ""}>Weiter →</button>
+        </div>`;
+      bindEvents(question);
+    }
+
+    function bindEvents(question) {
+      document.querySelectorAll('input[name="answer"]').forEach(input => input.addEventListener("change", () => {
+        if (question.type === "single") state.answers[question.id] = [Number(input.value)];
+        else state.answers[question.id] = [...document.querySelectorAll('input[name="answer"]:checked')].map(element => Number(element.value));
+        saveState();
+      }));
+      document.querySelectorAll("[data-move]").forEach(button => button.addEventListener("click", () => {
+        const [position, delta] = button.dataset.move.split(",").map(Number);
+        const order = [...(state.order[question.id] || question.initial || question.items.map((_, index) => index))];
+        [order[position], order[position + delta]] = [order[position + delta], order[position]];
+        state.order[question.id] = order; saveState(); render();
+      }));
+      document.querySelectorAll("[data-category-index]").forEach(select => select.addEventListener("change", () => {
+        const answers = [...(state.answers[question.id] || Array(question.statements.length).fill(""))];
+        answers[Number(select.dataset.categoryIndex)] = select.value;
+        state.answers[question.id] = answers; saveState();
+      }));
+      document.getElementById("checkBtn")?.addEventListener("click", () => gradeAuto(question));
+      document.getElementById("saveTextBtn")?.addEventListener("click", () => {
+        const text = document.getElementById("textAnswer").value.trim();
+        if (!text) return alert("Schreibe zuerst eine eigene Antwort.");
+        state.answers[question.id] = text; state.revealed[question.id] = true; saveState(); render();
+      });
+      document.querySelectorAll("[data-rate]").forEach(button => button.addEventListener("click", () => {
+        const status = button.dataset.rate;
+        const factor = status === "correct" ? 1 : status === "partial" ? .5 : 0;
+        state.results[question.id] = { status, points: question.points * factor };
+        saveState(); render();
+      }));
+      document.getElementById("skipBtn")?.addEventListener("click", () => {
+        state.results[question.id] = { status: "skipped", points: 0 }; saveState(); render();
+      });
+      document.getElementById("prevBtn").addEventListener("click", () => navigate(-1));
+      document.getElementById("nextBtn").addEventListener("click", () => navigate(1));
+    }
+
+    function gradeAuto(question) {
+      if (isDone(question)) return;
+      let points = 0, note = "";
+      if (question.type === "single") {
+        const answer = state.answers[question.id]?.[0];
+        if (answer === undefined) return alert("Wähle zuerst eine Antwort.");
+        points = answer === question.correct ? question.points : 0;
+      } else if (question.type === "multi") {
+        const selected = state.answers[question.id] || [];
+        if (!selected.length) return alert("Wähle zuerst mindestens eine Antwort.");
+        const correctHits = selected.filter(value => question.correct.includes(value)).length;
+        const wrongHits = selected.filter(value => !question.correct.includes(value)).length;
+        const fraction = Math.max(0, (correctHits - wrongHits) / question.correct.length);
+        points = Math.round(question.points * fraction * 2) / 2;
+        if (points > 0 && points < question.points) note = "Teilpunkte: korrekte Auswahl abzüglich falscher Auswahl.";
+      } else if (question.type === "order") {
+        const order = state.order[question.id] || question.initial || question.items.map((_, index) => index);
+        const hits = order.filter((value, index) => value === question.correct[index]).length;
+        points = Math.round(question.points * hits / question.correct.length * 2) / 2;
+        state.order[question.id] = order;
+        if (points > 0 && points < question.points) note = `${hits} von ${question.correct.length} Positionen stimmen.`;
+      } else if (question.type === "categorize") {
+        const selected = state.answers[question.id] || Array(question.statements.length).fill("");
+        if (selected.some(value => value === "" || value === undefined)) return alert("Ordne zuerst jeder Aussage eine Aktivität zu.");
+        const hits = selected.filter((value, index) => Number(value) === question.correct[index]).length;
+        points = Math.round(question.points * hits / question.correct.length * 2) / 2;
+        if (points > 0 && points < question.points) note = `${hits} von ${question.correct.length} Zuordnungen stimmen.`;
+      }
+      const status = points === question.points ? "correct" : points > 0 ? "partial" : "wrong";
+      state.results[question.id] = { status, points, note };
+      state.revealed[question.id] = true;
+      saveState(); render();
+    }
+
+    function navigate(delta) {
+      state.current = Math.min(questions.length - 1, Math.max(0, state.current + delta));
+      saveState(); render(); window.scrollTo({ top: 0, behavior: "smooth" });
+    }
+
+    function conceptAnalysis() {
+      const map = {};
+      questions.forEach(question => {
+        const result = resultFor(question.id);
+        question.concepts.forEach(concept => {
+          map[concept] ||= { earned: 0, maximum: 0 };
+          map[concept].earned += result?.points || 0;
+          map[concept].maximum += question.points;
+        });
+      });
+      const groups = { strong: [], mixed: [], weak: [] };
+      Object.entries(map).forEach(([name, value]) => {
+        const percentage = value.maximum ? value.earned / value.maximum * 100 : 0;
+        const item = `${name} (${Math.round(percentage)} %)`;
+        if (percentage >= 80) groups.strong.push(item);
+        else if (percentage >= 55) groups.mixed.push(item);
+        else groups.weak.push(item);
+      });
+      return groups;
+    }
+
+    function classification(percentage) {
+      if (percentage >= 85) return { status: "Sehr gut verstanden" };
+      if (percentage >= 70) return { status: "Grundsätzlich verstanden, aber mit Lücken" };
+      if (percentage >= 50) return { status: "Noch nicht sicher verstanden" };
+      return { status: "Deutliche Wissenslücken" };
+    }
+    function list(items, emptyText) { return items.length ? `<ul>${items.map(item => `<li>${escapeHtml(item)}</li>`).join("")}</ul>` : `<p>${escapeHtml(emptyText)}</p>`; }
+
+    function renderResult() {
+      if (completedCount() !== questions.length) return alert("Bearbeite oder überspringe zuerst alle Aufgaben.");
+      state.completed = true;
+      state.completedAt ||= new Date().toISOString();
+      saveState();
+      const score = earned();
+      const percentage = Math.round(score / maxPoints * 100);
+      const resultClass = classification(percentage);
+      const concepts = conceptAnalysis();
+      const counts = { correct: 0, partial: 0, wrong: 0 };
+      questions.forEach(question => {
+        const status = resultFor(question.id)?.status;
+        if (status === "correct") counts.correct += 1;
+        else if (status === "partial") counts.partial += 1;
+        else counts.wrong += 1;
+      });
+      document.getElementById("quizView").classList.add("hidden");
+      const view = document.getElementById("resultView");
+      view.classList.add("show");
+      view.innerHTML = `
+        <div class="result-hero"><p class="eyebrow">Ergebnis</p><h2>${escapeHtml(resultClass.status)}</h2><div class="result-big">${percentage} %</div><p>${formatPoints(score)} / ${maxPoints} Punkte · Selbsteinschätzungsnote ${grade(score)}</p></div>
+        <div class="result-grid"><div class="result-tile"><strong>${counts.correct}</strong><span>voll richtig</span></div><div class="result-tile"><strong>${counts.partial}</strong><span>teilweise richtig</span></div><div class="result-tile"><strong>${counts.wrong}</strong><span>falsch / übersprungen</span></div></div>
+        <div class="concepts"><div class="concept-box"><h3>Stärken</h3>${list(concepts.strong, "Noch kein Bereich über 80 %.")}</div><div class="concept-box"><h3>Unsicher</h3>${list(concepts.mixed, "Keine gemischten Bereiche.")}</div><div class="concept-box"><h3>Wiederholen</h3>${list(concepts.weak, "Keine klar schwachen Bereiche.")}</div></div>
+        <div class="solution"><h3>Nächster freiwilliger Schritt</h3><p>${percentage >= 85 ? "Später auffrischen: Dieser vollständige Versuch zählt als abgeschlossen." : percentage >= 70 ? "Optional gezielt üben: Konzentriere dich nur auf die unsicheren Konzepte; der vollständige Versuch ist abgeschlossen." : "Optional Grundlagen festigen: Nutze die Auswertung, um die schwächsten Konzepte gezielt nachzulesen und mit neuen Fällen zu üben."}</p></div><div class="actions"><button class="btn ghost" id="backToQuiz">Antworten ansehen</button><button class="btn secondary" id="exportBtn">Ergebnis als JSON herunterladen</button><button class="btn ghost" id="targetedBtn">Gezieltes Review vorbereiten (optional)</button><button class="btn ghost" id="retakeBtn">Quiz nochmals machen</button></div>`;
+      document.getElementById("backToQuiz").addEventListener("click", () => { state.completed = false; saveState(); render(); });
+      document.getElementById("exportBtn").addEventListener("click", () => downloadResult(score, percentage, concepts, resultClass));
+      document.getElementById("targetedBtn").addEventListener("click", () => { downloadResult(score, percentage, concepts, resultClass); alert("Das Ergebnis wurde exportiert. Gib die JSON-Datei später Codex für ein neues, gezieltes Review mit anderen Fragen."); });
+      document.getElementById("retakeBtn").addEventListener("click", startNewQuiz);
+      reportResultToDashboard(score, percentage, concepts, resultClass);
+      updateHeader();
+    }
+
+    function buildReviewItems() {
+      const label = value => value === undefined || value === null || value === "" ? "Keine Antwort" : String(value);
+      const answerText = (question, correct) => {
+        if (question.type === "text") return correct ? label(question.solution) : label(state.answers[question.id]);
+        if (question.type === "order") {
+          const order = correct ? question.correct : (state.order[question.id] || question.initial || []);
+          return order.length ? order.map(index => question.items[index]).join(" → ") : "Keine Antwort";
+        }
+        if (question.type === "categorize") {
+          const values = correct ? question.correct : (state.answers[question.id] || []);
+          return question.statements.map((statement, index) => `${statement} → ${question.categories[Number(values[index])] || "Keine Antwort"}`).join("\n");
+        }
+        const values = correct ? (Array.isArray(question.correct) ? question.correct : [question.correct]) : (state.answers[question.id] || []);
+        return values.length ? values.map(index => question.options[index]).join(" · ") : "Keine Antwort";
+      };
+      return questions.map(question => {
+        const result = resultFor(question.id) || { status: "skipped", points: 0 };
+        if (result.status === "correct") return null;
+        return {
+          status: result.status,
+          prompt: question.prompt,
+          yourAnswer: answerText(question, false),
+          correctAnswer: answerText(question, true),
+          explanation: question.type === "text" ? "" : question.solution,
+          points: result.points || 0,
+          maximum: question.points
+        };
+      }).filter(Boolean);
+    }
+
+    function resultPayload(score, percentage, concepts, resultClass) {
+      return {
+        subject: "ITRECHT", lecture: "Vorlesung 01 – Einführung ins Informatikrecht",
+        source: "W1_Einfuerhung.pdf", date: state.completedAt || new Date().toISOString(), attemptId: state.attemptId,
+        totalScore: score, maximumScore: maxPoints, percentage, grade: Number(grade(score)), understanding: resultClass.status,
+        questionResults: questions.map(question => ({ id: question.id, topic: question.topic, points: resultFor(question.id)?.points || 0, maximum: question.points, status: resultFor(question.id)?.status || "unanswered" })),
+        weakConcepts: concepts.weak, partiallyUnderstoodConcepts: concepts.mixed, strongConcepts: concepts.strong
+      };
+    }
+
+    function downloadResult(score, percentage, concepts, resultClass) {
+      const payload = resultPayload(score, percentage, concepts, resultClass);
+      const blob = new Blob([JSON.stringify(payload, null, 2)], { type: "application/json" });
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement("a");
+      link.href = url; link.download = `itrecht-w1-ergebnis-${state.attemptId}.json`; link.click();
+      setTimeout(() => URL.revokeObjectURL(url), 500);
+    }
+
+    function reportResultToDashboard(score, percentage, concepts, resultClass) {
+      const payload = resultPayload(score, percentage, concepts, resultClass);
+      const message = { source: "quiz-dashboard", version: 1, type: "quiz-completed", quizId: DASHBOARD_QUIZ_ID, attempt: {
+        attemptId: payload.attemptId, completedAt: payload.date, score: payload.totalScore, maximumScore: payload.maximumScore,
+        percentage: payload.percentage, grade: payload.grade, understanding: payload.understanding,
+        strongConcepts: payload.strongConcepts, uncertainConcepts: payload.partiallyUnderstoodConcepts, weakConcepts: payload.weakConcepts,
+        reviewItems: buildReviewItems()
+      }};
+      if (window.parent && window.parent !== window) window.parent.postMessage(message, "*");
+      if (window.opener && !window.opener.closed) window.opener.postMessage(message, "*");
+    }
+
+    function snapshotQuizState() {
+      return JSON.parse(JSON.stringify({
+        current: state.current, answers: state.answers, order: state.order,
+        results: state.results, revealed: state.revealed, completed: false,
+        attemptId: state.attemptId, startedAt: state.startedAt,
+        completedAt: null, updatedAt: state.updatedAt
+      }));
+    }
+
+    function restoreProgressFromDashboard(progress) {
+      const remote = progress?.quizState;
+      if (!remote || typeof remote !== "object" || remote.completed) return;
+      const remoteTime = Date.parse(progress.updatedAt || remote.updatedAt) || 0;
+      const localTime = Date.parse(state.updatedAt) || 0;
+      if (remoteTime <= localTime) return;
+      const record = value => value && typeof value === "object" && !Array.isArray(value) ? value : {};
+      state = {
+        ...defaultState(), ...remote,
+        current: Math.min(questions.length - 1, Math.max(0, Number(remote.current) || 0)),
+        answers: record(remote.answers), order: record(remote.order),
+        results: record(remote.results), revealed: record(remote.revealed),
+        completed: false, completedAt: null,
+        updatedAt: new Date(remoteTime).toISOString()
+      };
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+      render();
+      document.getElementById("saveNotice").textContent = "Cloud-Zwischenstand geladen.";
+    }
+
+    function reportProgressToDashboard(manual = false) {
+      if (state.completed) return;
+      const message = {
+        source: "quiz-dashboard", version: 1, type: "quiz-progress", quizId: DASHBOARD_QUIZ_ID, manual,
+        progress: {
+          attemptId: state.attemptId,
+          currentTask: state.current + 1,
+          completedCount: completedCount(),
+          totalQuestions: questions.length,
+          score: earned(),
+          maximumScore: maxPoints,
+          updatedAt: state.updatedAt || new Date().toISOString(),
+          quizState: snapshotQuizState()
+        }
+      };
+      if (window.parent && window.parent !== window) window.parent.postMessage(message, "*");
+      if (window.opener && !window.opener.closed) window.opener.postMessage(message, "*");
+    }
+
+    function saveProgressManually() {
+      const question = questions[state.current];
+      const text = document.getElementById("textAnswer");
+      if (question?.type === "text" && text) state.answers[question.id] = text.value;
+      saveState();
+      reportProgressToDashboard(true);
+      document.getElementById("saveNotice").textContent = `Zwischenstand gespeichert · ${new Date().toLocaleTimeString("de-CH", { hour: "2-digit", minute: "2-digit" })}`;
+    }
+
+    function clearDashboardProgress() {
+      const message = { source: "quiz-dashboard", version: 1, type: "quiz-progress-reset", quizId: DASHBOARD_QUIZ_ID };
+      if (window.parent && window.parent !== window) window.parent.postMessage(message, "*");
+      if (window.opener && !window.opener.closed) window.opener.postMessage(message, "*");
+    }
+
+    function render() {
+      if (state.completed) renderResult(); else renderQuestion();
+      updateHeader();
+    }
+
+    document.getElementById("saveBtn").addEventListener("click", saveProgressManually);
+    document.getElementById("finishBtn").addEventListener("click", renderResult);
+    function startNewQuiz() {
+      if (!confirm("Neues Quiz beginnen? Ein noch nicht abgeschlossener Zwischenstand wird verworfen. Bereits abgeschlossene Versuche bleiben im Dashboard erhalten.")) return;
+      localStorage.removeItem(STORAGE_KEY); clearDashboardProgress(); state = defaultState(); render();
+    }
+
+    document.getElementById("newQuizBtn").addEventListener("click", startNewQuiz);
+
+    window.addEventListener("message", event => {
+      const message = event.data;
+      const allowedSource = event.source === window.parent || event.source === window.opener;
+      if (!allowedSource || !message || message.source !== "quiz-dashboard" || message.version !== 1) return;
+      if (message.type !== "quiz-resume" || message.quizId !== DASHBOARD_QUIZ_ID) return;
+      restoreProgressFromDashboard(message.progress);
+    });
+
+    const readyMessage = { source: "quiz-dashboard", version: 1, type: "quiz-ready", quizId: DASHBOARD_QUIZ_ID };
+    if (window.parent && window.parent !== window) window.parent.postMessage(readyMessage, "*");
+    if (window.opener && !window.opener.closed) window.opener.postMessage(readyMessage, "*");
+    render();
+  </script>
+</body>
+</html>

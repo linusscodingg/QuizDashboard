@@ -51,6 +51,15 @@ window.QUIZ_CATALOG = {
       source: "W3_SoftwareSecurityErrors.pdf",
       path: "quizzes/SWS1/W3_Software_Security_Errors.html",
       maximumScore: 124
+    },
+    {
+      id: "itrecht-w1-einfuehrung",
+      subject: "ITRECHT",
+      week: 1,
+      title: "Einführung ins Informatikrecht – Open Book",
+      source: "W1_Einfuerhung.pdf",
+      path: "quizzes/ITRECHT/W1_Einfuehrung_Open_Book.html",
+      maximumScore: 100
     }
   ]
 };
