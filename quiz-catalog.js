@@ -60,6 +60,15 @@ window.QUIZ_CATALOG = {
       source: "W1_Einfuerhung.pdf",
       path: "quizzes/ITRECHT/W1_Einfuehrung_Open_Book.html",
       maximumScore: 100
+    },
+    {
+      id: "itrecht-w2-it-vertraege",
+      subject: "ITRECHT",
+      week: 2,
+      title: "IT-Verträge und Projektfallen – Open Book",
+      source: "W2_ITR-HS26-IT-Verträge, Mf.pdf",
+      path: "quizzes/ITRECHT/W2_IT_Vertraege_Open_Book.html",
+      maximumScore: 100
     }
   ]
 };

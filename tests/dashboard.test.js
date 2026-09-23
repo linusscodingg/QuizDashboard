@@ -89,13 +89,13 @@ context.window.addEventListener = (type, handler) => { windowListeners[type] = h
 
 vm.runInContext(catalogCode, context, { filename: "quiz-catalog.js" });
 const catalog = context.window.QUIZ_CATALOG;
-assert.equal(catalog.quizzes.length, 6);
+assert.equal(catalog.quizzes.length, 7);
 for (const quiz of catalog.quizzes) {
   assert.ok(fs.existsSync(path.resolve(dashboardDirectory, quiz.path)), `Missing quiz file: ${quiz.path}`);
 }
 
 vm.runInContext(inlineScripts[0], context, { filename: "dashboard-inline.js" });
-assert.equal(elements.completedTotal.textContent, "0 / 6");
+assert.equal(elements.completedTotal.textContent, "0 / 7");
 assert.equal(elements.averageGrade.textContent, "–");
 
 openQuizButton.click();
@@ -146,7 +146,7 @@ assert.equal(resumeMessage.type, "quiz-resume");
 assert.deepEqual(resumeMessage.progress.quizState.answers["icmp-role"], [1, 2]);
 
 report("attempt-1", 70);
-assert.equal(elements.completedTotal.textContent, "1 / 6");
+assert.equal(elements.completedTotal.textContent, "1 / 7");
 assert.equal(elements.averagePercent.textContent, "70 %");
 assert.equal(elements.averageGrade.textContent, "4.5");
 assert.equal(String(elements.attemptTotal.textContent), "1");
@@ -179,7 +179,7 @@ for (const quiz of catalog.quizzes) {
   assert.match(quizHtml, /quizState:\s*snapshotQuizState\(\)/);
   assert.match(quizHtml, /type !== "quiz-resume"/);
   assert.match(quizHtml, /Zwischenstand speichern|Save progress/);
-  const questionsLiteral = quizHtml.match(/const questions = (\[[\s\S]*?\n\s*\]);\n\n\s*const STORAGE_KEY/);
+  const questionsLiteral = quizHtml.match(/const questions = (\[[\s\S]*?\r?\n\s*\]);\r?\n\r?\n\s*const STORAGE_KEY/);
   assert.ok(questionsLiteral, `Questions array should remain readable for ${quiz.id}`);
   const questions = vm.runInNewContext(questionsLiteral[1]);
   assert.equal(questions.reduce((sum, question) => sum + question.points, 0), quiz.maximumScore);

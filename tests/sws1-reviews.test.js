@@ -31,7 +31,7 @@ for (const review of cases) {
   assert.doesNotMatch(html, /Healthcare Data|DHEAL/);
   assert.doesNotMatch(html, /Aufgabe|Antwort prüfen|Punkte|Zurück|Weiter|Zwischenstand|Fortschritt/);
 
-  const questionsLiteral = html.match(/const questions = (\[[\s\S]*?\n\s*\]);\n\n\s*const STORAGE_KEY/);
+  const questionsLiteral = html.match(/const questions = (\[[\s\S]*?\r?\n\s*\]);\r?\n\r?\n\s*const STORAGE_KEY/);
   assert.ok(questionsLiteral, `Questions missing in ${review.file}`);
   const questions = vm.runInNewContext(questionsLiteral[1]);
   assert.equal(questions.length, review.questionCount);
