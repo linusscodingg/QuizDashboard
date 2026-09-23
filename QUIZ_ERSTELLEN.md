@@ -240,3 +240,17 @@ Ein neues Quiz ist fertig, wenn:
 - der Versuch im persönlichen Verlauf und Lernvergleich erscheint,
 - die relevanten Tests bestanden sind und
 - keine persönlichen Notizen verändert wurden, sofern beim Lernen keine echte Wissenslücke entstanden ist.
+
+## Pflichtprüfung für jedes neue Quiz
+
+Ab jetzt darf ein neues Quiz nicht als fertig gelten, wenn nur `localStorage` funktioniert. Vor dem Veröffentlichen muss ein geräteübergreifender Test durchgeführt werden:
+
+1. Auf Gerät beziehungsweise Browser A mit GitHub anmelden.
+2. Mindestens eine Auswahl, einen Freitext und – falls vorhanden – eine Reihenfolge bearbeiten.
+3. **Zwischenstand speichern** drücken und auf die bestätigte Firebase-Synchronisierung warten.
+4. Auf Gerät beziehungsweise Browser B mit demselben GitHub-Konto anmelden.
+5. Das Quiz über das Dashboard mit **Quiz fortsetzen** öffnen.
+6. Prüfen, dass aktuelle Aufgabe, Antworten, Reihenfolge, Punkte, geöffnete Lösungen und Versuch-ID identisch wiederhergestellt wurden.
+7. Das Quiz abschliessen und prüfen, dass Versuch, Fehlerdetails, Lernnote und Lernvergleich aktualisiert wurden.
+
+Ein neues Quiz muss deshalb immer `quiz-ready`, `quiz-resume`, den vollständigen `quizState` in `quiz-progress` sowie `quiz-completed` unterstützen. Es darf beim Laden keinen leeren Fortschritt senden, bevor der mögliche Firebase-Zwischenstand empfangen wurde.
