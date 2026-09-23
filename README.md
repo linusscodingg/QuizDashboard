@@ -28,6 +28,8 @@ QuizDashboard/
 
 Neue Quiz werden in `quizzes/<FACH>/` gespeichert und zusätzlich in `quiz-catalog.js` registriert. Der lokale Verlauf und unfertige Zwischenstände werden im Browser gespeichert. Nach einer Anmeldung wird derselbe Dashboard-Datensatz zusätzlich unter `users/<uid>/dashboard/state` in Cloud Firestore gespeichert. Lokaler und entfernter Stand werden beim Login zusammengeführt.
 
+Eine vollständige Schritt-für-Schritt-Anleitung für neue Autorinnen und Autoren steht in [`QUIZ_ERSTELLEN.md`](QUIZ_ERSTELLEN.md). Sie beschreibt auch Lösungsschutz, Fortschritt, Katalogeintrag, Tests und die Integration in den Lernvergleich.
+
 Neue abgeschlossene Versuche speichern zusätzlich die falsch oder teilweise richtig beantworteten Aufgaben mit eigener Antwort, richtiger Antwort und Erklärung. Diese Details lassen sich in der Versuchshistorie über **Fehler ansehen** öffnen. Bei älteren Versuchen können Details nur nachgetragen werden, wenn der dazugehörige abgeschlossene Quizstand noch lokal vorhanden ist.
 
 Der **Lernvergleich** veröffentlicht nach der GitHub-Anmeldung automatisch den GitHub-Benutzernamen und aggregierte Noten. Pro Quiz zeigt er Bestnote, Durchschnitt aller Versuche und Anzahl Versuche. Pro Fach zeigt der Bestleistungs-Durchschnitt den Mittelwert der jeweiligen Quiz-Bestnoten; der Gesamt-Durchschnitt umfasst alle Versuche einschliesslich Wiederholungen. Private Antworten und Fehler bleiben im persönlichen Dashboard.

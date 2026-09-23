@@ -547,12 +547,43 @@
         </div>
         <div class="actions">
           <button class="btn ghost" id="backToQuiz">Antworten ansehen</button>
+          <button class="btn secondary" id="exportBtn">Ergebnis als JSON speichern</button>
           <button class="btn danger" id="retakeBtn">Neues Quiz starten</button>
         </div>`;
       document.getElementById("backToQuiz").addEventListener("click", () => { state.completed = false; saveState(); render(); });
+      document.getElementById("exportBtn").addEventListener("click", exportResult);
       document.getElementById("retakeBtn").addEventListener("click", startNewQuiz);
       reportResultToDashboard(score, pct, concepts, cls);
       updateHeader();
+    }
+
+    function exportResult() {
+      const score = earned();
+      const percentage = Math.round(score / maxPoints * 100);
+      const concepts = conceptAnalysis();
+      const payload = {
+        subject: "CNS1",
+        lecture: "IPv6 - Exercise 01a",
+        quizId: DASHBOARD_QUIZ_ID,
+        attemptId: state.attemptId,
+        completedAt: state.completedAt,
+        score,
+        maximumScore: maxPoints,
+        percentage,
+        grade: Number(grade(score)),
+        understanding: classification(percentage).status,
+        questionResults: questions.map(q => ({ id: q.id, status: resultFor(q.id)?.status || "unanswered", points: resultFor(q.id)?.points || 0, maximumPoints: q.points })),
+        strongConcepts: concepts.strong,
+        uncertainConcepts: concepts.mixed,
+        weakConcepts: concepts.weak,
+        targetedReviewRecommended: percentage < 85
+      };
+      const url = URL.createObjectURL(new Blob([JSON.stringify(payload, null, 2)], { type: "application/json" }));
+      const link = document.createElement("a");
+      link.href = url;
+      link.download = `cns1-ipv6-exercise-01a-${state.attemptId}.json`;
+      link.click();
+      URL.revokeObjectURL(url);
     }
 
     function buildReviewItems() {
