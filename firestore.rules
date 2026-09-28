@@ -28,6 +28,19 @@ service cloud.firestore {
       allow delete: if isGithubOwner(userId) && documentId == "state";
     }
 
+    match /users/{userId}/lerncoach/{documentId} {
+      allow read, delete: if isGithubOwner(userId) && documentId == "progress";
+      allow create, update: if isGithubOwner(userId)
+        && documentId == "progress"
+        && request.resource.data.keys().hasOnly(["version", "checkpoints", "positions", "updatedAt"])
+        && request.resource.data.version == 1
+        && request.resource.data.checkpoints is map
+        && request.resource.data.checkpoints.size() <= 5000
+        && request.resource.data.positions is map
+        && request.resource.data.positions.size() <= 1000
+        && request.resource.data.updatedAt == request.time;
+    }
+
     match /leaderboard/{userId} {
       allow read: if isGithubUser();
       allow create, update: if isGithubOwner(userId)

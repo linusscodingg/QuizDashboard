@@ -18,6 +18,10 @@ function dashboardDocument(userId) {
   return doc(database, "users", userId, "dashboard", "state");
 }
 
+function lerncoachDocument(userId) {
+  return doc(database, "users", userId, "lerncoach", "progress");
+}
+
 function leaderboardDocument(userId) {
   return doc(database, "leaderboard", userId);
 }
@@ -50,6 +54,23 @@ const cloud = {
       updatedAt: serverTimestamp()
     });
   },
+  async loadLerncoach() {
+    if (!cloud.currentUser) return null;
+    const snapshot = await getDoc(lerncoachDocument(cloud.currentUser.uid));
+    if (!snapshot.exists()) return null;
+    const value = snapshot.data();
+    return { version: 1, checkpoints: value.checkpoints || {}, positions: value.positions || {} };
+  },
+  async saveLerncoach(progress) {
+    if (!cloud.currentUser) return;
+    const safe = JSON.parse(JSON.stringify(progress || {}));
+    await setDoc(lerncoachDocument(cloud.currentUser.uid), {
+      version: 1,
+      checkpoints: safe.checkpoints || {},
+      positions: safe.positions || {},
+      updatedAt: serverTimestamp()
+    });
+  },
   async loadLeaderboard() {
     if (!cloud.currentUser) return [];
     const snapshot = await getDocs(collection(database, "leaderboard"));
@@ -71,6 +92,8 @@ const cloud = {
     await reauthenticateWithPopup(user, new GithubAuthProvider());
     await deleteDoc(dashboardDocument(user.uid));
     await deleteDoc(leaderboardDocument(user.uid));
+    // Eigener try-Block: Solange die Lerncoach-Regeln nicht veröffentlicht sind, darf das Löschen nicht blockieren.
+    try { await deleteDoc(lerncoachDocument(user.uid)); } catch (_) {}
     await deleteUser(user);
   }
 };

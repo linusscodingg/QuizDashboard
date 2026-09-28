@@ -18,6 +18,12 @@ QuizDashboard/
 ├── firestore.rules
 ├── privacy.html
 ├── quiz-catalog.js
+├── lerncoach/
+│   ├── manifest.js
+│   ├── engine.js
+│   ├── ui.js
+│   ├── lerncoach.css
+│   └── content/
 ├── quizzes/
 │   ├── CNS1/
 │   ├── DHEAL/
@@ -33,6 +39,12 @@ Eine vollständige Schritt-für-Schritt-Anleitung für neue Autorinnen und Autor
 Neue abgeschlossene Versuche speichern zusätzlich die falsch oder teilweise richtig beantworteten Aufgaben mit eigener Antwort, richtiger Antwort und Erklärung. Diese Details lassen sich in der Versuchshistorie über **Fehler ansehen** öffnen. Bei älteren Versuchen können Details nur nachgetragen werden, wenn der dazugehörige abgeschlossene Quizstand noch lokal vorhanden ist.
 
 Der **Lernvergleich** veröffentlicht nach der GitHub-Anmeldung automatisch den GitHub-Benutzernamen und aggregierte Noten. Pro Quiz zeigt er Bestnote, Durchschnitt aller Versuche und Anzahl Versuche. Pro Fach zeigt der Bestleistungs-Durchschnitt den Mittelwert der jeweiligen Quiz-Bestnoten; der Gesamt-Durchschnitt umfasst alle Versuche einschliesslich Wiederholungen. Private Antworten und Fehler bleiben im persönlichen Dashboard.
+
+## Lerncoach
+
+Der Tab **Lerncoach** führt pro Fach und Woche Folie für Folie durch eine Vorlesung. Checkpoints (3 bis 5 Fragen: Freitext, Mehrfachauswahl, Reihenfolge, optional Einfachauswahl) müssen zu 100 % bestanden werden, bevor es weitergeht. Mit **Nur Quiz machen** werden die Checkpoints einer Woche ohne Folien abgefragt. Wochen können über `requiredPoints` bzw. `status: "locked"` an bestandene Checkpoints der Vorwoche gekoppelt werden.
+
+Inhalte liegen als Daten unter `lerncoach/content/<FACH>.js` und werden in `lerncoach/manifest.js` eingetragen. Die Logik (`lerncoach/engine.js`, `lerncoach/ui.js`) muss dafür nicht angepasst werden. Der Fortschritt wird lokal und nach der GitHub-Anmeldung unter `users/<uid>/lerncoach/progress` in Firestore gespeichert. Anleitung: [`LERNCOACH_ERSTELLEN.md`](LERNCOACH_ERSTELLEN.md).
 
 ## Firebase
 

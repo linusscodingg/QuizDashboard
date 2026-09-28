@@ -7,6 +7,7 @@
   <meta name="referrer" content="strict-origin-when-cross-origin">
   <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' https://www.gstatic.com https://apis.google.com; script-src-elem 'self' 'unsafe-inline' https://www.gstatic.com https://apis.google.com; style-src 'self' 'unsafe-inline'; img-src 'self' data:; connect-src 'self' https://www.gstatic.com https://apis.google.com https://*.googleapis.com https://*.firebaseio.com https://*.firebaseapp.com; frame-src 'self' https://*.firebaseapp.com; object-src 'none'; base-uri 'self'; form-action 'self'; upgrade-insecure-requests">
   <title>Quiz-Dashboard</title>
+  <link rel="stylesheet" href="lerncoach/lerncoach.css">
   <style>
     :root {
       color-scheme: light;
@@ -326,6 +327,12 @@
       </div>
     </section>
 
+    <nav class="mode-tabs" aria-label="Modus wählen">
+      <button class="mode-tab is-active" id="modeQuizTab" type="button" aria-pressed="true">Quiz-Übersicht</button>
+      <button class="mode-tab" id="modeCoachTab" type="button" aria-pressed="false">Lerncoach</button>
+    </nav>
+
+    <div id="quizView">
     <section class="summary-grid" aria-label="Gesamtübersicht">
       <div class="summary-card"><span>Bearbeitet</span><strong id="completedTotal">0 / 0</strong><em>Quiz mindestens einmal abgeschlossen</em></div>
       <div class="summary-card"><span>Durchschnitt</span><strong id="averagePercent">–</strong><em>aus den jeweiligen Bestwerten</em></div>
@@ -343,6 +350,9 @@
     </aside>
 
     <div class="subjects" id="subjects"></div>
+    </div>
+
+    <section class="coach" id="coachView" hidden aria-label="Lerncoach"></section>
     <p class="footnote">Die Lernnote dient deiner Motivation und Selbsteinschätzung. Sie ist keine offizielle Bewertung. · <a href="privacy.html">Datenschutzerklärung</a></p>
   </main>
 
@@ -974,6 +984,8 @@
 
       function exportBackup() {
         const payload = { format: "quiz-dashboard", exportedAt: new Date().toISOString(), catalogVersion: catalog.version, data: store };
+        const lerncoachProgress = window.lerncoach?.exportState?.();
+        if (lerncoachProgress) payload.lerncoach = lerncoachProgress;
         const blob = new Blob([JSON.stringify(payload, null, 2)], { type: "application/json" });
         const url = URL.createObjectURL(blob);
         const link = document.createElement("a");
@@ -991,6 +1003,7 @@
           if (!compatibleFormat || !validStore(payload.data)) throw new Error("invalid");
           if (!confirm("Die Sicherung ersetzt die aktuell im Dashboard gespeicherten Resultate. Fortfahren?")) return;
           store = normaliseStore(payload.data);
+          if (payload.lerncoach) window.lerncoach?.importState?.(payload.lerncoach);
           saveStore();
           render();
           showToast("Sicherung erfolgreich importiert.");
@@ -1048,6 +1061,7 @@
         try {
           await window.quizCloud.deleteAccountAndData();
           localStorage.removeItem(STORAGE_KEY);
+          window.lerncoach?.clearLocal?.();
           window.location.replace("login.html");
         } catch (deleteError) {
           error.textContent = friendlyDeleteError(deleteError);
@@ -1067,6 +1081,9 @@
       render();
     })();
   </script>
+  <script src="lerncoach/engine.js"></script>
+  <script src="lerncoach/manifest.js"></script>
+  <script src="lerncoach/ui.js"></script>
   <script src="firebase-config.js"></script>
   <script src="firebase-sync.js"></script>
 </body>
