@@ -505,7 +505,7 @@ Lerncoach.registerSubject({
       id: "w2",
       number: 2,
       title: "IPv6 Part 2: ICMPv6, Autokonfiguration, Übergang",
-      status: "locked",
+      status: "ready",
       items: [
         {
           type: "slide",
@@ -915,7 +915,7 @@ Lerncoach.registerSubject({
       id: "w3",
       number: 3,
       title: "VoIP und Signaling: SIP und SDP",
-      status: "locked",
+      status: "ready",
       items: [
         {
           type: "slide",

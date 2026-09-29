@@ -13,14 +13,14 @@ lerncoach/
 ├── ui.js              Oberfläche, nicht anfassen
 ├── lerncoach.css      Stil, nutzt die Farben aus index.html
 └── content/
-    ├── START.js       Beispiel-Fach und Vorlage
+    ├── CNS1.js        vollständiges Beispiel (3 Wochen)
     ├── CNS1.js
     └── ...
 ```
 
 - **Neue Woche:** in der Fach-Datei einen Eintrag in `weeks` ergänzen.
 - **Neues Fach:** neue Datei `lerncoach/content/<FACH>.js` anlegen und den Pfad in `lerncoach/manifest.js` eintragen.
-- **Beispiel-Fach entfernen:** Zeile `lerncoach/content/START.js` aus dem Manifest löschen.
+- **Fach entfernen:** Zeile aus `lerncoach/manifest.js` löschen.
 
 ## Aufbau einer Fach-Datei
 

@@ -2,7 +2,7 @@
  * Lerncoach-Inhalte für IT-Recht.
  * Wochen mit status "soon" erscheinen als "Noch keine Inhalte".
  * Zum Befüllen: status auf "ready" (oder "locked") setzen und items ergänzen.
- * Aufbau und Beispiele: LERNCOACH_ERSTELLEN.md und lerncoach/content/START.js
+ * Aufbau und Beispiele: LERNCOACH_ERSTELLEN.md und lerncoach/content/CNS1.js
  */
 Lerncoach.registerSubject({
   id: "ITRECHT",
