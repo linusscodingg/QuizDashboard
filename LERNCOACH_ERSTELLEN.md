@@ -73,6 +73,73 @@ Lerncoach.registerSubject({
 }
 ```
 
+## Lernform-Blöcke im Folientext
+
+Neben Text und `{ list: [...] }` kennt `body` weitere Blöcke. Jeder Block ist ein Objekt mit genau einem der folgenden Schlüssel. Die Validierung meldet Fehler mit Blocknummer, zum Beispiel `Woche 3 Item 5 Block 2: callout.tone muss def, exam, warn oder tip sein`.
+
+Setze einen Block nur, wenn er das Verständnis besser macht als ein Absatz. Für reines Hintergrundwissen bleibt normaler Text die richtige Wahl.
+
+| Block | Wofür | Pflichtfelder |
+|---|---|---|
+| `callout` | Definition, Prüfungsrelevanz, typischer Fehler, Merkhilfe | `tone` (`def`, `exam`, `warn`, `tip`), `text` (Text oder Liste) |
+| `table` | echte Daten aus der Vorlesung zeigen | `head`, `rows` (jede Zeile so lang wie `head`) |
+| `flow` | Prozess oder Schrittfolge mit Pfeilen | `steps` (mindestens 2, je mit `title`) |
+| `compare` | zwei Konzepte gegenüberstellen | `left` und `right`, je mit `title` und `points` |
+| `cards` | mehrere gleichrangige Punkte nebeneinander | mindestens 2 Karten mit `title` |
+| `formula` | Formel mit erklärten Bestandteilen | `main` |
+| `reveal` | aktive Frage, Antwort erst nach Klick | `question`, `answer` |
+| `checklist` | Selbstcheck „Kann ich das jetzt?" mit Zähler | `items` |
+| `sim` | Mini-Simulation, aktuell `kind: "minmax"` | `kind`, `label`, `min`, `max`, `start` |
+| `chart` | Diagramm als SVG | `kind` (`histogram`, `box`, `scatter`, `heatmap`, `sampling`) |
+
+Beispiele:
+
+```js
+{ callout: { tone: "warn", title: "Typischer Fehler", text: "Look nicht direkt mit Decide verbinden." } }
+
+{ table: {
+  caption: "Min- und Max-Zeile",
+  head: ["ID", "Glucose", "Age"],
+  rows: [["1", "148", "50"], ["Min", "85", "21"]],
+  marks: { "1,1": "warn" },          // "zeile,spalte" → good | bad | warn | focus
+  note: "Gelb die Min-Zeile."
+} }
+
+{ flow: { steps: [{ title: "Look", text: "hinschauen" }, { title: "Decide" }], note: "Reihenfolge zählt" } }
+
+{ compare: {
+  left:  { title: "Stratified", points: ["zieht aus jeder Gruppe"] },
+  right: { title: "Cluster",    points: ["nimmt ganze Gruppen"] },
+  verdict: "Der Merksatz."
+} }
+
+{ cards: [{ title: "Centre", text: "Wo liegt die Masse?" }, { title: "Spread", text: "Wie breit?", tone: "warn" }] }
+
+{ formula: { main: "x_scaled = (x − x_min) / (x_max − x_min)",
+             parts: [{ label: "Zähler", text: "Abstand zum Minimum" }], note: "Resultat 0 bis 1" } }
+
+{ reveal: { question: "Was passiert als Nächstes?", answer: ["Erster Absatz.", "Zweiter Absatz."], label: "Auflösung" } }
+
+{ checklist: { title: "Kann ich das jetzt?", items: ["Ich kann X erklären."] } }
+
+{ sim: { kind: "minmax", label: "Age, Min 20 und Max 80", min: 20, max: 80, start: 50, unit: "Jahre" } }
+
+{ chart: { kind: "histogram", caption: "Altersverteilung",
+           panels: [{ title: "Kohorte A", counts: [1, 4, 2], start: 40, step: 10, mean: 60 }], xLabel: "Alter" } }
+{ chart: { kind: "box", groups: [{ label: "Not readmitted", low: 0.5, q1: 1.8, median: 3, q3: 4.5, high: 8.7, outliers: [12] }] } }
+{ chart: { kind: "scatter", panels: [{ title: "positiv", points: [[1, 2], [2, 3], [3, 5]], note: "Direction positiv" }] } }
+{ chart: { kind: "heatmap", labels: ["Age", "Glucose"], matrix: [[1, 0.19], [0.19, 1]] } }
+{ chart: { kind: "sampling", mode: "stratified" } }   // simple | systematic | stratified | cluster
+```
+
+Regeln:
+
+- `box`-Gruppen müssen `low <= q1 <= median <= q3 <= high` erfüllen.
+- `heatmap.matrix` braucht genau eine quadratische Zeile pro `label`.
+- `sampling` zeichnet zwölf Personen und die Auswahl selbst. Der Modus genügt, eigene `note` ersetzt den eingebauten Hinweis.
+- Diagramme und Tabellen sind **eigene Nachbauten mit den Zahlen der Folien**. Folienbilder werden nicht kopiert, siehe `QUIZ_ERSTELLEN.md`.
+- Die Blöcke bleiben rückwärtskompatibel: bestehende Fächer mit reinem Text und Listen rendern unverändert.
+
 ## Checkpoint (`checkpoint`)
 
 3 bis 5 Fragen. Nur mit 100 % geht es weiter, sonst **Nochmal versuchen**. Nicht nur `single` verwenden (wird von der Validierung abgelehnt).

@@ -15,6 +15,11 @@
   const ID_PATTERN = /^[A-Za-z0-9][A-Za-z0-9_-]{0,63}$/;
   const WEEK_STATUSES = new Set(["ready", "soon", "locked"]);
   const QUESTION_TYPES = new Set(["type", "multi", "order", "single"]);
+  const CALLOUT_TONES = new Set(["def", "exam", "warn", "tip"]);
+  const CELL_TONES = new Set(["good", "bad", "warn", "focus"]);
+  const CHART_KINDS = new Set(["histogram", "box", "scatter", "heatmap", "sampling"]);
+  const SAMPLING_MODES = new Set(["simple", "systematic", "stratified", "cluster"]);
+  const SIM_KINDS = new Set(["minmax"]);
   const MAX_QUESTIONS = 8;
 
   /* ---------- Hilfsfunktionen ---------- */
@@ -107,13 +112,179 @@
     }
   }
 
+  // Lernform-Bloecke im Folientext. Ein Block ist entweder Text oder genau ein Objekt
+  // mit einem der unten gepruefte Schluessel. Gibt null zurueck oder eine Fehlermeldung.
+  function textList(value) {
+    return Array.isArray(value) && value.length > 0 && value.every(isText);
+  }
+  function numberList(value) {
+    return Array.isArray(value) && value.length > 0 && value.every(entry => typeof entry === "number" && Number.isFinite(entry));
+  }
+  function textOrList(value) {
+    return isText(value) || textList(value);
+  }
+
+  function blockError(block) {
+    if (isText(block)) return null;
+    if (!isObject(block)) return "Block muss Text oder ein Objekt sein";
+
+    if (block.list !== undefined) {
+      return textList(block.list) ? null : "list braucht mindestens einen Text";
+    }
+    if (block.callout !== undefined) {
+      const callout = block.callout;
+      if (!isObject(callout)) return "callout muss ein Objekt sein";
+      if (!CALLOUT_TONES.has(callout.tone)) return "callout.tone muss def, exam, warn oder tip sein";
+      if (callout.title !== undefined && !isText(callout.title)) return "callout.title muss Text sein";
+      return textOrList(callout.text) ? null : "callout.text braucht Text oder eine Liste von Texten";
+    }
+    if (block.table !== undefined) {
+      const table = block.table;
+      if (!isObject(table)) return "table muss ein Objekt sein";
+      if (!textList(table.head)) return "table.head braucht mindestens eine Spalte";
+      if (!Array.isArray(table.rows) || !table.rows.length) return "table.rows braucht mindestens eine Zeile";
+      for (const row of table.rows) {
+        if (!Array.isArray(row) || row.length !== table.head.length) return "jede table-Zeile braucht so viele Zellen wie head";
+      }
+      if (table.marks !== undefined) {
+        if (!isObject(table.marks)) return "table.marks muss ein Objekt sein";
+        for (const [key, tone] of Object.entries(table.marks)) {
+          if (!/^-?\d+,\d+$/.test(key)) return `table.marks "${key}" muss die Form "zeile,spalte" haben`;
+          if (!CELL_TONES.has(tone)) return `table.marks "${key}" braucht good, bad, warn oder focus`;
+        }
+      }
+      if (table.caption !== undefined && !isText(table.caption)) return "table.caption muss Text sein";
+      if (table.note !== undefined && !isText(table.note)) return "table.note muss Text sein";
+      return null;
+    }
+    if (block.flow !== undefined) {
+      const flow = block.flow;
+      if (!isObject(flow) || !Array.isArray(flow.steps) || flow.steps.length < 2) return "flow.steps braucht mindestens 2 Schritte";
+      for (const step of flow.steps) {
+        if (!isObject(step) || !isText(step.title)) return "jeder flow-Schritt braucht einen title";
+        if (step.text !== undefined && !isText(step.text)) return "flow-Schritt text muss Text sein";
+      }
+      if (flow.note !== undefined && !isText(flow.note)) return "flow.note muss Text sein";
+      return null;
+    }
+    if (block.compare !== undefined) {
+      const compare = block.compare;
+      if (!isObject(compare)) return "compare muss ein Objekt sein";
+      for (const side of ["left", "right"]) {
+        const column = compare[side];
+        if (!isObject(column) || !isText(column.title)) return `compare.${side} braucht einen title`;
+        if (!textList(column.points)) return `compare.${side}.points braucht mindestens einen Text`;
+      }
+      if (compare.verdict !== undefined && !isText(compare.verdict)) return "compare.verdict muss Text sein";
+      return null;
+    }
+    if (block.cards !== undefined) {
+      if (!Array.isArray(block.cards) || block.cards.length < 2) return "cards braucht mindestens 2 Karten";
+      for (const card of block.cards) {
+        if (!isObject(card) || !isText(card.title)) return "jede Karte braucht einen title";
+        if (card.text !== undefined && !isText(card.text)) return "Karten-text muss Text sein";
+      }
+      return null;
+    }
+    if (block.formula !== undefined) {
+      const formula = block.formula;
+      if (!isObject(formula) || !isText(formula.main)) return "formula.main fehlt";
+      if (formula.parts !== undefined) {
+        if (!Array.isArray(formula.parts) || !formula.parts.length) return "formula.parts braucht mindestens einen Eintrag";
+        for (const part of formula.parts) {
+          if (!isObject(part) || !isText(part.label) || !isText(part.text)) return "jeder formula.parts-Eintrag braucht label und text";
+        }
+      }
+      if (formula.note !== undefined && !isText(formula.note)) return "formula.note muss Text sein";
+      return null;
+    }
+    if (block.reveal !== undefined) {
+      const reveal = block.reveal;
+      if (!isObject(reveal) || !isText(reveal.question)) return "reveal.question fehlt";
+      if (reveal.label !== undefined && !isText(reveal.label)) return "reveal.label muss Text sein";
+      return textOrList(reveal.answer) ? null : "reveal.answer braucht Text oder eine Liste von Texten";
+    }
+    if (block.checklist !== undefined) {
+      const checklist = block.checklist;
+      if (!isObject(checklist)) return "checklist muss ein Objekt sein";
+      if (checklist.title !== undefined && !isText(checklist.title)) return "checklist.title muss Text sein";
+      return textList(checklist.items) ? null : "checklist.items braucht mindestens einen Text";
+    }
+    if (block.sim !== undefined) {
+      const sim = block.sim;
+      if (!isObject(sim) || !SIM_KINDS.has(sim.kind)) return "sim.kind muss minmax sein";
+      if (![sim.min, sim.max, sim.start].every(value => typeof value === "number" && Number.isFinite(value))) {
+        return "sim braucht min, max und start als Zahlen";
+      }
+      if (sim.min >= sim.max) return "sim.min muss kleiner als sim.max sein";
+      if (!isText(sim.label)) return "sim.label fehlt";
+      if (sim.note !== undefined && !isText(sim.note)) return "sim.note muss Text sein";
+      return null;
+    }
+    if (block.chart !== undefined) {
+      const chart = block.chart;
+      if (!isObject(chart) || !CHART_KINDS.has(chart.kind)) return "chart.kind muss histogram, box, scatter, heatmap oder sampling sein";
+      if (chart.caption !== undefined && !isText(chart.caption)) return "chart.caption muss Text sein";
+      if (chart.note !== undefined && !isText(chart.note)) return "chart.note muss Text sein";
+      if (chart.kind === "histogram") {
+        if (!Array.isArray(chart.panels) || !chart.panels.length) return "histogram braucht panels";
+        for (const panel of chart.panels) {
+          if (!isObject(panel) || !isText(panel.title)) return "jedes histogram-panel braucht einen title";
+          if (!numberList(panel.counts)) return "jedes histogram-panel braucht counts als Zahlenliste";
+          if (typeof panel.start !== "number" || typeof panel.step !== "number" || panel.step <= 0) return "histogram-panel braucht start und step als Zahlen";
+          if (panel.mean !== undefined && typeof panel.mean !== "number") return "histogram-panel mean muss eine Zahl sein";
+        }
+        return null;
+      }
+      if (chart.kind === "box") {
+        if (!Array.isArray(chart.groups) || !chart.groups.length) return "box braucht groups";
+        for (const group of chart.groups) {
+          if (!isObject(group) || !isText(group.label)) return "jede box-group braucht ein label";
+          for (const key of ["low", "q1", "median", "q3", "high"]) {
+            if (typeof group[key] !== "number") return `box-group braucht ${key} als Zahl`;
+          }
+          if (!(group.low <= group.q1 && group.q1 <= group.median && group.median <= group.q3 && group.q3 <= group.high)) {
+            return "box-group: low <= q1 <= median <= q3 <= high verletzt";
+          }
+          if (group.outliers !== undefined && !Array.isArray(group.outliers)) return "box-group outliers muss eine Liste sein";
+        }
+        return null;
+      }
+      if (chart.kind === "scatter") {
+        if (!Array.isArray(chart.panels) || !chart.panels.length) return "scatter braucht panels";
+        for (const panel of chart.panels) {
+          if (!isObject(panel) || !isText(panel.title)) return "jedes scatter-panel braucht einen title";
+          if (!Array.isArray(panel.points) || panel.points.length < 3) return "jedes scatter-panel braucht mindestens 3 Punkte";
+          for (const point of panel.points) {
+            if (!Array.isArray(point) || point.length !== 2 || !point.every(Number.isFinite)) return "scatter-Punkte muessen [x, y] mit Zahlen sein";
+          }
+        }
+        return null;
+      }
+      if (chart.kind === "heatmap") {
+        if (!textList(chart.labels)) return "heatmap braucht labels";
+        if (!Array.isArray(chart.matrix) || chart.matrix.length !== chart.labels.length) return "heatmap.matrix braucht eine Zeile pro label";
+        for (const row of chart.matrix) {
+          if (!Array.isArray(row) || row.length !== chart.labels.length || !row.every(Number.isFinite)) return "jede heatmap-Zeile braucht eine Zahl pro label";
+        }
+        return null;
+      }
+      if (!SAMPLING_MODES.has(chart.mode)) return "sampling braucht mode simple, systematic, stratified oder cluster";
+      return null;
+    }
+    return "unbekannter Block-Typ";
+  }
+
   function validateSlide(item, where, errors) {
     if (!isText(item.title)) errors.push(`${where}: title fehlt`);
     const body = item.body;
-    const validBlock = block => isText(block)
-      || (isObject(block) && Array.isArray(block.list) && block.list.length > 0 && block.list.every(isText));
-    if (!Array.isArray(body) || !body.length || !body.every(validBlock)) {
-      errors.push(`${where}: body braucht mindestens einen Absatz (Text oder { list: [...] })`);
+    if (!Array.isArray(body) || !body.length) {
+      errors.push(`${where}: body braucht mindestens einen Absatz`);
+    } else {
+      body.forEach((block, index) => {
+        const problem = blockError(block);
+        if (problem) errors.push(`${where} Block ${index + 1}: ${problem}`);
+      });
     }
     const remember = item.remember;
     if (remember !== undefined && !isText(remember) && !(Array.isArray(remember) && remember.length && remember.every(isText))) {
@@ -402,7 +573,7 @@
   return {
     ID_PATTERN,
     escapeHtml, formatInline, normaliseText, shuffledIndices,
-    validateSubject,
+    validateSubject, blockError,
     expectedAnswer, isAnswered, checkQuestion, gradeCheckpoint,
     emptyProgress, normaliseProgress, weekKey, checkpointKey,
     isCheckpointPassed, markCheckpointPassed, setPosition, mergeProgress,

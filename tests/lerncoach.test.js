@@ -185,6 +185,75 @@ for (const file of manifest.files) {
   }
 }
 
+/* ---------- Lernform-Bloecke im Folientext ---------- */
+
+const goodBlocks = [
+  "Reiner Text mit **fett** und \`code\`.",
+  { list: ["Punkt A", "Punkt B"] },
+  { callout: { tone: "def", title: "Unit of Observation", text: "Was eine Zeile darstellt." } },
+  { callout: { tone: "exam", text: ["Erste Zeile", "Zweite Zeile"] } },
+  { table: { caption: "Beispiel", head: ["Age", "Sex"], rows: [["67", "F"], ["74", "M"]], marks: { "1,1": "bad" }, note: "Fussnote" } },
+  { flow: { steps: [{ title: "Look", text: "hinschauen" }, { title: "Decide" }], note: "Reihenfolge zaehlt" } },
+  { compare: { left: { title: "Stratified", points: ["aus jedem Stratum"] }, right: { title: "Cluster", points: ["ganze Gruppen"] }, verdict: "Der Unterschied" } },
+  { cards: [{ title: "A", text: "x" }, { title: "B", tone: "bad" }] },
+  { formula: { main: "x = (a - b) / (c - b)", parts: [{ label: "a", text: "Rohwert" }], note: "Hinweis" } },
+  { reveal: { question: "Was passiert?", answer: ["Das hier."], label: "Aufdecken" } },
+  { checklist: { title: "Kann ich das?", items: ["Ich kann X erklaeren."] } },
+  { sim: { kind: "minmax", label: "Glucose", min: 85, max: 148, start: 117, unit: "mg/dL" } },
+  { chart: { kind: "histogram", panels: [{ title: "Kohorte A", counts: [1, 4, 2], start: 40, step: 10, mean: 60 }], xLabel: "Alter" } },
+  { chart: { kind: "box", groups: [{ label: "Not readmitted", low: 0, q1: 2, median: 3, q3: 5, high: 9, outliers: [14] }] } },
+  { chart: { kind: "scatter", panels: [{ title: "positiv", points: [[1, 1], [2, 2], [3, 3]] }] } },
+  { chart: { kind: "heatmap", labels: ["Age", "Glucose"], matrix: [[1, 0.19], [0.19, 1]] } },
+  { chart: { kind: "sampling", mode: "cluster", caption: "Cluster sampling" } }
+];
+for (const block of goodBlocks) {
+  assert.equal(L.blockError(block), null, `gueltiger Block abgelehnt: ${JSON.stringify(block).slice(0, 70)}`);
+}
+
+const badBlocks = [
+  [42, "Zahl ist kein Block"],
+  [{}, "leeres Objekt"],
+  [{ unbekannt: 1 }, "unbekannter Typ"],
+  [{ list: [] }, "leere Liste"],
+  [{ callout: { tone: "bunt", text: "x" } }, "ungueltiger callout-tone"],
+  [{ callout: { tone: "def" } }, "callout ohne text"],
+  [{ table: { head: ["a"], rows: [["1", "2"]] } }, "Zeile laenger als head"],
+  [{ table: { head: ["a"], rows: [["1"]], marks: { "0,0": "pink" } } }, "ungueltiger Zellton"],
+  [{ table: { head: ["a"], rows: [["1"]], marks: { oben: "bad" } } }, "ungueltiger marks-Schluessel"],
+  [{ flow: { steps: [{ title: "nur einer" }] } }, "flow mit einem Schritt"],
+  [{ compare: { left: { title: "L", points: ["x"] } } }, "compare ohne rechte Spalte"],
+  [{ cards: [{ title: "nur eine" }] }, "cards mit einer Karte"],
+  [{ formula: {} }, "formula ohne main"],
+  [{ reveal: { question: "Q" } }, "reveal ohne answer"],
+  [{ checklist: { items: [] } }, "leere checklist"],
+  [{ sim: { kind: "minmax", label: "X", min: 10, max: 10, start: 10 } }, "sim mit min = max"],
+  [{ sim: { kind: "irgendwas", label: "X", min: 1, max: 2, start: 1 } }, "unbekannte sim-Art"],
+  [{ chart: { kind: "pie" } }, "unbekannte chart-Art"],
+  [{ chart: { kind: "sampling", mode: "zufaellig" } }, "unbekannter sampling-mode"],
+  [{ chart: { kind: "heatmap", labels: ["a", "b"], matrix: [[1, 0]] } }, "heatmap mit fehlender Zeile"],
+  [{ chart: { kind: "box", groups: [{ label: "g", low: 5, q1: 4, median: 3, q3: 2, high: 1 }] } }, "box mit verdrehten Quartilen"],
+  [{ chart: { kind: "scatter", panels: [{ title: "t", points: [[1, 1]] }] } }, "scatter mit zu wenig Punkten"]
+];
+for (const [block, why] of badBlocks) {
+  assert.ok(typeof L.blockError(block) === "string", `ungueltiger Block akzeptiert: ${why}`);
+}
+
+// Bloecke muessen auch ueber validateSubject greifen
+const brokenSubject = {
+  id: "TEST", name: "Test", weeks: [{ id: "w1", title: "W", status: "ready", items: [
+    { type: "slide", title: "S", body: ["ok", { chart: { kind: "pie" } }] }
+  ] }]
+};
+const blockErrors = L.validateSubject(brokenSubject);
+assert.ok(blockErrors.some(entry => /Block 2/.test(entry)), "validateSubject muss den fehlerhaften Block benennen");
+
+// Rueckwaertskompatibel: reine Text- und Listen-Bodies bleiben gueltig
+assert.deepEqual(L.validateSubject({
+  id: "TEST2", name: "Test", weeks: [{ id: "w1", title: "W", status: "ready", items: [
+    { type: "slide", title: "S", body: ["nur Text", { list: ["a"] }], remember: "merk" }
+  ] }]
+}), []);
+
 /* ---------- Einbindung ins Dashboard ---------- */
 
 const html = fs.readFileSync(path.join(root, "index.html"), "utf8");

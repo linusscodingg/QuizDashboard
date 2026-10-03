@@ -166,7 +166,8 @@
 .lc-card-top { display: flex; flex-wrap: wrap; gap: 8px 14px; align-items: center; justify-content: space-between; }
 .lc-card-eyebrow { margin: 0 0 8px; color: var(--accent, var(--blue)); font-size: .76rem; font-weight: 850; letter-spacing: .1em; text-transform: uppercase; }
 .lc-card-lead { margin: 0 0 18px; color: var(--muted); }
-.lc-prose { max-width: 720px; font-size: 1.04rem; line-height: 1.7; }
+.lc-prose { max-width: none; min-width: 0; font-size: 1.04rem; line-height: 1.7; }
+.lc-prose > p, .lc-prose > ul { max-width: 720px; }
 .lc-prose p { margin: 0 0 14px; }
 .lc-prose ul { margin: 0 0 14px; padding-left: 22px; }
 .lc-prose li { margin: 6px 0; }
@@ -310,3 +311,141 @@
   .lc-nav .button { width: 100%; }
   .lc-week-actions .button { flex: 1 1 auto; }
 }
+
+
+/* ---------- Lernform-Bloecke ---------- */
+
+.lc-block { max-width: 860px; min-width: 0; margin: 0 0 20px; }
+.lc-block-note { margin: 10px 0 0; color: var(--muted); font-size: .88rem; line-height: 1.55; }
+
+/* Callout: Definition, Pruefungsrelevanz, Stolperstein, Merkhilfe */
+.lc-callout {
+  max-width: 760px;
+  margin: 0 0 20px;
+  padding: 14px 18px;
+  border: 1px solid var(--line);
+  border-left: 5px solid var(--blue);
+  border-radius: 14px;
+  background: var(--wash);
+}
+.lc-callout-tag { margin: 0 0 4px; font-size: .74rem; font-weight: 850; letter-spacing: .09em; text-transform: uppercase; color: var(--blue); }
+.lc-callout-title { margin: 0 0 6px; font-weight: 800; }
+.lc-callout-body p { margin: 0 0 8px; }
+.lc-callout-body p:last-child { margin-bottom: 0; }
+.lc-callout.is-exam { border-left-color: var(--orange); background: var(--orange-bg); }
+.lc-callout.is-exam .lc-callout-tag { color: var(--orange); }
+.lc-callout.is-warn { border-left-color: var(--red); background: var(--red-bg); }
+.lc-callout.is-warn .lc-callout-tag { color: var(--red); }
+.lc-callout.is-tip { border-left-color: var(--green); background: var(--green-bg); }
+.lc-callout.is-tip .lc-callout-tag { color: var(--green); }
+
+/* Datentabellen */
+.lc-tablewrap figcaption { margin: 0 0 8px; color: var(--muted); font-size: .88rem; font-weight: 700; }
+.lc-tablescroll { max-width: 100%; overflow-x: auto; border: 1px solid var(--line); border-radius: 14px; background: var(--paper); }
+.lc-table { width: 100%; border-collapse: collapse; font-size: .92rem; font-variant-numeric: tabular-nums; }
+.lc-table th, .lc-table td { padding: 9px 12px; text-align: left; border-bottom: 1px solid var(--line); white-space: nowrap; }
+.lc-table thead th { color: #fff; background: var(--navy); font-size: .8rem; letter-spacing: .04em; text-transform: uppercase; }
+.lc-table tbody tr:last-child td { border-bottom: 0; }
+.lc-table tbody tr:nth-child(even) td { background: #fafdfe; }
+.lc-table td.is-bad { color: var(--red); background: var(--red-bg) !important; font-weight: 800; }
+.lc-table td.is-good { color: var(--green); background: var(--green-bg) !important; font-weight: 800; }
+.lc-table td.is-warn { color: var(--yellow); background: var(--yellow-bg) !important; font-weight: 800; }
+.lc-table td.is-focus { color: var(--blue); background: var(--wash) !important; font-weight: 800; }
+
+/* Prozess-Schrittfolge */
+.lc-flow-list { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(160px, 100%), 1fr)); gap: 10px; margin: 0; padding: 0; list-style: none; }
+.lc-flow-step {
+  position: relative;
+  padding: 14px 14px 14px 16px;
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  background: var(--paper);
+}
+.lc-flow-step + .lc-flow-step::before {
+  content: "→";
+  position: absolute; left: -13px; top: 50%;
+  color: var(--blue); font-weight: 900; transform: translateY(-50%);
+}
+.lc-flow-num { display: grid; place-items: center; width: 24px; height: 24px; margin-bottom: 8px; color: #fff; border-radius: 8px; background: var(--blue); font-size: .78rem; font-weight: 900; }
+.lc-flow-title { display: block; font-weight: 800; }
+.lc-flow-text { display: block; margin-top: 5px; color: var(--muted); font-size: .9rem; line-height: 1.5; }
+
+/* Zwei Konzepte vergleichen */
+.lc-compare-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+.lc-compare-col { padding: 14px 16px; border: 1px solid var(--line); border-top: 4px solid var(--blue); border-radius: 14px; background: var(--paper); }
+.lc-compare-col.is-right { border-top-color: #b4446f; }
+.lc-compare-col h4 { margin: 0 0 8px; font-size: 1rem; }
+.lc-compare-col ul { margin: 0; padding-left: 18px; }
+.lc-compare-col li { margin: 5px 0; font-size: .94rem; line-height: 1.5; }
+.lc-compare-verdict { margin: 12px 0 0; padding: 11px 14px; border-radius: 12px; background: var(--wash); font-weight: 700; }
+
+/* Kleine Karten */
+.lc-cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(190px, 100%), 1fr)); gap: 10px; }
+.lc-mini { padding: 13px 15px; border: 1px solid var(--line); border-radius: 13px; background: var(--paper); }
+.lc-mini strong { display: block; margin-bottom: 4px; }
+.lc-mini span { display: block; color: var(--muted); font-size: .89rem; line-height: 1.5; }
+.lc-mini.is-bad { border-color: #f0c3c6; background: var(--red-bg); }
+.lc-mini.is-good { border-color: #b7e3c7; background: var(--green-bg); }
+.lc-mini.is-warn { border-color: #ecd9a2; background: var(--yellow-bg); }
+
+/* Formel */
+.lc-formula { padding: 16px 18px; border: 1px solid var(--line); border-radius: 14px; background: var(--wash); }
+.lc-formula-main { margin: 0; padding-bottom: 2px; overflow-x: auto; font-size: 1.16rem; font-weight: 800; text-align: center; font-variant-numeric: tabular-nums; }
+.lc-formula-parts { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(190px, 100%), 1fr)); gap: 8px 16px; margin: 14px 0 0; }
+.lc-formula-parts dt { font-weight: 800; font-size: .9rem; }
+.lc-formula-parts dd { margin: 2px 0 0; color: var(--muted); font-size: .88rem; line-height: 1.5; }
+
+/* Aufdecken */
+.lc-reveal { padding: 15px 18px; border: 1px dashed var(--blue); border-radius: 14px; background: var(--paper); }
+.lc-reveal-q { margin: 0 0 10px; font-weight: 800; }
+.lc-reveal-a { margin-top: 12px; padding-top: 12px; border-top: 1px solid var(--line); }
+.lc-reveal-a p { margin: 0 0 8px; }
+.lc-reveal-a p:last-child { margin-bottom: 0; }
+.lc-reveal.is-open { border-style: solid; background: var(--wash); }
+
+/* Selbstcheck */
+.lc-checklist { padding: 15px 18px; border: 1px solid var(--line); border-radius: 14px; background: var(--paper); }
+.lc-checklist.is-complete { border-color: #b7e3c7; background: var(--green-bg); }
+.lc-checklist-head { display: flex; justify-content: space-between; align-items: center; gap: 12px; margin: 0 0 10px; font-weight: 850; }
+.lc-checklist-count { color: var(--muted); font-size: .86rem; font-variant-numeric: tabular-nums; }
+.lc-checklist ul { margin: 0; padding: 0; list-style: none; }
+.lc-checklist li { margin: 6px 0; }
+.lc-checklist label { display: grid; grid-template-columns: auto 1fr; gap: 10px; align-items: start; cursor: pointer; line-height: 1.5; }
+.lc-checklist label.is-done span { color: var(--muted); text-decoration: line-through; }
+.lc-checklist input { width: 18px; height: 18px; margin: 2px 0 0; accent-color: var(--green); }
+
+/* Mini-Simulation */
+.lc-sim { padding: 16px 18px; border: 1px solid var(--line); border-radius: 14px; background: var(--wash); }
+.lc-sim-head { margin: 0 0 10px; font-weight: 800; }
+.lc-sim-range { width: 100%; max-width: 420px; accent-color: var(--blue); }
+.lc-sim-calc { margin: 12px 0 0; font-size: 1.08rem; font-weight: 700; font-variant-numeric: tabular-nums; }
+.lc-sim-out { padding: 2px 10px; color: #fff; border-radius: 8px; background: var(--blue); }
+.lc-sim-hint { margin: 8px 0 0; color: var(--muted); font-size: .88rem; }
+
+/* Diagramme */
+.lc-chart figcaption { margin: 0 0 10px; color: var(--muted); font-size: .88rem; font-weight: 700; }
+.lc-chart-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(230px, 100%), 1fr)); gap: 14px; }
+.lc-chart-panel { margin: 0; padding: 10px; border: 1px solid var(--line); border-radius: 13px; background: var(--paper); }
+.lc-chart-panel figcaption { margin: 0 0 6px; color: var(--ink); font-size: .86rem; font-weight: 800; }
+.lc-chart-panel svg, .lc-chart-single { display: block; width: 100%; height: auto; }
+.lc-chart-single { padding: 10px; border: 1px solid var(--line); border-radius: 13px; background: var(--paper); }
+.lc-chart-axis { margin: 6px 0 0; color: var(--muted); font-size: .8rem; text-align: center; }
+
+@media (max-width: 720px) {
+  .lc-compare-grid { grid-template-columns: 1fr; }
+  .lc-flow-step + .lc-flow-step::before { content: "↓"; left: 50%; top: -14px; transform: translateX(-50%); }
+  .lc-formula-main { font-size: 1rem; }
+}
+
+/* Schmale Viewports: Grids duerfen unter ihre Spurbreite */
+.lc-player { grid-template-columns: minmax(0, 1fr); }
+.lc-stage { min-width: 0; }
+.lc-card, .lc-slide, .lc-compare-grid, .lc-compare-col, .lc-mini, .lc-flow-step { min-width: 0; }
+.lc-chart-panel, .lc-tablewrap, .lc-callout { min-width: 0; max-width: 100%; }
+.lc-chart-single, .lc-chart-panel svg { max-width: 100%; }
+.lc-prose > p, .lc-callout-body, .lc-mini span, .lc-flow-text { overflow-wrap: break-word; }
+
+/* Diagrammbreiten begrenzen, sonst skaliert die SVG-Beschriftung mit */
+.lc-chart-panel { max-width: 440px; }
+.lc-chart.is-box .lc-chart-single { max-width: 580px; }
+.lc-chart.is-heatmap .lc-chart-single { max-width: 540px; }

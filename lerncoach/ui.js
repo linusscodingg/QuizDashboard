@@ -376,9 +376,295 @@
     }).join("")}</ol>`;
   }
 
-  function renderBlock(block) {
-    if (typeof block === "string") return `<p>${L.formatInline(block)}</p>`;
-    return `<ul>${block.list.map(entry => `<li>${L.formatInline(entry)}</li>`).join("")}</ul>`;
+  /* ---------- Lernform-Bloecke ---------- */
+
+  const fi = value => L.formatInline(value);
+  const asList = value => Array.isArray(value) ? value : [value];
+  const paras = value => asList(value).map(entry => `<p>${fi(entry)}</p>`).join("");
+  const CALLOUT_LABEL = { def: "Definition", exam: "Prüfungsrelevant", warn: "Achtung, typischer Fehler", tip: "Merkhilfe" };
+  const CHART_INK = "#14243a", CHART_MUTED = "#607086", CHART_LINE = "#d3e2e9", CHART_BLUE = "#087da8", CHART_RED = "#b42f35";
+  const GROUP_COLORS = ["#087da8", "#b4446f", "#168447"];
+  const SAMPLING_PICKS = {
+    simple: { picked: [0, 3, 4, 8, 10], groups: 0, hint: "Jede Person hat dieselbe Auswahlwahrscheinlichkeit." },
+    systematic: { picked: [1, 3, 5, 7, 9, 11], groups: 0, ordered: true, hint: "Nach Alter sortiert, danach jede 2. Person." },
+    stratified: { picked: [1, 3, 4, 6, 9, 11], groups: 3, hint: "Aus jedem Stratum wird zufällig gezogen." },
+    cluster: { picked: [4, 5, 6, 7], groups: 3, hint: "Ein ganzer Cluster kommt rein, die beiden anderen fallen komplett weg." }
+  };
+
+  function renderCallout(callout) {
+    const label = CALLOUT_LABEL[callout.tone];
+    return `<aside class="lc-callout is-${callout.tone}">
+      <p class="lc-callout-tag">${esc(label)}</p>
+      ${callout.title ? `<p class="lc-callout-title">${fi(callout.title)}</p>` : ""}
+      <div class="lc-callout-body">${paras(callout.text)}</div>
+    </aside>`;
+  }
+
+  function renderTable(table) {
+    const marks = table.marks || {};
+    const head = table.head.map(cell => `<th scope="col">${fi(cell)}</th>`).join("");
+    const rows = table.rows.map((row, rowIndex) => `<tr>${row.map((cell, colIndex) => {
+      const tone = marks[`${rowIndex},${colIndex}`];
+      const cls = tone ? ` class="is-${tone}"` : "";
+      return `<td${cls}>${fi(cell)}</td>`;
+    }).join("")}</tr>`).join("");
+    return `<figure class="lc-block lc-tablewrap">
+      ${table.caption ? `<figcaption>${fi(table.caption)}</figcaption>` : ""}
+      <div class="lc-tablescroll"><table class="lc-table"><thead><tr>${head}</tr></thead><tbody>${rows}</tbody></table></div>
+      ${table.note ? `<p class="lc-block-note">${fi(table.note)}</p>` : ""}
+    </figure>`;
+  }
+
+  function renderFlow(flow) {
+    const steps = flow.steps.map((step, index) => `<li class="lc-flow-step">
+      <span class="lc-flow-num">${index + 1}</span>
+      <span class="lc-flow-title">${fi(step.title)}</span>
+      ${step.text ? `<span class="lc-flow-text">${fi(step.text)}</span>` : ""}
+    </li>`).join("");
+    return `<div class="lc-block lc-flow">
+      <ol class="lc-flow-list">${steps}</ol>
+      ${flow.note ? `<p class="lc-block-note">${fi(flow.note)}</p>` : ""}
+    </div>`;
+  }
+
+  function renderCompare(compare) {
+    const column = (side, data) => `<div class="lc-compare-col is-${side}">
+      <h4>${fi(data.title)}</h4>
+      <ul>${data.points.map(point => `<li>${fi(point)}</li>`).join("")}</ul>
+    </div>`;
+    return `<div class="lc-block lc-compare">
+      <div class="lc-compare-grid">${column("left", compare.left)}${column("right", compare.right)}</div>
+      ${compare.verdict ? `<p class="lc-compare-verdict">${fi(compare.verdict)}</p>` : ""}
+    </div>`;
+  }
+
+  function renderCards(cards) {
+    return `<div class="lc-block lc-cards">${cards.map(card => `<div class="lc-mini${card.tone ? ` is-${card.tone}` : ""}">
+      <strong>${fi(card.title)}</strong>${card.text ? `<span>${fi(card.text)}</span>` : ""}
+    </div>`).join("")}</div>`;
+  }
+
+  function renderFormula(formula) {
+    return `<div class="lc-block lc-formula">
+      <p class="lc-formula-main">${fi(formula.main)}</p>
+      ${formula.parts ? `<dl class="lc-formula-parts">${formula.parts.map(part => `<div><dt>${fi(part.label)}</dt><dd>${fi(part.text)}</dd></div>`).join("")}</dl>` : ""}
+      ${formula.note ? `<p class="lc-block-note">${fi(formula.note)}</p>` : ""}
+    </div>`;
+  }
+
+  function renderReveal(reveal, key) {
+    return `<div class="lc-block lc-reveal" data-reveal="${esc(key)}">
+      <p class="lc-reveal-q">${fi(reveal.question)}</p>
+      <button type="button" class="button lc-btn-ghost lc-reveal-btn" data-action="reveal">${esc(reveal.label || "Antwort aufdecken")}</button>
+      <div class="lc-reveal-a" hidden>${paras(reveal.answer)}</div>
+    </div>`;
+  }
+
+  function renderChecklist(checklist) {
+    const items = checklist.items.map((item, index) => `<li><label><input type="checkbox" class="lc-check" data-check-index="${index}"><span>${fi(item)}</span></label></li>`).join("");
+    return `<div class="lc-block lc-checklist">
+      <p class="lc-checklist-head"><span>${fi(checklist.title || "Kann ich das jetzt?")}</span><output class="lc-checklist-count">0 / ${checklist.items.length}</output></p>
+      <ul>${items}</ul>
+    </div>`;
+  }
+
+  function renderSim(sim) {
+    const span = sim.max - sim.min;
+    const scaled = ((sim.start - sim.min) / span).toFixed(2);
+    const unit = sim.unit ? ` ${sim.unit}` : "";
+    return `<div class="lc-block lc-sim" data-sim="minmax" data-min="${sim.min}" data-max="${sim.max}" data-unit="${esc(sim.unit || "")}">
+      <p class="lc-sim-head">${fi(sim.label)}</p>
+      <input class="lc-sim-range" type="range" min="${sim.min}" max="${sim.max}" step="1" value="${sim.start}" aria-label="${esc(sim.label)}">
+      <p class="lc-sim-calc"><span class="lc-sim-work">(<b class="lc-sim-x">${sim.start}</b> − ${sim.min}) / (${sim.max} − ${sim.min})</span> = <output class="lc-sim-out">${scaled}</output></p>
+      <p class="lc-sim-hint">Roher Wert <b class="lc-sim-raw">${sim.start}${esc(unit)}</b>, skaliert <b class="lc-sim-out2">${scaled}</b>. Schiebe auf das Minimum und auf das Maximum.</p>
+      ${sim.note ? `<p class="lc-block-note">${fi(sim.note)}</p>` : ""}
+    </div>`;
+  }
+
+  /* ---------- Diagramme als SVG ---------- */
+
+  function svgHistogram(chart) {
+    const panels = chart.panels.map(panel => {
+      const w = 300, h = 190, padL = 34, padR = 8, padT = 10, padB = 30;
+      const peak = Math.max(...panel.counts, 1);
+      const innerW = w - padL - padR, innerH = h - padT - padB;
+      const barW = innerW / panel.counts.length;
+      const bars = panel.counts.map((count, index) => {
+        const barH = count / peak * innerH;
+        return `<rect x="${(padL + index * barW).toFixed(1)}" y="${(padT + innerH - barH).toFixed(1)}" width="${Math.max(barW - 1.5, 1).toFixed(1)}" height="${barH.toFixed(1)}" fill="${CHART_BLUE}" opacity=".85"/>`;
+      }).join("");
+      const ticks = panel.counts.map((_, index) => index).filter(index => index % Math.ceil(panel.counts.length / 4) === 0);
+      const labels = ticks.map(index => {
+        const value = panel.start + index * panel.step;
+        return `<text x="${(padL + index * barW).toFixed(1)}" y="${h - 12}" font-size="10" fill="${CHART_MUTED}" text-anchor="middle">${value}</text>`;
+      }).join("");
+      let meanMark = "";
+      if (panel.mean !== undefined) {
+        const x = padL + (panel.mean - panel.start) / panel.step * barW;
+        meanMark = `<line x1="${x.toFixed(1)}" y1="${padT}" x2="${x.toFixed(1)}" y2="${padT + innerH}" stroke="${CHART_RED}" stroke-width="2" stroke-dasharray="5 4"/>
+          <text x="${x.toFixed(1)}" y="${padT + 10}" font-size="10" font-weight="700" fill="${CHART_RED}" text-anchor="middle">Ø ${panel.mean}</text>`;
+      }
+      return `<figure class="lc-chart-panel">
+        <figcaption>${fi(panel.title)}</figcaption>
+        <svg viewBox="0 0 ${w} ${h}" role="img" aria-label="${esc(panel.title)}">
+          <line x1="${padL}" y1="${padT}" x2="${padL}" y2="${padT + innerH}" stroke="${CHART_LINE}"/>
+          <line x1="${padL}" y1="${padT + innerH}" x2="${w - padR}" y2="${padT + innerH}" stroke="${CHART_LINE}"/>
+          ${bars}${meanMark}${labels}
+          <text x="${padL - 6}" y="${padT + 8}" font-size="10" fill="${CHART_MUTED}" text-anchor="end">${peak}</text>
+          <text x="${padL - 6}" y="${padT + innerH}" font-size="10" fill="${CHART_MUTED}" text-anchor="end">0</text>
+        </svg>
+        ${chart.xLabel ? `<p class="lc-chart-axis">${esc(chart.xLabel)}</p>` : ""}
+      </figure>`;
+    }).join("");
+    return `<div class="lc-chart-grid">${panels}</div>`;
+  }
+
+  function svgBox(chart) {
+    const groups = chart.groups;
+    const values = groups.flatMap(group => [group.low, group.high, ...(group.outliers || [])]);
+    const lo = Math.min(...values), hi = Math.max(...values);
+    const w = 420, h = 240, padL = 42, padR = 14, padT = 14, padB = 42;
+    const innerH = h - padT - padB, innerW = w - padL - padR;
+    const y = value => padT + innerH - (value - lo) / (hi - lo || 1) * innerH;
+    const slot = innerW / groups.length;
+    const boxW = Math.min(slot * 0.42, 74);
+    const body = groups.map((group, index) => {
+      const cx = padL + slot * (index + 0.5);
+      const outliers = (group.outliers || []).map(value => `<circle cx="${cx}" cy="${y(value).toFixed(1)}" r="2.6" fill="none" stroke="${CHART_MUTED}"/>`).join("");
+      return `<g>
+        <line x1="${cx}" y1="${y(group.low).toFixed(1)}" x2="${cx}" y2="${y(group.high).toFixed(1)}" stroke="${CHART_MUTED}"/>
+        <line x1="${cx - boxW / 4}" y1="${y(group.low).toFixed(1)}" x2="${cx + boxW / 4}" y2="${y(group.low).toFixed(1)}" stroke="${CHART_MUTED}"/>
+        <line x1="${cx - boxW / 4}" y1="${y(group.high).toFixed(1)}" x2="${cx + boxW / 4}" y2="${y(group.high).toFixed(1)}" stroke="${CHART_MUTED}"/>
+        <rect x="${cx - boxW / 2}" y="${y(group.q3).toFixed(1)}" width="${boxW}" height="${Math.max(y(group.q1) - y(group.q3), 1).toFixed(1)}" fill="${CHART_BLUE}" opacity=".16" stroke="${CHART_BLUE}"/>
+        <line x1="${cx - boxW / 2}" y1="${y(group.median).toFixed(1)}" x2="${cx + boxW / 2}" y2="${y(group.median).toFixed(1)}" stroke="${CHART_RED}" stroke-width="2.5"/>
+        ${outliers}
+        <text x="${cx}" y="${h - 22}" font-size="11" fill="${CHART_INK}" text-anchor="middle">${esc(group.label)}</text>
+        <text x="${cx}" y="${h - 8}" font-size="10" fill="${CHART_MUTED}" text-anchor="middle">Median ${group.median}</text>
+      </g>`;
+    }).join("");
+    const gridValues = [lo, (lo + hi) / 2, hi];
+    const grid = gridValues.map(value => `<g><line x1="${padL}" y1="${y(value).toFixed(1)}" x2="${w - padR}" y2="${y(value).toFixed(1)}" stroke="${CHART_LINE}" stroke-dasharray="3 3"/>
+      <text x="${padL - 6}" y="${(y(value) + 3).toFixed(1)}" font-size="10" fill="${CHART_MUTED}" text-anchor="end">${Math.round(value)}</text></g>`).join("");
+    return `<svg class="lc-chart-single" viewBox="0 0 ${w} ${h}" role="img" aria-label="${esc(chart.caption || "Box plot")}">
+      ${grid}${body}
+      ${chart.yLabel ? `<text x="12" y="${padT + innerH / 2}" font-size="10" fill="${CHART_MUTED}" text-anchor="middle" transform="rotate(-90 12 ${(padT + innerH / 2).toFixed(1)})">${esc(chart.yLabel)}</text>` : ""}
+    </svg>`;
+  }
+
+  function svgScatter(chart) {
+    const panels = chart.panels.map(panel => {
+      const w = 210, h = 170, pad = 24;
+      const xs = panel.points.map(point => point[0]), ys = panel.points.map(point => point[1]);
+      const xLo = Math.min(...xs), xHi = Math.max(...xs), yLo = Math.min(...ys), yHi = Math.max(...ys);
+      const sx = value => pad + (value - xLo) / (xHi - xLo || 1) * (w - pad * 1.4);
+      const sy = value => h - pad - (value - yLo) / (yHi - yLo || 1) * (h - pad * 1.7);
+      const dots = panel.points.map(point => `<circle cx="${sx(point[0]).toFixed(1)}" cy="${sy(point[1]).toFixed(1)}" r="3" fill="${CHART_BLUE}" opacity=".6"/>`).join("");
+      return `<figure class="lc-chart-panel">
+        <figcaption>${fi(panel.title)}</figcaption>
+        <svg viewBox="0 0 ${w} ${h}" role="img" aria-label="${esc(panel.title)}">
+          <line x1="${pad}" y1="${pad - 8}" x2="${pad}" y2="${h - pad}" stroke="${CHART_LINE}"/>
+          <line x1="${pad}" y1="${h - pad}" x2="${w - 8}" y2="${h - pad}" stroke="${CHART_LINE}"/>
+          ${dots}
+        </svg>
+        ${panel.note ? `<p class="lc-chart-axis">${fi(panel.note)}</p>` : ""}
+      </figure>`;
+    }).join("");
+    return `<div class="lc-chart-grid">${panels}</div>`;
+  }
+
+  function heatColor(value) {
+    const t = Math.max(-1, Math.min(1, value));
+    if (t >= 0) {
+      const mix = t;
+      const r = Math.round(238 - mix * 230), g = Math.round(247 - mix * 120), b = Math.round(250 - mix * 82);
+      return `rgb(${r},${g},${b})`;
+    }
+    const mix = -t;
+    const r = Math.round(238 + mix * 17), g = Math.round(247 - mix * 200), b = Math.round(250 - mix * 197);
+    return `rgb(${r},${g},${b})`;
+  }
+
+  function svgHeatmap(chart) {
+    const n = chart.labels.length;
+    const cell = 46, padL = 86, padT = 10, padB = 72;
+    const w = padL + n * cell + 10, h = padT + n * cell + padB;
+    let cells = "";
+    for (let row = 0; row < n; row += 1) {
+      for (let col = 0; col < n; col += 1) {
+        const value = chart.matrix[row][col];
+        const x = padL + col * cell, y = padT + row * cell;
+        const strong = Math.abs(value) > 0.72;
+        cells += `<rect x="${x}" y="${y}" width="${cell - 2}" height="${cell - 2}" rx="4" fill="${heatColor(value)}" stroke="${CHART_LINE}"/>
+          <text x="${x + (cell - 2) / 2}" y="${y + (cell - 2) / 2 + 4}" font-size="11" font-weight="${strong ? 800 : 500}" fill="${strong ? "#fff" : CHART_INK}" text-anchor="middle">${value.toFixed(2)}</text>`;
+      }
+    }
+    const rowLabels = chart.labels.map((label, index) => `<text x="${padL - 8}" y="${padT + index * cell + cell / 2}" font-size="11" fill="${CHART_INK}" text-anchor="end">${esc(label)}</text>`).join("");
+    const colLabels = chart.labels.map((label, index) => {
+      const x = padL + index * cell + (cell - 2) / 2, y = padT + n * cell + 10;
+      return `<text x="${x}" y="${y}" font-size="11" fill="${CHART_INK}" text-anchor="end" transform="rotate(-42 ${x} ${y})">${esc(label)}</text>`;
+    }).join("");
+    return `<svg class="lc-chart-single" viewBox="0 0 ${w} ${h}" role="img" aria-label="${esc(chart.caption || "Correlation heatmap")}">${cells}${rowLabels}${colLabels}</svg>`;
+  }
+
+  function svgSampling(chart) {
+    const spec = SAMPLING_PICKS[chart.mode];
+    const total = 12, perGroup = 4;
+    const cellW = 58, h = 150, padT = 26;
+    const w = total * cellW + 16;
+    const picked = new Set(spec.picked);
+    let groupBands = "";
+    if (spec.groups) {
+      for (let group = 0; group < spec.groups; group += 1) {
+        const x = 8 + group * perGroup * cellW;
+        const active = chart.mode !== "cluster" || spec.picked.includes(group * perGroup);
+        groupBands += `<rect x="${x}" y="6" width="${perGroup * cellW - 6}" height="${h - 34}" rx="10" fill="${GROUP_COLORS[group]}" opacity="${active ? ".09" : ".04"}" stroke="${GROUP_COLORS[group]}" stroke-opacity="${active ? ".55" : ".22"}" stroke-dasharray="${active ? "none" : "5 4"}"/>
+          <text x="${x + (perGroup * cellW - 6) / 2}" y="${h - 10}" font-size="11" font-weight="700" fill="${GROUP_COLORS[group]}" text-anchor="middle">${chart.mode === "cluster" ? "Cluster" : "Stratum"} ${String.fromCharCode(65 + group)}${chart.mode === "cluster" && !active ? " (verworfen)" : ""}</text>`;
+      }
+    }
+    let people = "";
+    for (let index = 0; index < total; index += 1) {
+      const cx = 8 + index * cellW + cellW / 2;
+      const on = picked.has(index);
+      const color = spec.groups ? GROUP_COLORS[Math.floor(index / perGroup)] : CHART_BLUE;
+      people += `<g opacity="${on ? 1 : .38}">
+        <circle cx="${cx}" cy="${padT + 14}" r="8.5" fill="${on ? color : "#fff"}" stroke="${color}" stroke-width="1.6"/>
+        <path d="M ${cx - 13} ${padT + 62} v -14 a 13 13 0 0 1 26 0 v 14 z" fill="${on ? color : "#fff"}" stroke="${color}" stroke-width="1.6"/>
+        ${on ? `<path d="M ${cx - 5} ${padT + 74} l 4 5 l 8 -11" fill="none" stroke="#168447" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/>` : ""}
+        ${spec.ordered ? `<text x="${cx}" y="${padT + 92}" font-size="10" fill="${CHART_MUTED}" text-anchor="middle">${20 + index * 2}</text>` : ""}
+      </g>`;
+    }
+    return `<svg class="lc-chart-single" viewBox="0 0 ${w} ${h}" role="img" aria-label="${esc(chart.mode)} sampling">${groupBands}${people}</svg>${chart.note ? "" : `
+      <p class="lc-block-note">${esc(spec.hint)}</p>`}`;
+  }
+
+  function renderChart(chart) {
+    let inner = "";
+    if (chart.kind === "histogram") inner = svgHistogram(chart);
+    else if (chart.kind === "box") inner = svgBox(chart);
+    else if (chart.kind === "scatter") inner = svgScatter(chart);
+    else if (chart.kind === "heatmap") inner = svgHeatmap(chart);
+    else inner = svgSampling(chart);
+    return `<figure class="lc-block lc-chart is-${chart.kind}">
+      ${chart.caption ? `<figcaption>${fi(chart.caption)}</figcaption>` : ""}
+      ${inner}
+      ${chart.note ? `<p class="lc-block-note">${fi(chart.note)}</p>` : ""}
+    </figure>`;
+  }
+
+  function renderBlock(block, index) {
+    if (typeof block === "string") return `<p>${fi(block)}</p>`;
+    if (block.list) return `<ul>${block.list.map(entry => `<li>${fi(entry)}</li>`).join("")}</ul>`;
+    if (block.callout) return renderCallout(block.callout);
+    if (block.table) return renderTable(block.table);
+    if (block.flow) return renderFlow(block.flow);
+    if (block.compare) return renderCompare(block.compare);
+    if (block.cards) return renderCards(block.cards);
+    if (block.formula) return renderFormula(block.formula);
+    if (block.reveal) return renderReveal(block.reveal, `r${index}`);
+    if (block.checklist) return renderChecklist(block.checklist);
+    if (block.sim) return renderSim(block.sim);
+    if (block.chart) return renderChart(block.chart);
+    return "";
   }
 
   function renderSlide(session, slide) {
@@ -386,7 +672,7 @@
     return `<article class="lc-card lc-slide">
       <p class="lc-card-eyebrow">Folie · Schritt ${session.index + 1} von ${session.items.length}</p>
       <h2>${esc(slide.title)}</h2>
-      <div class="lc-prose">${slide.body.map(renderBlock).join("")}</div>
+      <div class="lc-prose">${slide.body.map((block, index) => renderBlock(block, index)).join("")}</div>
       ${remember.length ? `<aside class="lc-remember"><strong>Kurz gemerkt</strong>${remember.length === 1 ? `<p>${L.formatInline(remember[0])}</p>` : `<ul>${remember.map(entry => `<li>${L.formatInline(entry)}</li>`).join("")}</ul>`}</aside>` : ""}
     </article>`;
   }
@@ -662,6 +948,15 @@
       }
       return;
     }
+    if (action === "reveal") {
+      const box = target.closest(".lc-reveal");
+      const answer = box?.querySelector(".lc-reveal-a");
+      if (!answer) return;
+      answer.hidden = false;
+      box.classList.add("is-open");
+      target.remove();
+      return;
+    }
     if (action === "order-add" || action === "order-remove") {
       const found = currentCheckpoint(target.dataset.cp);
       const question = found?.checkpoint.questions.find(item => item.id === target.dataset.q);
@@ -683,6 +978,15 @@
   });
 
   root.addEventListener("change", event => {
+    const box = event.target.closest?.(".lc-checklist");
+    if (box && event.target.matches?.(".lc-check")) {
+      const all = box.querySelectorAll(".lc-check");
+      const done = box.querySelectorAll(".lc-check:checked").length;
+      box.querySelector(".lc-checklist-count").textContent = `${done} / ${all.length}`;
+      box.classList.toggle("is-complete", done === all.length);
+      event.target.closest("label").classList.toggle("is-done", event.target.checked);
+      return;
+    }
     const input = event.target;
     if (!input.matches?.(".lc-option input")) return;
     const found = currentCheckpoint(input.dataset.cp);
@@ -699,6 +1003,18 @@
   });
 
   root.addEventListener("input", event => {
+    if (event.target.matches?.(".lc-sim-range")) {
+      const box = event.target.closest(".lc-sim");
+      const min = Number(box.dataset.min), max = Number(box.dataset.max);
+      const value = Number(event.target.value);
+      const scaled = ((value - min) / (max - min)).toFixed(2);
+      const unit = box.dataset.unit ? ` ${box.dataset.unit}` : "";
+      box.querySelector(".lc-sim-x").textContent = value;
+      box.querySelector(".lc-sim-out").textContent = scaled;
+      box.querySelector(".lc-sim-out2").textContent = scaled;
+      box.querySelector(".lc-sim-raw").textContent = `${value}${unit}`;
+      return;
+    }
     const input = event.target;
     if (!input.matches?.(".lc-text")) return;
     const found = currentCheckpoint(input.dataset.cp);

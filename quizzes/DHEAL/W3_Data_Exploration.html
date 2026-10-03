@@ -192,20 +192,20 @@
     const questions = [
       {
         id: "unit-of-observation", type: "single", topic: "Unit of observation", points: 6,
-        prompt: "Ein Export enthält für einen Patienten mit 4 Spitalaufenthalten insgesamt 12 Labormessungen, eine Zeile pro Messung. Welche Aussage ist gemäss Vorlesung korrekt?",
+        prompt: "Eine Auswertung meldet stolz „Daten von 4'500 Patientinnen und Patienten\". Beim Nachschauen zeigt sich: Jede Zeile ist eine Spitalaufnahme, und viele Personen wurden mehrfach aufgenommen. Was folgt daraus?",
         options: [
-          "Der Datensatz hat 12 unabhängige Patienten, weil jede Zeile ein Sample ist.",
-          "Der Datensatz hat 12 Measurement Records, aber nur 1 unabhängigen Patienten.",
-          "Der Datensatz hat 4 Beobachtungen, weil nur Encounters als Unit of Observation zählen.",
-          "Die Unit of Observation ist zweitrangig, solange die Zeilenzahl gross genug ist."
+          "Nichts Wesentliches, 4'500 Zeilen bleiben 4'500 Datenpunkte.",
+          "Die Unit of Observation ist der Encounter, nicht der Patient. Die Zahl unabhängiger Patienten ist kleiner, und die Zeilen sind nicht unabhängig voneinander.",
+          "Der Datensatz ist unbrauchbar und muss verworfen werden.",
+          "Man muss nur den Mittelwert pro Patient bilden, dann ist das Problem erledigt."
         ], correct: 1,
         optionExplanations: [
-          "Die Zeilenzahl ist nicht die Zahl unabhängiger Patienten. Mehrere Beobachtungen können zur selben Person gehören.",
-          "Genau dieses Zahlenbeispiel steht auf der Folie: Dataset size 12 Measurement Records, Independent patients 1.",
-          "Die Unit of Observation ist hier die einzelne Messung, nicht der Aufenthalt. Encounter wäre eine andere mögliche Unit, aber nicht die hier gewählte.",
-          "Die Vorlesung dreht die Frage ausdrücklich um: Erst klären, was ein Sample darstellt, dann zählen."
+          "Zeilen zählen ist nicht dasselbe wie unabhängige Beobachtungen zählen. Genau davor warnt die Folie.",
+          "Die Folie hält ausdrücklich fest: Die Anzahl Zeilen ist nicht notwendigerweise die Anzahl unabhängiger Patienten. Mehrfachaufenthalte derselben Person sind miteinander verwandt.",
+          "Der Datensatz ist nicht unbrauchbar. Man muss nur wissen, was eine Zeile darstellt, und das bei Analyse und Split berücksichtigen.",
+          "Aggregieren ist eine mögliche Entscheidung, aber keine automatische Lösung. Sie verändert, was eine Beobachtung bedeutet, und wirft dieselbe Frage erneut auf."
         ],
-        solution: "Die Unit of Observation legt fest, was eine Zeile darstellt: Patient, Encounter, Image oder Measurement. Im Folienbeispiel erzeugen 1 Patient, 4 Aufenthalte und 12 Labormessungen einen Datensatz mit 12 Measurement Records und genau 1 unabhängigen Patienten. Wiederholte Beobachtungen derselben Person sind nicht unabhängig.",
+        solution: "Die Unit of Observation legt fest, was eine Zeile darstellt: Patient, Encounter, Image oder Measurement. Hier ist es der Encounter. Im Folienbeispiel erzeugen 1 Patient, 4 Aufenthalte und 12 Labormessungen einen Datensatz mit 12 Measurement Records und genau 1 unabhängigen Patienten. Die praktische Folge: Der Datensatz wirkt grösser und aussagekräftiger, als er ist, und ein zufälliger Split nach Zeilen verteilt dieselbe Person auf Training und Test.",
         reference: "Folie 8", concepts: ["Unit of observation", "Dataset size"]
       },
       {
@@ -323,25 +323,25 @@
         reference: "Folien 26–27", concepts: ["Distribution", "Histogram", "Summary statistics"]
       },
       {
-        id: "boxplot-read", type: "multi", topic: "Box plot lesen", points: 7,
-        prompt: "Welche Aussagen über das Lesen eines Box plots sind korrekt?",
-        hint: "Wähle alle korrekten Aussagen.",
+        id: "boxplot-read", type: "multi", topic: "Box plot interpretieren", points: 7,
+        prompt: "Ein Box plot der Length of Stay zeigt für „not readmitted\" einen Median von 3 Tagen und eine Box von 1.8 bis 4.5, für „readmitted\" einen Median von 4.9 und eine Box von 3.5 bis 6.7. Über der ersten Gruppe liegen zehn einzelne Punkte. Welche Schlüsse sind zulässig?",
+        hint: "Achte darauf, was der Plot zeigt und was er gerade nicht zeigt.",
         options: [
-          "Die Linie in der Box markiert den Median, also die mittlere Beobachtung.",
-          "Die Box umfasst die mittleren 50 % der Beobachtungen, den Interquartilsabstand.",
-          "Punkte ausserhalb der Whisker sind automatisch Messfehler und werden entfernt.",
-          "Die Whisker zeigen den Wertebereich jenseits der Box gemäss der gewählten Box-Plot-Konvention.",
-          "Ein Box plot zeigt den Zusammenhang zwischen zwei numerischen Variablen."
+          "Wieder aufgenommene Patienten hatten tendenziell einen längeren Aufenthalt.",
+          "Die beiden Boxen überlappen, einzelne Patienten lassen sich über die Aufenthaltsdauer allein nicht zuverlässig zuordnen.",
+          "Die zehn Punkte über der ersten Gruppe sind Messfehler und sollten entfernt werden.",
+          "Ein längerer Aufenthalt verursacht die Readmission.",
+          "In jeder Box liegen die mittleren 50 % der Beobachtungen der jeweiligen Gruppe."
         ],
-        correct: [0, 1, 3],
+        correct: [0, 1, 4],
         optionExplanations: [
-          "Der Median ist die Linie innerhalb der Box.",
-          "Der Interquartilsabstand ist genau die Box und enthält die mittleren 50 % der Beobachtungen.",
-          "Die Folie sagt ausdrücklich: Diese Punkte sind beachtenswert, aber nicht automatisch Fehler. Das passt zum Verify-Schritt der EDA.",
-          "Wie weit die Whisker reichen, hängt von der gewählten Konvention ab. Genau so steht es auf der Folie.",
-          "Zwei numerische Variablen gegeneinander ist der Scatter plot. Der Box plot vergleicht eine numerische Variable über Gruppen."
+          "Der Median liegt bei 4.9 statt 3 Tagen, und die ganze Box liegt höher. Das ist ein zulässiger Gruppenvergleich.",
+          "Die Bereiche 1.8 bis 4.5 und 3.5 bis 6.7 überschneiden sich deutlich. Ein Gruppenunterschied im Median macht noch keine Einzelfallzuordnung möglich.",
+          "Die Folie sagt ausdrücklich: Punkte jenseits der Whisker sind beachtenswert, aber nicht automatisch Fehler. Das wäre ein Sprung von Look direkt zu Decide.",
+          "Der Plot zeigt einen Unterschied zwischen Gruppen, keine Ursache. Beides dürfte eher Ausdruck eines schwereren Krankheitsbildes sein.",
+          "Das ist die Definition des Interquartilsabstands, den die Box darstellt."
         ],
-        solution: "Ein Box plot fasst eine numerische Verteilung über Median und Quartile zusammen und macht mehrere Gruppen vergleichbar: Median als Linie, Box als Interquartilsabstand mit den mittleren 50 %, Whisker gemäss Konvention, und Punkte darüber hinaus als beachtenswerte, aber nicht automatisch fehlerhafte Beobachtungen.",
+        solution: "Zulässig sind drei Schlüsse: der Median der wieder aufgenommenen Gruppe liegt höher, die Verteilungen überlappen stark, und die Box enthält je die mittleren 50 % der Beobachtungen. Nicht zulässig sind die beiden häufigsten Fehlschlüsse: Punkte jenseits der Whisker als Fehler zu behandeln, und aus einem Gruppenunterschied eine Ursache zu machen.",
         reference: "Folie 29", concepts: ["Box plot", "Group comparison", "Outliers"]
       },
       {
