@@ -35,6 +35,15 @@ window.QUIZ_CATALOG = {
       maximumScore: 100
     },
     {
+      id: "dheal-w3-data-exploration",
+      subject: "DHEAL",
+      week: 3,
+      title: "Data Processing: Scaling, Visualisation, Sampling",
+      source: "03.digital-health.data-exploration_moodle.pdf",
+      path: "quizzes/DHEAL/W3_Data_Exploration.html",
+      maximumScore: 100
+    },
+    {
       id: "sws1-w2-secure-development-lifecycle",
       subject: "SWS1",
       week: 2,
