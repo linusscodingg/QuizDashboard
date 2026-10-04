@@ -344,7 +344,7 @@
 .lc-tablescroll { max-width: 100%; overflow-x: auto; border: 1px solid var(--line); border-radius: 14px; background: var(--paper); }
 .lc-table { width: 100%; border-collapse: collapse; font-size: .92rem; font-variant-numeric: tabular-nums; }
 .lc-table th, .lc-table td { padding: 9px 12px; text-align: left; border-bottom: 1px solid var(--line); white-space: nowrap; }
-.lc-table thead th { color: #fff; background: var(--navy); font-size: .8rem; letter-spacing: .04em; text-transform: uppercase; }
+.lc-table thead th { color: #fff; background: var(--navy); font-size: .82rem; letter-spacing: .02em; }
 .lc-table tbody tr:last-child td { border-bottom: 0; }
 .lc-table tbody tr:nth-child(even) td { background: #fafdfe; }
 .lc-table td.is-bad { color: var(--red); background: var(--red-bg) !important; font-weight: 800; }

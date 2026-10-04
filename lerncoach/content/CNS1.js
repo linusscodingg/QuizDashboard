@@ -1,6 +1,7 @@
 /*
  * Lerncoach-Inhalte für CNS1 (Communication Networks and Services 1, AS 2025, Andreas Marx).
- * Quellen: W1_IPV6_Part1.pdf, W2_CNS1-sld-02-ipv6-2.pdf, W3_CNS1-sld-03-voip-signaling.pdf
+ * Quellen: W1_IPV6_Part1.pdf, W2_CNS1-sld-02-ipv6-2.pdf, W3_CNS1-sld-03-voip-signaling.pdf,
+ *          W4_CNS1-sld-04-routing-1.pdf
  * Erklärungen auf Deutsch, Checkpoints auf Englisch (Prüfungssprache).
  */
 Lerncoach.registerSubject({
@@ -1371,6 +1372,1031 @@ Lerncoach.registerSubject({
               ],
               correct: [0, 1, 2, 3],
               explanation: "ATAs are often integrated into home routers such as a FRITZ!Box or the Swisscom router."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      id: "w4",
+      number: 4,
+      title: "Routing Part 1: Bellman Ford, RIP, RIPng, EIGRP",
+      status: "ready",
+      items: [
+
+        /* ================= Orientierung ================= */
+        {
+          type: "slide",
+          title: "Folie 5 — Was du nach dieser Vorlesung können musst",
+          body: [
+            { callout: { tone: "exam", title: "Learning Objectives im Wortlaut", text: [
+              "… can understand and describe **dynamical routing protocols** like **RIP**, **RIPng** for IPv6",
+              "… understood the **Bellman Ford Algorithm**",
+              "… learned how **EIGRP** and its metrics works",
+              "… are prepared for the **Lab** working with RIP"
+            ] } },
+            "Vier Ziele, und drei davon sind Protokolle. Das Vierte, Bellman Ford, ist der Algorithmus, der unter RIP und RIPng steckt. Der rote Faden der Vorlesung ist deshalb: **ein Algorithmus, drei Protokolle, die ihn unterschiedlich gut ausnutzen.**",
+            { flow: { steps: [
+              { title: "Warum dynamisch?", text: "Routen von Hand pflegen geht ab wenigen Routern nicht mehr" },
+              { title: "Der Algorithmus", text: "Bellman Ford berechnet kürzeste Wege" },
+              { title: "RIP und RIPng", text: "einfachste Umsetzung, nur Hop Count, max. 15" },
+              { title: "EIGRP", text: "mehrere Metriken, DUAL, nur inkrementelle Updates" }
+            ] } },
+            { callout: { tone: "tip", title: "Zur Sprache", text: "Die Erklärungen sind auf Deutsch, die Checkpoints auf Englisch, weil die Prüfung auf Englisch ist. Englische Fachbegriffe bleiben überall stehen." } }
+          ],
+          remember: "Vier Lernziele: RIP und RIPng beschreiben, Bellman Ford verstehen, EIGRP samt Metrik kennen, aufs RIP-Lab vorbereitet sein."
+        },
+        {
+          type: "slide",
+          title: "Folien 2–4 und 8–10 — Warum dynamisches Routing, und was ein Routing-Protokoll ist",
+          body: [
+            "Die Vorlesung startet mit einer praktischen Frage: Woher kennen eigentlich **alle Router** zwischen deinem Heimrouter und einem beliebigen Ziel im Internet den Weg? Die Folien zeigen das mit Traceroutes, einmal zu Googles DNS-Server und einmal zu einem DNS-Root-Server. Das Paket läuft über **mehrere Hops**, und keiner davon wurde von Hand konfiguriert.",
+            "Folie 8 ordnet die Router zuerst nach ihrer Rolle im Netz ein:",
+            { cards: [
+              { title: "Core Router", text: "Kern des Netzes, hohe Bandbreite, möglichst wenig Zusatzaufgaben" },
+              { title: "Distribution Router", text: "Verteilebene zwischen Kern und Zugang" },
+              { title: "Access Router", text: "Zugangsebene, hier hängen die Endnetze dran" }
+            ] },
+            { callout: { tone: "def", title: "Was ist ein Routing-Protokoll? (Folie 9)", text: [
+              "Ein Routing-Protokoll ist ein **Satz von Regeln, der den Routing-Prozess definiert**.",
+              "Routing-Protokolle unterscheiden sich in der **Komplexität**: Das einfachste stützt sich auf einen einzigen Parameter, zum Beispiel die Anzahl der **Layer-3-Hops**, so wie RIP. Anspruchsvollere Protokolle treffen die Routing-Entscheidung anhand von **mehr als einem Parameter**."
+            ] } },
+            "Folie 10 ordnet die Protokolle den Netzprotokollen zu. Für dich sind die ersten beiden Zeilen relevant:",
+            { table: {
+              caption: "Netzprotokoll und zugehörige Routing-Protokolle, Auszug aus Folie 10",
+              head: ["Network Protocol", "Routing Protocols"],
+              rows: [
+                ["IPv4", "RIP, OSPF, BGP, EGP, IS-IS, IGRP, EIGRP"],
+                ["IPv6", "RIPng, OSPF for IPv6, BGP-4 for IPv6, IS-IS for IPv6, EIGRP for IPv6"],
+                ["Novell IPX", "RIP, (SAP), EIGRP"],
+                ["Apple Talk", "RMTP, EIGRP"],
+                ["DECnet Phase V", "IS-IS"],
+                ["ISO-CLNS", "IS-IS, OSI-IGRP"]
+              ],
+              marks: { "0,0": "focus", "1,0": "focus" },
+              note: "Die unteren vier Zeilen sind historische Einordnung. Blau markiert, was in dieser Vorlesung zählt."
+            } },
+            { reveal: {
+              question: "Warum taucht EIGRP in fast jeder Zeile der Tabelle auf, RIP aber nicht?",
+              label: "Antwort aufdecken",
+              answer: [
+                "Weil EIGRP von Anfang an als **Multi-Protocol-Routing-Protokoll** gebaut wurde und mehrere Netzprotokolle gleichzeitig bedienen kann. In der Tabelle steht es bei IPv4, IPv6, Novell IPX und Apple Talk.",
+                "RIP dagegen ist eng an das jeweilige Netzprotokoll gekoppelt. Für IPv6 brauchte es deshalb eine eigene Variante, **RIPng**, mit eigenem RFC und eigenem UDP-Port. Genau das ist Abschnitt 3 dieser Vorlesung."
+              ]
+            } }
+          ],
+          remember: "Routing-Protokoll = Regelsatz für den Routing-Prozess. RIP nutzt einen Parameter (L3-Hops), anspruchsvollere Protokolle mehrere. Router-Rollen: Core, Distribution, Access."
+        },
+        {
+          type: "checkpoint",
+          id: "cp-overview",
+          title: "Checkpoint: Routing protocols overview",
+          questions: [
+            {
+              id: "what-is",
+              type: "single",
+              prompt: "According to slide 9, what is a routing protocol?",
+              options: [
+                "A set of rules that defines the routing process",
+                "A table that lists all reachable networks",
+                "The hardware interface that forwards packets",
+                "A tunnelling mechanism between two networks"
+              ],
+              correct: 0,
+              explanation: "The slide also notes that routing protocols differ in complexity: the simplest ones use a single parameter such as the L3 hop count."
+            },
+            {
+              id: "ipv6-protocols",
+              type: "multi",
+              prompt: "Which routing protocols does slide 10 list for **IPv6**?",
+              options: [
+                "RIPng",
+                "OSPF for IPv6",
+                "BGP-4 for IPv6",
+                "EIGRP for IPv6",
+                "IGRP for IPv6"
+              ],
+              correct: [0, 1, 2, 3],
+              explanation: "IGRP is listed only as a historical predecessor of EIGRP and is not available for IPv6."
+            },
+            {
+              id: "router-roles",
+              type: "order",
+              prompt: "Order the router roles of slide 8 from the centre of the network towards the end networks.",
+              items: ["Core Router", "Distribution Router", "Access Router"],
+              explanation: "Core is the backbone, distribution is the middle layer, access is where the end networks attach."
+            },
+            {
+              id: "single-param",
+              type: "type",
+              prompt: "Which single parameter does the simplest routing protocol, RIP, base its decision on? (two words, as on slide 9)",
+              accept: ["hop count", "hop-count", "L3 hops", "layer 3 hops", "number of hops", "layer-3 hops", "hops"],
+              placeholder: "two words",
+              explanation: "The number of layer 3 hops. RIP uses nothing else as a metric."
+            }
+          ]
+        },
+
+        /* ================= Bellman Ford ================= */
+        {
+          type: "slide",
+          title: "Folie 12 — Bellman Ford: die Idee hinter RIP",
+          body: [
+            { callout: { tone: "def", title: "Was der Algorithmus tut (Folie 12)", text: [
+              "RIP benutzt den **Bellman-Ford-Algorithmus**, um die optimalen Routen zu berechnen.",
+              "Der Algorithmus löst das **Single Source Shortest Path**-Problem in einem **gewichteten gerichteten Graphen** (weighted digraph). Also: kürzeste Wege von **einem** Startknoten zu allen anderen."
+            ] } },
+            { compare: {
+              left: { title: "Bellman Ford", points: [
+                "Langsamer",
+                "Kann mit **negativen** Kantengewichten umgehen",
+                "Wird von RIP verwendet"
+              ] },
+              right: { title: "Dijkstra", points: [
+                "Schneller",
+                "Kommt mit negativen Gewichten **nicht** zurecht",
+                "Wird von Link-State-Protokollen wie OSPF verwendet"
+              ] },
+              verdict: "Die Folie nennt genau diesen Trade-off: Dijkstra ist schneller, Bellman Ford ist der Allgemeinere."
+            } },
+            "Die Rechenvorschrift, die auf Folie 22 für RIP konkret wird, ist immer dieselbe:",
+            { formula: {
+              main: "d(i, j) = min [ d(i, k) + d(k, j) ]",
+              parts: [
+                { label: "d(i, j)", text: "gesuchte Distanz von Router i zum Ziel j" },
+                { label: "d(i, k)", text: "Distanz von Router i zum Nachbarn k" },
+                { label: "d(k, j)", text: "Distanz, die Nachbar k für das Ziel j gemeldet hat" }
+              ],
+              note: "Router i rechnet also nicht selbst den ganzen Weg aus. Er nimmt das, was seine Nachbarn melden, und addiert die eigene Distanz zum Nachbarn. Genau das ist **Distance Vector**."
+            } },
+            { callout: { tone: "tip", title: "Merkbild", text: "Bellman Ford arbeitet wie Flüsterpost mit Zahlen: Jede Runde erzählt jeder Knoten seinen Nachbarn, wie weit er vom Start entfernt ist. Nach genügend Runden hat sich die beste Zahl überall durchgesetzt." } }
+          ],
+          remember: "Bellman Ford: Single Source Shortest Path im gewichteten gerichteten Graphen. Langsamer als Dijkstra, kommt dafür mit negativen Gewichten klar. d(i,j) = min[d(i,k) + d(k,j)]."
+        },
+        {
+          type: "slide",
+          title: "Folien 13–19 — Bellman Ford Schritt für Schritt",
+          body: [
+            "Die Vorlesung rechnet das Beispiel über **sieben Folien** durch. Wo der Dozent so viel Platz investiert, lohnt sich das Nachvollziehen. Startknoten ist **A**, die Kanten des Graphen sind:",
+            { table: {
+              caption: "Die Kanten des Beispielgraphen mit ihren Gewichten",
+              head: ["Von", "Nach", "Gewicht"],
+              rows: [
+                ["A", "B", "−1"],
+                ["A", "C", "4"],
+                ["B", "C", "3"],
+                ["B", "D", "2"],
+                ["B", "E", "2"],
+                ["C", "D", "5"],
+                ["D", "B", "1"],
+                ["D", "E", "−3"]
+              ],
+              marks: { "0,2": "focus", "7,2": "focus" },
+              note: "Blau die beiden negativen Gewichte. Genau sie sind der Grund, warum hier Bellman Ford und nicht Dijkstra gerechnet wird."
+            } },
+            "So entwickeln sich die Distanzen von A aus. Jede Zeile ist eine Runde, die Spalte **# hops** zählt die benutzten Kanten:",
+            { table: {
+              caption: "Der Ablauf der Folien 13 bis 19",
+              head: ["Runde", "# hops", "A", "B", "C", "D", "E"],
+              rows: [
+                ["Start", "0", "0", "∞", "∞", "∞", "∞"],
+                ["1", "1", "0", "−1", "∞", "∞", "∞"],
+                ["2", "2", "0", "−1", "2", "∞", "∞"],
+                ["3", "2", "0", "−1", "2", "1", "∞"],
+                ["4", "3", "0", "−1", "2", "1", "−2"]
+              ],
+              marks: { "4,3": "good", "4,4": "good", "4,5": "good", "4,6": "good" },
+              note: "Grün das Endergebnis: A = 0, B = −1, C = 2, D = 1, E = −2."
+            } },
+            { reveal: {
+              question: "Rechne nach: Warum ist C am Ende 2 und nicht 4, obwohl es eine direkte Kante A → C mit Gewicht 4 gibt?",
+              label: "Rechnung prüfen",
+              answer: [
+                "Weil der Umweg über B billiger ist: **A → B → C = (−1) + 3 = 2**. Die direkte Kante A → C kostet 4.",
+                "Genau das macht der Algorithmus in jeder Runde: Er prüft für jeden Knoten, ob ein Weg über einen Nachbarn kürzer ist als der bisher bekannte."
+              ]
+            } },
+            { reveal: {
+              question: "Und warum ist E am Ende −2 und nicht 1?",
+              label: "Rechnung prüfen",
+              answer: [
+                "Es gibt zwei Wege zu E. Der direkte über B: **A → B → E = (−1) + 2 = 1**. Und der über D: **A → B → D → E = (−1) + 2 + (−3) = −2**.",
+                "Der zweite ist kürzer, obwohl er einen Hop mehr braucht. Deshalb steht in der letzten Zeile der Tabelle # hops = 3.",
+                "Merke: **Mehr Hops heisst nicht automatisch teurer**, sobald die Kanten unterschiedliche Gewichte haben. Bei RIP ist das anders, dort kostet jeder Hop genau 1."
+              ]
+            } },
+            { callout: { tone: "warn", title: "Wichtiger Hinweis auf Folie 19", text: "Der Dozent schreibt ausdrücklich dazu: Das ist nur ein Beispiel zur Erklärung des Algorithmus. **In RIP-gerouteten Netzen hat normalerweise jede Teilstrecke die Metrik 1.** Negative Gewichte kommen im echten RIP also nicht vor." } }
+          ],
+          remember: "Beispiel: Start A, Ergebnis A = 0, B = −1, C = 2, D = 1, E = −2. C über B (−1+3 = 2) statt direkt (4), E über D (−1+2−3 = −2) statt über B (1). In echtem RIP hat jede Teilstrecke Metrik 1."
+        },
+        {
+          type: "checkpoint",
+          id: "cp-bellman",
+          title: "Checkpoint: Bellman Ford",
+          questions: [
+            {
+              id: "bf-problem",
+              type: "single",
+              prompt: "Which problem does the Bellman Ford algorithm solve?",
+              options: [
+                "Single source shortest path in a weighted digraph",
+                "All pairs shortest path in an undirected graph",
+                "Minimum spanning tree",
+                "Maximum flow between two nodes"
+              ],
+              correct: 0,
+              explanation: "Slide 12 states it exactly like this: single source shortest path in a weighted digraph."
+            },
+            {
+              id: "bf-vs-dijkstra",
+              type: "multi",
+              prompt: "What does slide 12 say about Bellman Ford compared to Dijkstra?",
+              options: [
+                "Dijkstra is faster",
+                "Bellman Ford can handle negative weights",
+                "Bellman Ford is used by RIP",
+                "Dijkstra cannot be used for routing at all"
+              ],
+              correct: [0, 1, 2],
+              explanation: "Dijkstra is widely used for routing as well, for example in link state protocols. The slide only says it cannot handle negative weights."
+            },
+            {
+              id: "bf-formula",
+              type: "type",
+              prompt: "Complete the distance vector formula from slide 22: d(i,j) = min [ d(i,k) + ... ]",
+              accept: ["d(k,j)", "d(k, j)", "dkj", "d k j"],
+              placeholder: "the missing term",
+              explanation: "d(i,j) = min [ d(i,k) + d(k,j) ]. Router i adds its own distance to neighbour k to whatever k reports for destination j."
+            },
+            {
+              id: "bf-result",
+              type: "single",
+              prompt: "In the lecture example the final distance from A to E is −2, reached via A → B → D → E. Why is this better than A → B → E?",
+              options: [
+                "Because (−1) + 2 + (−3) = −2 is smaller than (−1) + 2 = 1, even though it uses one more hop",
+                "Because a path with more hops is always preferred in Bellman Ford",
+                "Because the direct edge B → E does not exist",
+                "Because negative weights are always skipped"
+              ],
+              correct: 0,
+              explanation: "With different edge weights, more hops can still mean a lower total cost. In real RIP every leg costs 1, so this cannot happen."
+            }
+          ]
+        },
+
+        /* ================= RIP ================= */
+        {
+          type: "slide",
+          title: "Folie 21 — RIP: der Steckbrief",
+          body: [
+            "Jetzt vom Algorithmus zum Protokoll. Diese Tabelle ist der Kern von Lernziel 1 und sollte sitzen:",
+            { table: {
+              caption: "RIP und RIPng nach Folie 21",
+              head: ["Eigenschaft", "Wert"],
+              rows: [
+                ["Typ", "Distance vector routing protocol"],
+                ["Algorithmus", "Bellman Ford"],
+                ["Metrik", "ausschliesslich der Layer-3-Hop-Count"],
+                ["Maximaler Hop-Count", "15, in RIPv2 und RIPng gleichermassen"],
+                ["Transportprotokoll", "UDP"],
+                ["Portnummer", "520 (RIP für IPv4)"],
+                ["Administrative Distance", "120"]
+              ],
+              marks: { "3,1": "focus", "5,1": "focus", "6,1": "focus" }
+            } },
+            "Die RFC-Geschichte zeigt, wie oft nachgebessert wurde:",
+            { table: {
+              caption: "Die RFCs von Folie 21",
+              head: ["RFC", "Inhalt"],
+              rows: [
+                ["RFC 1058", "RIPv1 für IPv4"],
+                ["RFC 1388", "RIPv2 für IPv4, aktualisiert RFC 1058"],
+                ["RFC 1723", "löst RFC 1388 ab, IPv4"],
+                ["RFC 2453", "löst RFC 1723 und RFC 1388 ab, IPv4"],
+                ["RFC 2080", "spezifiziert RIPng, also RIP für IPv6"]
+              ],
+              marks: { "4,0": "focus" }
+            } },
+            { callout: { tone: "exam", title: "Die Zahl, an der alles hängt", text: "**15 Hops Maximum.** Damit ist RIP für grosse Netze unbrauchbar, und genau daraus erklären sich fast alle Nachteile, die später kommen. Der Wert **16 bedeutet unendlich**, also unerreichbar." } },
+            { reveal: {
+              question: "Warum reicht RIP ein einziger Zähler als Metrik nicht aus, um gute Wege zu finden?",
+              label: "Überlegung aufdecken",
+              answer: [
+                "Weil der Hop-Count nichts über die **Qualität** einer Strecke sagt. Ein Weg über zwei 64-kbit/s-Leitungen hat zwei Hops, ein Weg über drei Gigabit-Links hat drei. RIP würde den langsamen Weg wählen.",
+                "Genau das ist die Lücke, die EIGRP später mit **Bandwidth und Delay** als Metriken schliesst. Folie 9 hat es schon angekündigt: Anspruchsvollere Protokolle entscheiden anhand von mehr als einem Parameter."
+              ]
+            } }
+          ],
+          remember: "RIP: Distance Vector, Bellman Ford, nur Hop-Count, max. 15 Hops (16 = unendlich), UDP Port 520, Administrative Distance 120. RIPng in RFC 2080."
+        },
+        {
+          type: "slide",
+          title: "Folien 23, 26–27 — Topology Database, Timer und Konvergenz",
+          body: [
+            "Jeder Router kennt nur seine **Nachbarn** und das, was diese melden. Dieses Wissen steht in der Topology Database, die alle 30 Sekunden per RIP Update Report aufgefrischt wird:",
+            { table: {
+              caption: "Struktur der RIP Topology Database für IPv4, Folie 23",
+              head: ["Feld", "Bedeutung"],
+              rows: [
+                ["Destination", "IPv4-Adresse des Hosts oder Netzes"],
+                ["Metric", "Administrative Distance bzw. Anzahl Layer-3-Hops zum Ziel"],
+                ["Gateway", "IPv4-Adresse des Nachbarknotens auf dem Weg"],
+                ["Timer", "vergangene Zeit seit dem letzten Update"],
+                ["Link Interface", "Schnittstelle des Geräts, zum Beispiel ein Ethernet-Port"]
+              ],
+              note: "In der Cisco-Routing-Tabelle beginnen RIP-Einträge mit dem Buchstaben R."
+            } },
+            "Die vier Timer von Folie 26 entscheiden, wie schnell RIP auf Ausfälle reagiert:",
+            { table: {
+              caption: "RIP-Timer nach Folie 26",
+              head: ["Timer", "Standardwert", "Wirkung"],
+              rows: [
+                ["Update", "30 s", "im stabilen Betrieb wird alle 30 Sekunden die Tabelle verschickt"],
+                ["Invalid", "180 s", "kommt 180 s kein Update für einen Eintrag, wird er ungültig und bekommt Metrik 16 (∞)"],
+                ["Hold Down", "180 s", "während dieser Zeit akzeptiert der Router keine positiven Meldungen für eine als ungültig erklärte Route, das dient der Netzstabilität"],
+                ["Flush", "240 s", "ungültige Routen werden nach Ablauf gelöscht"]
+              ],
+              marks: { "1,2": "bad", "2,2": "warn" }
+            } },
+            "Folie 27 zeigt, was das praktisch bedeutet. Eine Kette von Routern ohne **triggered updates** lernt pro Update-Intervall genau **einen Hop dazu**:",
+            { table: {
+              caption: "Aufbau der Einträge d(Ni, N1) in einer Router-Kette, Folie 27",
+              head: ["Zeitpunkt", "R2", "R3", "R4", "R5"],
+              rows: [
+                ["Start", "∞", "∞", "∞", "∞"],
+                ["nach 30 s", "1", "∞", "∞", "∞"],
+                ["nach 60 s", "1", "2", "∞", "∞"],
+                ["nach 90 s", "1", "2", "3", "∞"],
+                ["nach 120 s", "1", "2", "3", "4"],
+                ["nach 150 s", "1", "2", "3", "4"]
+              ],
+              note: "∞ bedeutet «unreachable». Moderne Routing-Protokolle haben triggered updates und warten nicht auf das nächste Intervall."
+            } },
+            { callout: { tone: "warn", title: "Zwei Ungenauigkeiten in den Folien", text: [
+              "Auf Folie 27 ist der zweite Router in der Zeichnung **zweimal als R2** beschriftet. Gemeint ist eine Kette R1 bis R6, bei der sich die Distanz pro 30-Sekunden-Intervall um einen Hop weiterschiebt. Die fünfte Spalte erreicht auf der Folie nach 150 Sekunden den Wert 5.",
+              "Auf Folie 28 stehen in der 30-Sekunden-Zeile die Netze **10.0.4.0** und **10.0.5.0** sowie das Gateway **10.0.3.2**. In der 60-Sekunden-Zeile heissen dieselben Einträge korrekt 10.1.4.0, 10.1.5.0 und 10.1.3.2. Die 10.0.x.x-Angaben sind Tippfehler."
+            ] } }
+          ],
+          remember: "Topology Database: Destination, Metric, Gateway, Timer, Link Interface. Timer: Update 30 s, Invalid 180 s (dann Metrik 16), Hold Down 180 s, Flush 240 s. Ohne triggered updates ein Hop pro Intervall."
+        },
+        {
+          type: "slide",
+          title: "Folie 28 — RIP Convergence Sample: vier Router, 90 Sekunden",
+          body: [
+            "Das ist die Folie, die du für das Lab brauchst. Vier Router in einer Kette, fünf Netze. Zu Beginn kennt jeder Router nur seine **direkt angeschlossenen** Netze mit 0 Hops.",
+            { table: {
+              caption: "Wie sich die Routing-Tabelle von R1 füllt, nach Folie 28",
+              head: ["Zeitpunkt", "Netz", "via", "Hops"],
+              rows: [
+                ["0 s", "10.1.1.0", "– –", "0"],
+                ["0 s", "10.1.2.0", "– –", "0"],
+                ["30 s", "10.1.3.0", "10.1.2.2", "1"],
+                ["60 s", "10.1.4.0", "10.1.2.2", "2"],
+                ["90 s", "10.1.5.0", "10.1.2.2", "3"]
+              ],
+              marks: { "4,0": "good", "4,3": "good" },
+              note: "Nach 90 Sekunden ist das Netz konvergiert. R1 erreicht das entfernteste Netz 10.1.5.0 mit 3 Hops."
+            } },
+            "Zwei Dinge, die man an dieser Tabelle sehen soll:",
+            { cards: [
+              { title: "Das Gateway bleibt gleich", text: "Alle gelernten Routen von R1 zeigen auf 10.1.2.2, also den direkten Nachbarn. Ein Distance-Vector-Router kennt nur den nächsten Schritt, nicht den ganzen Pfad." },
+              { title: "Die Hop-Zahl wächst pro Intervall", text: "30 s → 1 Hop, 60 s → 2 Hops, 90 s → 3 Hops. Dieselbe Mechanik wie in der Kette auf Folie 27." }
+            ] },
+            { reveal: {
+              question: "Wie lange würde die Konvergenz dauern, wenn die Kette nicht 4, sondern 10 Router hätte? Und wo liegt das harte Limit?",
+              label: "Überlegung aufdecken",
+              answer: [
+                "Pro Update-Intervall von 30 Sekunden wandert die Information einen Hop weiter. Bei 10 Routern sind es 9 Teilstrecken, also rund **9 × 30 s = 270 Sekunden**, also viereinhalb Minuten, bis alle Bescheid wissen.",
+                "Das harte Limit ist aber nicht die Zeit, sondern die **15 Hops**. Ein Netz, das tiefer als 15 Hops ist, lässt sich mit RIP überhaupt nicht vollständig abbilden. Alles ab 16 gilt als unerreichbar.",
+                "Zusammen mit der Tatsache, dass alle 30 Sekunden die **komplette** Tabelle verschickt wird (Folie 37), ist das der Grund, warum RIP für grosse Netze ungeeignet ist."
+              ]
+            } }
+          ],
+          remember: "Convergence Sample: vier Router, konvergiert nach 90 Sekunden, R1 erreicht 10.1.5.0 mit 3 Hops über 10.1.2.2. Pro 30-Sekunden-Intervall ein Hop weiter."
+        },
+        {
+          type: "checkpoint",
+          id: "cp-rip",
+          title: "Checkpoint: RIP basics, timers and convergence",
+          questions: [
+            {
+              id: "rip-port",
+              type: "type",
+              prompt: "Which UDP port number is reserved for RIP (the IPv4 version)?",
+              accept: ["520", "UDP 520", "port 520"],
+              placeholder: "number",
+              explanation: "RIP for IPv4 uses UDP port 520. RIPng uses 521."
+            },
+            {
+              id: "rip-max",
+              type: "single",
+              prompt: "A RIP route shows a metric of 16. What does that mean?",
+              options: [
+                "The destination is unreachable, 16 stands for infinity",
+                "The destination is 16 hops away and still usable",
+                "The route was learned from another routing protocol",
+                "The hold down timer has expired"
+              ],
+              correct: 0,
+              explanation: "The maximum usable RIP hop count is 15. A metric of 16 marks the route as invalid and unreachable."
+            },
+            {
+              id: "rip-timers",
+              type: "multi",
+              prompt: "Which statements about the RIP timers on slide 26 are correct?",
+              options: [
+                "In a stable RIP process updates are sent every 30 seconds",
+                "After 180 seconds without an update an entry becomes invalid and gets metric 16",
+                "The hold down timer has a default value of 180 seconds",
+                "The flush timer has a default value of 240 seconds",
+                "Invalid routes are deleted immediately when they become invalid"
+              ],
+              correct: [0, 1, 2, 3],
+              explanation: "Invalid routes are only flushed after the flush timer of 240 seconds has elapsed, not immediately."
+            },
+            {
+              id: "rip-db",
+              type: "order",
+              prompt: "Put the fields of the RIP topology database (slide 23) in the order shown on the slide.",
+              items: ["Destination", "Metric", "Gateway", "Timer", "Link Interface"],
+              explanation: "Destination, Metric, Gateway, Timer, Link Interface. In a Cisco routing table RIP entries start with the letter R."
+            },
+            {
+              id: "rip-converge",
+              type: "single",
+              prompt: "In the convergence sample on slide 28, after how many seconds does R1 know the most distant network 10.1.5.0, and with which metric?",
+              options: [
+                "After 90 seconds with 3 hops",
+                "After 30 seconds with 1 hop",
+                "After 60 seconds with 2 hops",
+                "After 120 seconds with 4 hops"
+              ],
+              correct: 0,
+              explanation: "One hop per 30 second update interval, so the third hop is learned after 90 seconds. The slide marks that moment as «Convergence!»."
+            }
+          ]
+        },
+
+        /* ================= RIPv2 Format und Konfiguration ================= */
+        {
+          type: "slide",
+          title: "Folien 24–25 und 29–31 — Konfiguration und RIPv2-Nachrichtenformat",
+          body: [
+            "Die Konfiguration auf Folie 24 ist erstaunlich kurz. Unter Cisco IOS genügt pro Router der Aufruf von `router rip` und danach je ein `network`-Eintrag für jedes direkt angeschlossene Netz:",
+            { table: {
+              caption: "Konfiguration von Router 1 im Beispiel der Folie 24",
+              head: ["Befehl", "Bedeutung"],
+              rows: [
+                ["`router rip`", "wechselt in die RIP-Konfiguration"],
+                ["`network 192.168.1.0`", "das LAN von Router 1, /24"],
+                ["`network 192.168.4.0`", "Inter-Router-Netz, /30"],
+                ["`network 192.168.5.0`", "zweites Inter-Router-Netz, /30"]
+              ],
+              note: "Netzmasken im Beispiel: LAN /24 = 255.255.255.0, Inter-Router-Netze /30 = 255.255.255.252."
+            } },
+            "Die Folien 29 bis 31 zerlegen die RIPv2-Nachricht. Eine Nachricht besteht aus einem **Header** und **einem oder mehreren Entries**:",
+            { table: {
+              caption: "RIPv2-Nachricht nach den Folien 29 bis 31",
+              head: ["Teil", "Feld", "Wert und Bedeutung"],
+              rows: [
+                ["Header", "Command", "0x01 = RIP-Request, 0x02 = RIP-Response"],
+                ["Header", "Version", "0x02"],
+                ["Entry", "Address Family Indicator (AFI)", "0x0002 = IP, 0xFFFF = Authentisierung vorhanden"],
+                ["Entry", "Route Tag", "kennzeichnet Ziele, die ausserhalb der Routing-Domain gelernt wurden, also Nicht-RIP-Routen"],
+                ["Entry", "IPv4 Address", "das Zielnetz"],
+                ["Entry", "Subnet Mask", "die zugehörige Maske"],
+                ["Entry", "Next Hop", "IP-Adresse des anderen Routers, unter dessen Adresse die Routen angekündigt werden"],
+                ["Entry", "Metric", "der Hop-Count"]
+              ],
+              marks: { "2,2": "focus", "3,2": "focus" },
+              note: "Maximal 25 Entries pro Nachricht, jeder Entry ist 20 Bytes gross."
+            } },
+            { callout: { tone: "tip", title: "Woran du den Route Tag erkennst", text: "Der Route Tag ist das Feld, mit dem RIP unterscheidet, ob eine Route **innerhalb** der eigenen Routing-Domain gelernt wurde oder von **aussen** hereingereicht wurde, etwa aus BGP. Bei RIPng heisst das Feld gleich und hat dieselbe Aufgabe." } }
+          ],
+          remember: "Konfiguration: router rip plus je ein network-Eintrag. RIPv2-Nachricht: Header (Command 0x01/0x02, Version 0x02) plus max. 25 Entries à 20 Bytes mit AFI, Route Tag, IPv4-Adresse, Subnetzmaske, Next Hop und Metrik."
+        },
+
+        /* ================= RIPng ================= */
+        {
+          type: "slide",
+          title: "Folien 33 und 37–39 — RIPng: was gleich bleibt und was sich ändert",
+          body: [
+            "RIPng ist nicht einfach RIP mit längeren Adressen. Aber die Unterschiede sind überschaubar, und genau deshalb lohnt sich eine saubere Gegenüberstellung:",
+            { compare: {
+              left: { title: "RIP für IPv4", points: [
+                "RFC 2453 als aktuelle Fassung",
+                "UDP Port **520**",
+                "max. 15 Hops, Kosten pro Hop fest **1**",
+                "max. **25** Entries pro Nachricht",
+                "Administrative Distance 120"
+              ] },
+              right: { title: "RIPng für IPv6", points: [
+                "RFC **2080**",
+                "UDP Port **521**",
+                "max. 15 Hops, Kosten pro Hop **manuell konfigurierbar**",
+                "**26** RTE pro Nachricht (524 Bytes)",
+                "Administrative Distance 120"
+              ] },
+              verdict: "Gleich bleiben: Bellman Ford, die Grenze von 15, das 30-Sekunden-Intervall und die Administrative Distance 120."
+            } },
+            { callout: { tone: "exam", title: "Die konfigurierbaren Hop-Kosten", text: "RIPng erlaubt, die **Kosten für einen Layer-3-Hop manuell** festzulegen. Das Beispiel der Folie: Setzt man sie auf **2**, ergibt sich eine neue Grenze von **7 «doppelten» Hops**, weil 7 × 2 = 14 noch unter 15 liegt. Die 15 bleibt also stehen, nur ihre Bedeutung ändert sich." } },
+            "Die Rechnung auf Folie 38 wird gern gefragt, weil sie in einer Zeile geht:",
+            { formula: {
+              main: "524 Bytes verfügbar  ÷  20 Bytes pro RTE  =  26 RTE",
+              parts: [
+                { label: "524 Bytes", text: "Grösse der eingekapselten RIPng-Nachricht" },
+                { label: "20 Bytes", text: "Grösse eines Routing Table Entry (RTE)" },
+                { label: "26", text: "so viele RTE passen in eine RIPng-Nachricht" }
+              ],
+              note: "Der RIPng-Header selbst ist 4 Bytes gross, mit Command und Version."
+            } },
+            { table: {
+              caption: "RIPng-Felder nach den Folien 35 bis 38",
+              head: ["Feld", "Bedeutung"],
+              rows: [
+                ["Command", "1 = request an das Zielsystem, 2 = reply vom Zielsystem zurück"],
+                ["Version", "0000 0001"],
+                ["Route Tag", "weitere Information zur Route, etwa dass sie aus BGP-4 gelernt wurde"],
+                ["Metric", "Wert 0xFF (255) bedeutet: Der IPv6-Prefix dieses RTE ist eine Next-Hop-Adresse"]
+              ],
+              marks: { "3,1": "focus" },
+              note: "Neben den angeforderten Antworten gibt es «untasked responses», nämlich die periodisch gesendeten Routing-Updates."
+            } },
+            { callout: { tone: "warn", title: "Der eigentliche Schwachpunkt (Folie 37)", text: "RIPng sendet **alle 30 Sekunden die komplette Routing-Tabelle** an alle Nachbarn. Die Folie nennt das ausdrücklich als einen Grund, warum RIP für grosse Router-Netze nicht gut geeignet ist: Es erzeugt schlicht zu viel Verkehr. Genau hier setzt EIGRP an." } }
+          ],
+          remember: "RIPng: RFC 2080, UDP 521, gleicher Bellman Ford, max. 15, Hop-Kosten konfigurierbar (2 → 7 doppelte Hops), 26 RTE in 524 Bytes, AD 120, Metrik 0xFF = Next-Hop-Adresse, alle 30 s die ganze Tabelle."
+        },
+        {
+          type: "checkpoint",
+          id: "cp-ripng",
+          title: "Checkpoint: RIPv2 message format and RIPng",
+          questions: [
+            {
+              id: "ripng-port",
+              type: "type",
+              prompt: "Which UDP port does RIPng use?",
+              accept: ["521", "UDP 521", "port 521"],
+              placeholder: "number",
+              explanation: "RIPng uses UDP port 521, RIP for IPv4 uses 520."
+            },
+            {
+              id: "rte-count",
+              type: "single",
+              prompt: "A RIPng message offers 524 bytes and one RTE needs 20 bytes. How many RTEs fit into one message?",
+              options: ["26", "25", "20", "32"],
+              correct: 0,
+              explanation: "524 / 20 = 26. For RIPv2 the limit is 25 entries of 20 bytes each, so do not mix up the two numbers."
+            },
+            {
+              id: "ripng-same",
+              type: "multi",
+              prompt: "What stays the same between RIP for IPv4 and RIPng?",
+              options: [
+                "The Bellman Ford algorithm",
+                "The maximum metric of 15",
+                "The administrative distance of 120",
+                "The update interval of 30 seconds",
+                "The UDP port number"
+              ],
+              correct: [0, 1, 2, 3],
+              explanation: "Only the port differs: 520 for RIP, 521 for RIPng."
+            },
+            {
+              id: "ripv2-afi",
+              type: "single",
+              prompt: "In a RIPv2 entry the Address Family Indicator is set to 0xFFFF. What does that indicate?",
+              options: [
+                "Authentication is present",
+                "The entry carries an IP address",
+                "The route is unreachable",
+                "The entry is the last one in the message"
+              ],
+              correct: 0,
+              explanation: "0x0002 indicates IP, 0xFFFF indicates that authentication is present."
+            },
+            {
+              id: "ripng-cost",
+              type: "single",
+              prompt: "RIPng lets you set the cost per layer 3 hop manually. If you set it to 2, what is the practical limit?",
+              options: [
+                "7 «double» hops, because the maximum metric of 15 still applies",
+                "30 hops, because the limit doubles as well",
+                "15 hops, the setting has no effect on the limit",
+                "There is no limit any more"
+              ],
+              correct: 0,
+              explanation: "The ceiling of 15 stays. With a cost of 2 per hop only 7 hops fit below it, which is exactly the example on slide 33."
+            }
+          ]
+        },
+
+        /* ================= EIGRP ================= */
+        {
+          type: "slide",
+          title: "Folien 42–43 — Von IGRP zu EIGRP",
+          body: [
+            "EIGRP hat einen Vorgänger, und der Vergleich erklärt, warum EIGRP so aussieht, wie es aussieht:",
+            { compare: {
+              left: { title: "IGRP (Folie 42)", points: [
+                "Cisco-proprietär, entwickelt in den 1980er-Jahren",
+                "**classful** routing, kein CIDR",
+                "**keine** variable length subnet masks (VLSM)",
+                "Routing-Updates alle **90 Sekunden**",
+                "eher Distance Vector als Link State",
+                "Support endete mit IOS 12.3 im Jahr 2005"
+              ] },
+              right: { title: "EIGRP (Folie 43)", points: [
+                "Cisco-proprietär ab 1992, **Open Standard 2013**, RFC 7868",
+                "**classless**, CIDR wird unterstützt",
+                "VLSM wird unterstützt",
+                "nur **inkrementelle** Updates statt periodischer",
+                "partielle Erneuerung der Routing-Tabellen, schnelle Konvergenz",
+                "zusätzlicher Faktor in der Metrik-Formel"
+              ] },
+              verdict: "Die Folie nennt drei Hauptunterschiede: classful gegen classless, ein zusätzlicher Faktor im Metrik-Kalkül, und inkrementelle statt vollständiger Updates."
+            } },
+            { callout: { tone: "tip", title: "Kleine Stolperfalle aus der Folie", text: "Cisco IOS ist das **Internetwork Operating System** der Router. Die Folie weist ausdrücklich darauf hin, es nicht mit Apples iOS auf dem iPhone zu verwechseln." } }
+          ],
+          remember: "IGRP: classful, kein VLSM, Updates alle 90 s, Support bis IOS 12.3 (2005). EIGRP: classless, VLSM, CIDR, inkrementelle Updates, seit 2013 Open Standard in RFC 7868."
+        },
+        {
+          type: "slide",
+          title: "Folien 44–46 — Nachbarschaft, drei Tabellen und DUAL",
+          body: [
+            "EIGRP arbeitet grundlegend anders als RIP: Es schickt nicht blind die ganze Tabelle in die Gegend, sondern baut zuerst eine **Nachbarschaft** auf und meldet danach nur noch Änderungen.",
+            { flow: { steps: [
+              { title: "Hello", text: "alle 5 Sekunden, per Multicast oder Unicast, braucht keine Bestätigung" },
+              { title: "Nachbar werden", text: "wer ein Hello hört, versucht Nachbar des anderen Routers zu werden" },
+              { title: "Update", text: "als Init Set, Routes Sent und End of Table, in TLVs verpackt" },
+              { title: "ACK", text: "jedes Update-Paket wird einzeln bestätigt" }
+            ], note: "Erst nach dieser Nachbarschaft werden Routen überhaupt verarbeitet und in die Routing Information Base (RIB) aufgenommen." } },
+            { cards: [
+              { title: "Neighbor table", text: "wer sind meine direkten EIGRP-Nachbarn?" },
+              { title: "Topology table", text: "welche Wege kenne ich insgesamt?" },
+              { title: "Routing table", text: "welcher Weg wird tatsächlich benutzt?" }
+            ] },
+            { callout: { tone: "def", title: "DUAL, Diffusing Update Algorithm (Folie 46)", text: [
+              "EIGRP benutzt **DUAL**, um die günstigsten Wege zu allen erreichbaren Zielen zu konstruieren.",
+              "DUAL garantiert, dass jeder konstruierte Pfad **schleifenfrei** ist. Erreicht wird das dadurch, dass Update-Nachrichten nur an die Router gehen, die von einer Topologieänderung **betroffen** sind. Nicht betroffene Router werden in die Neuberechnung gar nicht einbezogen.",
+              "Dadurch ist die Konvergenzzeit sehr kurz, weil wenig Overhead entsteht."
+            ] } },
+            { callout: { tone: "exam", title: "Die Zahlen, die man sich merken muss", text: "**Hello alle 5 Sekunden.** Nach **16 fehlenden ACK-Nachrichten** wird ein Nachbar aus der Neighbor table entfernt. Multicast **224.0.0.10** für IPv4 und **FF02::A** für IPv6, transportiert über Ciscos **RTP** (Reliable Transport Protocol)." } },
+            { reveal: {
+              question: "RIP schickt alle 30 Sekunden die ganze Tabelle, EIGRP alle 5 Sekunden ein Hello. Erzeugt EIGRP damit nicht viel mehr Verkehr?",
+              label: "Überlegung aufdecken",
+              answer: [
+                "Nein, im Gegenteil. Ein **Hello** ist eine winzige Nachricht, die nur sagt «ich bin noch da». Sie enthält keine Routing-Information und braucht nicht einmal eine Bestätigung.",
+                "Die teuren Nachrichten sind die **Updates**, und genau die verschickt EIGRP nur bei neuen Netzen oder Topologieänderungen. Es gibt **keine periodischen Updates und keine vollständigen Tabellen-Updates**.",
+                "Bei RIP ist es umgekehrt: Die teure Nachricht, die komplette Tabelle, geht alle 30 Sekunden raus, auch wenn sich nichts geändert hat. Das ist der Punkt, den Folie 37 als Grund gegen RIP in grossen Netzen nennt."
+              ]
+            } }
+          ],
+          remember: "EIGRP: Hello alle 5 s ohne ACK, 16 fehlende ACKs → Nachbar weg, mcast 224.0.0.10 bzw. FF02::A über RTP. Drei Tabellen: Neighbor, Topology, Routing. DUAL baut schleifenfreie Pfade und bezieht nur betroffene Router ein."
+        },
+        {
+          type: "slide",
+          title: "Folien 47–49 — Die EIGRP-Metrik rechnen",
+          body: [
+            "Das ist der Rechenteil der Vorlesung und zugleich Lernziel 3. EIGRP benutzt **Bandwidth** und **Delay** statt eines blossen Hop-Zählers.",
+            { formula: {
+              main: "Metric = 256 × ( BW_EIGRP + Σ DLY_EIGRP )",
+              parts: [
+                { label: "BW_EIGRP", text: "10^7 geteilt durch die **kleinste** Bandbreite auf dem Pfad, in kbit/s" },
+                { label: "Σ DLY_EIGRP", text: "Summe aller Delays der ausgehenden Interfaces, in µs geteilt durch 10" },
+                { label: "256 ×", text: "fester Skalierungsfaktor" }
+              ],
+              note: "Entscheidend: Bei der Bandbreite zählt nur der langsamste Link des ganzen Pfads, bei den Delays wird aufsummiert."
+            } },
+            { table: {
+              caption: "Die Werte-Tabelle von Folie 47",
+              head: ["Interface", "BW in bps", "BW in kbps", "BW_EIGRP", "Delay in µs", "DLY_EIGRP"],
+              rows: [
+                ["Serial", "64'000", "64", "156'250", "20'000", "2'000"],
+                ["Serial", "1'544'000", "1'544", "6'477", "20'000", "2'000"],
+                ["10 Mbps", "10'000'000", "10'000", "1'000", "1'000", "100"],
+                ["100 Mbps", "100'000'000", "100'000", "100", "100", "10"],
+                ["1 Gbps", "1'000'000'000", "1'000'000", "10", "10", "1"],
+                ["10 Gbps", "10'000'000'000", "10'000'000", "1", "10", "1"]
+              ],
+              marks: { "2,3": "focus", "3,3": "focus", "2,5": "focus", "3,5": "focus" },
+              note: "Blau die vier Werte, die im Rechenbeispiel der Folie 49 gebraucht werden."
+            } },
+            "Und so rechnet die Folie 49 das Beispiel durch. Drei ausgehende Interfaces in Flussrichtung, Links mit 100, 100 und 10 Mbit/s:",
+            { table: {
+              caption: "Rechenbeispiel von Folie 49",
+              head: ["Schritt", "Rechnung", "Ergebnis"],
+              rows: [
+                ["Langsamster Link bestimmen", "10 Mbit/s auf dem Pfad", "entscheidet die Bandbreite"],
+                ["BW_EIGRP", "10^7 / 10'000 kbit/s", "1'000"],
+                ["Delays summieren", "10 + 100 + 10", "120"],
+                ["Metrik", "( 1'000 + 120 ) × 256", "286'720"]
+              ],
+              marks: { "3,2": "good" }
+            } },
+            { reveal: {
+              question: "Rechne selbst: Ein Pfad besteht aus drei 100-Mbit/s-Links. Wie gross ist die EIGRP-Metrik?",
+              label: "Rechnung prüfen",
+              answer: [
+                "**BW_EIGRP:** Der langsamste Link ist 100 Mbit/s, also 100'000 kbit/s. 10^7 / 10^5 = **100**.",
+                "**Σ DLY_EIGRP:** Ein 100-Mbit/s-Interface hat laut Tabelle DLY_EIGRP = 10. Drei ausgehende Interfaces ergeben 10 + 10 + 10 = **30**.",
+                "**Metrik:** ( 100 + 30 ) × 256 = 130 × 256 = **33'280**.",
+                "Zum Vergleich: Das Beispiel der Folie kommt auf 286'720, weil dort ein einziger 10-Mbit/s-Link den Wert BW_EIGRP von 100 auf 1'000 hochtreibt. Ein einziger langsamer Link verschlechtert also den ganzen Pfad."
+              ]
+            } },
+            { callout: { tone: "warn", title: "Widerspruch auf Folie 48", text: "Die Folie zeigt die vollständige Composite-Metric-Formel mit den Konstanten K1 bis K5 und schreibt zweierlei: einmal «Often, K2 and K4 are = 0 and K5 = 1», was zur vereinfachten Formel von Folie 47 führt, und einmal «By default, K1 and K3 have a value of 1, and K2, K4, and K5 are set to 0». Beide Sätze stehen auf derselben Folie. Für die Rechnung gilt die **vereinfachte Form** von Folie 47, die Composite-Formel musst du nur einordnen können." } }
+          ],
+          remember: "Metric = 256 × (BW_EIGRP + Σ DLY_EIGRP). BW_EIGRP = 10^7 / kleinste Bandbreite in kbit/s. DLY_EIGRP = Delay in µs / 10, über alle ausgehenden Interfaces summiert. Beispiel der Folie: (1'000 + 120) × 256 = 286'720."
+        },
+        {
+          type: "slide",
+          title: "Folien 50–52 und 56 — Pakete, Transport und der EIGRP-Steckbrief",
+          body: [
+            "Folie 50 ergänzt, dass jede Update-Nachricht die Metriken **pro Subnetz** mitführt und diese bei jedem Hop aktualisiert werden. So kann jeder Router mit DUAL unabhängig den kürzesten Weg bestimmen.",
+            { table: {
+              caption: "EIGRP-Pakettypen nach Folie 51",
+              head: ["Typ", "Opcode", "Name", "Funktion", "Transport"],
+              rows: [
+                ["1", "5", "Hello", "Entdeckung von EIGRP-Nachbarn und Erkennen, wenn ein Nachbar nicht mehr verfügbar ist", "multicast"],
+                ["2", "5", "Request / ACK", "bestimmte Information von Nachbarn holen, Empfang eines EIGRP-Pakets bestätigen", "unicast"],
+                ["3", "1", "Update", "Routing- und Erreichbarkeitsinformation übertragen", "multicast oder unicast"],
+                ["4", "3", "Query", "Nachfrage bei Nachbarn", "–"],
+                ["5", "–", "Reply", "Antwort auf eine Query", "–"]
+              ],
+              note: "Die Folie listet fünf Pakettypen. Zu Query und Reply nennt sie keine weiteren Details."
+            } },
+            "Folie 52 zeigt, wie EIGRP transportiert wird, und hier wird es interessant:",
+            { table: {
+              caption: "EIGRP-Kapselung nach Folie 52",
+              head: ["Bestandteil", "IPv4", "IPv6"],
+              rows: [
+                ["Vorangehender Header", "IPv4 Header, 20 Bytes", "IPv6 Header, 40 Bytes"],
+                ["EIGRP Header", "20 Bytes", "20 Bytes"],
+                ["Danach", "ein oder mehrere TLVs", "ein oder mehrere TLVs"],
+                ["Multicast-Adresse", "224.0.0.10", "FF02::A"]
+              ]
+            } },
+            { callout: { tone: "warn", title: "Achtung, 88 ist kein Port", text: "Folie 51 spricht von «port number 88», Folie 52 hält aber ausdrücklich fest, dass EIGRP **nicht in TCP oder UDP eingekapselt** wird, sondern Ciscos RTP direkt über Layer 3 nutzt, und zeigt im IPv6-Bild «Next Header EIGRP (88)». Die 88 ist also die **Protokollnummer** auf Layer 3, nicht eine Portnummer auf Layer 4. Merke dir die Zahl, aber ordne sie richtig ein." } },
+            { table: {
+              caption: "EIGRP-Steckbrief nach Folie 56",
+              head: ["Eigenschaft", "Wert"],
+              rows: [
+                ["Metriken", "Bandwidth und Delay"],
+                ["Updates", "partielle Erneuerung der Routing-Tabellen, inkrementell"],
+                ["Hello-Intervall", "5 Sekunden (Standard)"],
+                ["VLSM und CIDR", "werden unterstützt"],
+                ["Administrative Distance", "90 als IGP, 170 als EGP"],
+                ["IP-Versionen", "IPv4 und IPv6"],
+                ["Standardisierung", "Open Standard 21 Jahre nach der ersten Veröffentlichung, RFC 7868"],
+                ["Schicht", "läuft über dem Network Layer (Layer 3)"],
+                ["Maximaler Hop-Count", "bis zu 256 möglich"]
+              ],
+              marks: { "4,1": "focus", "8,1": "focus" }
+            } },
+            { reveal: {
+              question: "Ein Netz hat 40 Router in einer Kette. Welches der drei Protokolle dieser Vorlesung kommt überhaupt infrage?",
+              label: "Antwort aufdecken",
+              answer: [
+                "Nur **EIGRP**. RIP und RIPng sind bei **15 Hops** am Ende, ein 40 Hops tiefes Netz lässt sich damit nicht abbilden.",
+                "EIGRP erlaubt laut Folie 56 Hop-Counts **bis zu 256**. Dazu kommt, dass EIGRP keine periodischen Volltabellen verschickt, was bei 40 Routern den entscheidenden Unterschied im Verkehrsaufkommen macht.",
+                "Und die Konvergenz: RIP bräuchte ohne triggered updates rund 39 × 30 s, also über 19 Minuten. EIGRP konvergiert mit DUAL deutlich schneller, weil nur betroffene Router rechnen."
+              ]
+            } }
+          ],
+          remember: "Fünf Pakettypen: Hello, Request/ACK, Update, Query, Reply. EIGRP-Header 20 Bytes, nicht in TCP/UDP, Protokollnummer 88, RTP über Layer 3. AD 90 als IGP und 170 als EGP, Hop-Counts bis 256."
+        },
+        {
+          type: "checkpoint",
+          id: "cp-eigrp",
+          title: "Checkpoint: EIGRP",
+          questions: [
+            {
+              id: "eigrp-metrics",
+              type: "multi",
+              prompt: "Which statements about EIGRP are correct according to slides 43, 44 and 56?",
+              options: [
+                "EIGRP uses bandwidth and delay as metrics",
+                "EIGRP sends Hello messages every 5 seconds",
+                "EIGRP sends only incremental updates, no periodic full table updates",
+                "EIGRP supports VLSM and CIDR",
+                "EIGRP sends its complete routing table every 30 seconds"
+              ],
+              correct: [0, 1, 2, 3],
+              explanation: "Sending the complete table every 30 seconds is RIP behaviour, and slide 37 names it as a reason why RIP does not scale."
+            },
+            {
+              id: "eigrp-calc",
+              type: "type",
+              prompt: "A path has a slowest link of 10 Mbit/s and outgoing interface delays summing to DLY_EIGRP = 120. What is the EIGRP metric? (number only)",
+              accept: ["286720", "286'720", "286.720", "286 720"],
+              placeholder: "number",
+              explanation: "BW_EIGRP = 10^7 / 10'000 = 1'000. Metric = (1'000 + 120) × 256 = 286'720. This is exactly the example on slide 49."
+            },
+            {
+              id: "eigrp-bw",
+              type: "single",
+              prompt: "Which bandwidth on the path determines BW_EIGRP?",
+              options: [
+                "The lowest bandwidth on the whole path",
+                "The highest bandwidth on the whole path",
+                "The average of all link bandwidths",
+                "The bandwidth of the first outgoing interface"
+              ],
+              correct: 0,
+              explanation: "Only the slowest link counts for the bandwidth part. The delays, in contrast, are summed over all outgoing interfaces."
+            },
+            {
+              id: "eigrp-dual",
+              type: "single",
+              prompt: "What does DUAL guarantee, and how?",
+              options: [
+                "Loop free paths, by involving only the routers affected by a topology change",
+                "The shortest path in hops, by flooding the whole network",
+                "Encrypted updates, by using RTP",
+                "Backwards compatibility with IGRP"
+              ],
+              correct: 0,
+              explanation: "Routers that are not affected are not involved in the recalculation, which keeps the overhead and the convergence time low."
+            },
+            {
+              id: "eigrp-ad",
+              type: "type",
+              prompt: "What is the administrative distance of EIGRP as an IGP? (number only)",
+              accept: ["90", "AD 90"],
+              placeholder: "number",
+              explanation: "90 as an IGP and 170 as an EGP. RIP and RIPng both have 120."
+            }
+          ]
+        },
+
+        /* ================= Abschluss ================= */
+        {
+          type: "slide",
+          title: "Die drei Protokolle im direkten Vergleich",
+          body: [
+            "Diese Tabelle ist dein Nachschlagewerk für die Prüfung. Alle Werte stammen aus den Folien 21, 33, 39 und 56.",
+            { table: {
+              caption: "RIP, RIPng und EIGRP nebeneinander",
+              head: ["Eigenschaft", "RIP (IPv4)", "RIPng (IPv6)", "EIGRP"],
+              rows: [
+                ["Typ", "Distance Vector", "Distance Vector", "Distance Vector mit DUAL"],
+                ["Algorithmus", "Bellman Ford", "Bellman Ford", "DUAL"],
+                ["Metrik", "Hop-Count", "Hop-Count", "Bandwidth und Delay"],
+                ["Max. Hops", "15", "15", "bis zu 256"],
+                ["Transport", "UDP", "UDP", "RTP direkt über Layer 3"],
+                ["Port bzw. Nummer", "UDP 520", "UDP 521", "Protokollnummer 88"],
+                ["Administrative Distance", "120", "120", "90 (IGP), 170 (EGP)"],
+                ["Updates", "ganze Tabelle alle 30 s", "ganze Tabelle alle 30 s", "nur inkrementell bei Änderung"],
+                ["Hello", "–", "–", "alle 5 s"],
+                ["Multicast", "–", "–", "224.0.0.10 bzw. FF02::A"],
+                ["RFC", "2453", "2080", "7868"]
+              ],
+              marks: { "3,1": "warn", "3,2": "warn", "3,3": "good", "7,1": "warn", "7,2": "warn", "7,3": "good" },
+              note: "Rot markiert die beiden Schwächen von RIP, grün die entsprechenden Stärken von EIGRP."
+            } }
+          ],
+          remember: "Die Merkzahlen: RIP 520 / 15 / 120, RIPng 521 / 15 / 120, EIGRP 88 / 256 / 90 bzw. 170. RFCs: 2453, 2080, 7868."
+        },
+        {
+          type: "slide",
+          title: "Das muss ich nach dieser Vorlesung können",
+          body: [
+            "Hak ab, was sitzt. Was offen bleibt, weisst du, wo du es nachlesen musst.",
+            { checklist: { title: "Kann ich das jetzt?", items: [
+              "Ich kann erklären, was ein **Routing-Protokoll** ist und wodurch sich einfache von anspruchsvollen unterscheiden.",
+              "Ich kann sagen, welches Problem **Bellman Ford** löst und warum RIP ihn statt Dijkstra verwendet.",
+              "Ich kann die Formel **d(i,j) = min[d(i,k) + d(k,j)]** erklären und auf ein kleines Netz anwenden.",
+              "Ich kann das Bellman-Ford-Beispiel der Vorlesung nachrechnen und begründen, warum C = 2 und E = −2 herauskommt.",
+              "Ich kenne den **RIP-Steckbrief**: Hop-Count, max. 15, 16 = unendlich, UDP 520, AD 120.",
+              "Ich kann die vier **RIP-Timer** nennen: 30, 180, 180 und 240 Sekunden, und sagen, was jeder bewirkt.",
+              "Ich kann erklären, warum ein RIP-Netz pro 30 Sekunden nur **einen Hop** weiterlernt.",
+              "Ich kann **RIP und RIPng** gegenüberstellen und nenne mindestens drei Unterschiede.",
+              "Ich kann ausrechnen, dass **26 RTE** in eine RIPng-Nachricht passen, und erklären warum.",
+              "Ich kann **IGRP von EIGRP** unterscheiden, vor allem classful gegen classless.",
+              "Ich kann erklären, was **DUAL** tut und warum EIGRP dadurch schnell konvergiert.",
+              "Ich kann die **EIGRP-Metrik** von Hand rechnen, inklusive der Regel, dass nur der langsamste Link zählt.",
+              "Ich kenne die **Administrative Distances**: RIP und RIPng 120, EIGRP 90 bzw. 170."
+            ] } }
+          ],
+          remember: "Dreizehn Punkte. Was nicht abgehakt ist, kommt auf den Wiederholungsstapel."
+        },
+        {
+          type: "slide",
+          title: "Transfer: drei Szenarien zum Selberdenken",
+          body: [
+            "Diese Fälle stehen so nicht auf den Folien. Sie verbinden mehrere Konzepte, und genau das wird in Prüfungen gern verlangt.",
+            { reveal: {
+              question: "**Szenario 1.** In einem RIP-Netz fällt eine Leitung aus. Ein Techniker beschwert sich, dass die Router nach zwei Minuten immer noch die alte Route anzeigen. Ist das ein Defekt?",
+              label: "Analyse aufdecken",
+              answer: [
+                "Nein, das ist normales RIP-Verhalten. Ein Eintrag wird erst **ungültig**, wenn **180 Sekunden** lang kein Update dafür eingetroffen ist. Nach zwei Minuten, also 120 Sekunden, ist dieser Timer noch nicht abgelaufen.",
+                "Danach bekommt der Eintrag die Metrik **16**, gilt also als unerreichbar. Gelöscht wird er aber erst nach dem **Flush-Timer von 240 Sekunden**.",
+                "Dazu kommt der **Hold-Down-Timer von 180 Sekunden**, während dessen der Router bewusst keine positiven Meldungen für diese Route annimmt. Das ist kein Fehler, sondern Absicht: Es verhindert, dass veraltete Information im Netz wieder auflebt.",
+                "Genau diese Trägheit ist der Grund, warum modernere Protokolle **triggered updates** nutzen und EIGRP mit DUAL arbeitet."
+              ]
+            } },
+            { reveal: {
+              question: "**Szenario 2.** Zwei Pfade führen zum selben Ziel. Pfad A besteht aus zwei Links mit 10 Mbit/s, Pfad B aus vier Links mit 1 Gbit/s. Welchen Pfad wählt RIP, welchen EIGRP, und welcher ist der bessere?",
+              label: "Analyse aufdecken",
+              answer: [
+                "**RIP** zählt nur Hops und nimmt **Pfad A** mit 2 Hops statt Pfad B mit 4 Hops. Das ist die schlechtere Wahl, denn der Pfad ist auf 10 Mbit/s begrenzt.",
+                "**EIGRP** rechnet mit Bandwidth und Delay. Für Pfad A ist der langsamste Link 10 Mbit/s, also BW_EIGRP = 10^7 / 10'000 = **1'000**. Für Pfad B ist der langsamste Link 1 Gbit/s, also 10^7 / 1'000'000 = **10**. Schon vor den Delays liegt Pfad B um Faktor 100 besser.",
+                "Mit den Delays aus der Tabelle: Pfad A ergibt (1'000 + 100 + 100) × 256 = **307'200**. Pfad B ergibt (10 + 1 + 1 + 1 + 1) × 256 = **3'584**. EIGRP wählt also klar Pfad B.",
+                "Das ist genau der Unterschied, den Folie 9 ankündigt: Ein Parameter gegen mehrere Parameter."
+              ]
+            } },
+            { reveal: {
+              question: "**Szenario 3.** Ein Kollege will RIPng einsetzen und die Kosten pro Hop auf 3 setzen, weil das Netz 20 Router tief ist. Funktioniert das?",
+              label: "Analyse aufdecken",
+              answer: [
+                "Nein, es macht die Lage sogar schlimmer. Die manuell konfigurierbaren Hop-Kosten **erhöhen die Obergrenze nicht**, sie bleibt bei **15**.",
+                "Bei Kosten von 3 pro Hop sind nur noch **5 Hops** möglich, weil 5 × 3 = 15. Das Beispiel der Folie zeigt dasselbe mit dem Wert 2 und 7 Hops.",
+                "Für ein 20 Router tiefes Netz ist RIPng grundsätzlich ungeeignet, schon mit den Standardkosten von 1 pro Hop. Hier braucht es ein Protokoll ohne diese enge Grenze, zum Beispiel **EIGRP** mit Hop-Counts bis 256.",
+                "Die konfigurierbaren Kosten sind dafür gedacht, **langsame Strecken teurer zu machen**, nicht dafür, grössere Netze zu ermöglichen."
+              ]
+            } }
+          ],
+          remember: "Transfer: RIP-Timer erklären scheinbare Defekte. Hop-Count gegen Bandwidth/Delay entscheidet die Pfadwahl. Konfigurierbare RIPng-Kosten senken die erreichbare Hop-Zahl, sie erhöhen sie nicht."
+        },
+        {
+          type: "slide",
+          title: "Was war nur Zusatzwissen?",
+          body: [
+            "Damit du deine Lernzeit richtig verteilst. Diese Punkte solltest du einordnen können, sie brauchen aber nicht denselben Aufwand:",
+            { list: [
+              "**Die Literaturhinweise auf den Folien 11, 40 und 57.** Buchempfehlungen zum Weiterlesen, kein Prüfungsstoff.",
+              "**Die unteren Zeilen der Übersichtstabelle auf Folie 10**, also Novell IPX, Apple Talk, DECnet Phase V und ISO-CLNS. Historische Einordnung. Relevant sind die Zeilen IPv4 und IPv6.",
+              "**Die Detailfelder des EIGRP-Headers auf den Folien 53 bis 55**, etwa Sequence und Acknowledgement. Du musst wissen, dass der EIGRP-Header 20 Bytes hat und dass danach TLVs folgen.",
+              "**Die vollständige Composite-Metric-Formel mit K1 bis K5 auf Folie 48.** Du musst wissen, dass sie existiert und dass die vereinfachte Form von Folie 47 daraus entsteht. Rechnen musst du mit der vereinfachten Form.",
+              "**Die kaskadierte Metrikberechnung auf Folie 50.** Die Idee genügt: Jede Update-Nachricht führt Metriken pro Subnetz mit, und sie werden bei jedem Hop aktualisiert."
+            ] },
+            { callout: { tone: "tip", title: "Faustregel für diese Vorlesung", text: "Investiere die Zeit dort, wo der Dozent mehrere Folien für dasselbe Thema verwendet hat: **sieben Folien** für das Bellman-Ford-Beispiel, **vier** für die EIGRP-Metrik, **drei** für das RIPv2-Format und **drei** für das RIPng-Format." } }
+          ],
+          remember: "Nice to know: Literaturhinweise, historische Protokollzeilen, EIGRP-Headerfelder im Detail, die K1-bis-K5-Formel, die kaskadierte Metrikberechnung."
+        },
+        {
+          type: "checkpoint",
+          id: "cp-final",
+          title: "Exam check: the whole lecture",
+          questions: [
+            {
+              id: "final-compare",
+              type: "multi",
+              prompt: "Which values are correct?",
+              options: [
+                "RIP uses UDP port 520, RIPng uses UDP port 521",
+                "RIP and RIPng both have an administrative distance of 120",
+                "EIGRP has an administrative distance of 90 as an IGP",
+                "EIGRP allows hop counts up to 256",
+                "RIPng allows hop counts up to 256"
+              ],
+              correct: [0, 1, 2, 3],
+              explanation: "RIPng keeps the maximum metric of 15, exactly like RIP for IPv4. Only EIGRP goes up to 256."
+            },
+            {
+              id: "final-path",
+              type: "single",
+              prompt: "Path A has two 10 Mbit/s links, path B has four 1 Gbit/s links. Which path does plain RIP choose, and is it the better one?",
+              options: [
+                "Path A, because it has fewer hops, and it is the worse choice in terms of throughput",
+                "Path B, because RIP prefers faster links",
+                "Path A, and it is also the better choice",
+                "RIP cannot decide between the two"
+              ],
+              correct: 0,
+              explanation: "RIP counts hops only. That is precisely the weakness EIGRP addresses by using bandwidth and delay."
+            },
+            {
+              id: "final-order",
+              type: "order",
+              prompt: "Put the EIGRP neighbour setup in the right order (slides 44 and 45).",
+              items: [
+                "Hello packets are sent every 5 seconds",
+                "A router that hears a Hello tries to become a neighbour",
+                "Once neighboured, routers send Update packets",
+                "Each Update packet is acknowledged by an ACK packet"
+              ],
+              explanation: "Only after the neighbour relationship exists are routes processed and added to the RIB."
+            },
+            {
+              id: "final-timer",
+              type: "type",
+              prompt: "After how many seconds without an update does a RIP entry become invalid? (number only)",
+              accept: ["180", "180 s", "180 seconds", "180s"],
+              placeholder: "number",
+              explanation: "180 seconds. The entry then gets metric 16, and it is flushed after the flush timer of 240 seconds."
+            },
+            {
+              id: "final-why-rip-fails",
+              type: "multi",
+              prompt: "Why is RIP not well suited for large router networks? Pick the reasons the slides actually give.",
+              options: [
+                "The maximum metric of 15 limits the depth of the network",
+                "The complete routing table is sent every 30 seconds, which generates too much traffic",
+                "Without triggered updates the information advances only one hop per update interval",
+                "RIP cannot be configured on Cisco routers"
+              ],
+              correct: [0, 1, 2],
+              explanation: "Slide 24 shows the Cisco IOS configuration for RIP, so the last option is wrong."
             }
           ]
         }
