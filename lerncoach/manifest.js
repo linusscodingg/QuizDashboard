@@ -10,6 +10,7 @@ window.LERNCOACH_MANIFEST = {
     "lerncoach/content/CNS1.js",
     "lerncoach/content/DHEAL.js",
     "lerncoach/content/SWS1.js",
-    "lerncoach/content/ITRECHT.js"
+    "lerncoach/content/ITRECHT.js",
+    "lerncoach/content/RESE.js"
   ]
 };

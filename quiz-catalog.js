@@ -4,7 +4,8 @@ window.QUIZ_CATALOG = {
     { id: "CNS1", name: "CNS1", description: "Computer Networks and Security", accent: "#0b77a5" },
     { id: "DHEAL", name: "Digital Health", description: "Healthcare data, systems and clinical AI", accent: "#237274" },
     { id: "SWS1", name: "SWS1", description: "Software and System Security 1", accent: "#9a4f24" },
-    { id: "ITRECHT", name: "IT-Recht", description: "Rechtliche Grundlagen der Informatik", accent: "#6d4bc3" }
+    { id: "ITRECHT", name: "IT-Recht", description: "Rechtliche Grundlagen der Informatik", accent: "#6d4bc3" },
+    { id: "RESE", name: "RESE", description: "Resilienz-Engineering", accent: "#28736b" }
   ],
   quizzes: [
     {
@@ -86,6 +87,42 @@ window.QUIZ_CATALOG = {
       title: "IT-Verträge und Projektfallen – Open Book",
       source: "W2_ITR-HS26-IT-Verträge, Mf.pdf",
       path: "quizzes/ITRECHT/W2_IT_Vertraege_Open_Book.html",
+      maximumScore: 100
+    },
+    {
+      id: "rese-w1-einfuehrung-begriffsgeschichte",
+      subject: "RESE",
+      week: 1,
+      title: "Einführung und Begriffsgeschichte",
+      source: "01 (01) RESE Introduction - Organisational Matters.pdf; 01 (02) RESE Resilience term history.pdf",
+      path: "quizzes/RESE/W1_Einfuehrung_Begriffsgeschichte.html",
+      maximumScore: 100
+    },
+    {
+      id: "rese-w2-resilienzkurven-selbststudium",
+      subject: "RESE",
+      week: 2,
+      title: "Resilienzkurven und Modelle · Selbststudium",
+      source: "02 (01) RESE Road to Resilience.pdf; 02 (02) RESE Resilience curve and key components.pdf; 02 (01) RESE Road to Resilience_full.pdf (Plan, Folie 3)",
+      path: "quizzes/RESE/W2_Resilienzkurven_Selbststudium.html",
+      maximumScore: 100
+    },
+    {
+      id: "rese-w3-safety-resilience",
+      subject: "RESE",
+      week: 3,
+      title: "Von Safety-I zu Resilience Engineering",
+      source: "02 (01) RESE Road to Resilience_full.pdf",
+      path: "quizzes/RESE/W3_Safety_Resilience.html",
+      maximumScore: 100
+    },
+    {
+      id: "rese-w4-risiko-zuverlaessigkeit-robustheit",
+      subject: "RESE",
+      week: 4,
+      title: "Vulnerabilität, Risiko, Zuverlässigkeit und Robustheit",
+      source: "03 (01) RESE Resilience and the___ of Vulnerability Risk etc.pdf; 03 (02) RESE Group Exercise.pdf; Resilience Curve.pdf",
+      path: "quizzes/RESE/W4_Risiko_Zuverlaessigkeit_Robustheit.html",
       maximumScore: 100
     }
   ]
