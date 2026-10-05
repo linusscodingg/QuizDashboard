@@ -8,6 +8,15 @@ window.QUIZ_CATALOG = {
   ],
   quizzes: [
     {
+      id: "cns1-w4-routing-rip-eigrp",
+      subject: "CNS1",
+      week: 4,
+      title: "Routing: RIP und EIGRP – Exercise Quiz",
+      source: "CNS1-exr-04a-rip.pdf, CNS1-exr-04c-eigrp.pdf",
+      path: "quizzes/CNS1/W4_Routing_RIP_EIGRP_Exercise.html",
+      maximumScore: 100
+    },
+    {
       id: "cns1-w2-ipv6-part2",
       subject: "CNS1",
       week: 2,
