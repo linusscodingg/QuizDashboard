@@ -399,6 +399,54 @@
     return { passed: total > 0 && correctCount === total, correctCount, total, results };
   }
 
+  /* ---------- Nochmal versuchen: Richtiges bleibt richtig ---------- */
+
+  function isQuestionLocked(cpState, questionId) {
+    return Boolean(cpState && cpState.locked && cpState.locked[questionId]);
+  }
+
+  /* Fragen, die noch beantwortet werden müssen. Gesperrte (bereits richtige) Fragen zählen nicht. */
+  function openQuestionCount(checkpoint, cpState) {
+    const answers = (cpState && cpState.answers) || {};
+    return checkpoint.questions.filter(question => !isQuestionLocked(cpState, question.id) && !isAnswered(question, answers[question.id])).length;
+  }
+
+  /*
+   * Bereitet den nächsten Versuch vor. Richtige Antworten (laut cpState.grade.results) bleiben stehen
+   * und werden gesperrt. Falsche und halb falsche Fragen (multi, order) werden geleert und freigegeben.
+   * makeLayout(question) liefert für eine freigegebene Frage ein neues Layout (gemischte Optionen).
+   * Gibt { kept, reopened } zurück. Ohne Bewertung passiert nichts.
+   */
+  function prepareRetry(checkpoint, cpState, makeLayout) {
+    const results = cpState && cpState.grade && cpState.grade.results;
+    if (!results) return { kept: 0, reopened: 0 };
+    const locked = Object.assign({}, cpState.locked);
+    const answers = Object.assign({}, cpState.answers);
+    const layout = Object.assign({}, cpState.layout);
+    let kept = 0;
+    let reopened = 0;
+    checkpoint.questions.forEach(question => {
+      if (results[question.id] && results[question.id].correct) {
+        locked[question.id] = true;
+        kept += 1;
+        return;
+      }
+      delete answers[question.id];
+      delete locked[question.id];
+      if (typeof makeLayout === "function") {
+        const fresh = makeLayout(question);
+        if (fresh !== undefined) layout[question.id] = fresh;
+      }
+      reopened += 1;
+    });
+    cpState.locked = locked;
+    cpState.answers = answers;
+    cpState.layout = layout;
+    cpState.phase = "answer";
+    cpState.grade = null;
+    return { kept, reopened };
+  }
+
   /* ---------- Fortschritt ---------- */
 
   function emptyProgress() {
@@ -575,6 +623,7 @@
     escapeHtml, formatInline, normaliseText, shuffledIndices,
     validateSubject, blockError,
     expectedAnswer, isAnswered, checkQuestion, gradeCheckpoint,
+    isQuestionLocked, openQuestionCount, prepareRetry,
     emptyProgress, normaliseProgress, weekKey, checkpointKey,
     isCheckpointPassed, markCheckpointPassed, setPosition, mergeProgress,
     checkpointsOf, hasContent, weekState, subjectState, canEnter, maxReachableIndex,

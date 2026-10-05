@@ -351,14 +351,20 @@
     return session;
   }
 
+  function questionLayout(question) {
+    if (question.type === "multi" || question.type === "single") return L.shuffledIndices(question.options.length);
+    if (question.type === "order") return L.shuffledIndices(question.items.length, { avoidIdentity: true });
+    return undefined;
+  }
+
   function checkpointState(session, checkpoint) {
     if (!session.checkpoints[checkpoint.id]) {
       const layout = {};
       checkpoint.questions.forEach(question => {
-        if (question.type === "multi" || question.type === "single") layout[question.id] = L.shuffledIndices(question.options.length);
-        if (question.type === "order") layout[question.id] = L.shuffledIndices(question.items.length, { avoidIdentity: true });
+        const entry = questionLayout(question);
+        if (entry !== undefined) layout[question.id] = entry;
       });
-      session.checkpoints[checkpoint.id] = { answers: {}, phase: "answer", grade: null, layout };
+      session.checkpoints[checkpoint.id] = { answers: {}, phase: "answer", grade: null, layout, locked: {} };
     }
     return session.checkpoints[checkpoint.id];
   }
@@ -707,7 +713,7 @@
   }
 
   function renderQuestionBody(checkpoint, question, cpState) {
-    const locked = cpState.phase !== "answer";
+    const locked = cpState.phase !== "answer" || L.isQuestionLocked(cpState, question.id);
     const result = cpState.grade?.results[question.id] || null;
     if (question.type === "type") {
       return `<input class="lc-text" type="text" autocomplete="off" autocapitalize="off" spellcheck="false" data-cp="${esc(checkpoint.id)}" data-q="${esc(question.id)}" value="${esc(cpState.answers[question.id] || "")}" placeholder="${esc(question.placeholder || "Antwort eintippen")}" aria-label="Antwort" ${locked ? "disabled" : ""}>`;
@@ -718,10 +724,11 @@
 
   function renderQuestion(checkpoint, question, index, cpState) {
     const result = cpState.grade?.results[question.id] || null;
-    const feedback = !result ? "" : result.correct
+    const kept = !result && L.isQuestionLocked(cpState, question.id);
+    const feedback = kept ? `<div class="lc-q-result is-ok"><strong>✓ Bereits richtig</strong></div>` : !result ? "" : result.correct
       ? `<div class="lc-q-result is-ok"><strong>✓ Richtig</strong>${question.explanation ? `<p>${L.formatInline(question.explanation)}</p>` : ""}</div>`
       : `<div class="lc-q-result is-bad"><strong>Richtig wäre:</strong> ${esc(result.expected)}${question.type === "type" && question.accept.length > 1 ? `<p class="lc-muted">Ebenfalls akzeptiert: ${esc(question.accept.slice(1).join(", "))}</p>` : ""}${question.explanation ? `<p>${L.formatInline(question.explanation)}</p>` : ""}</div>`;
-    return `<li class="lc-q${result ? (result.correct ? " is-ok" : " is-bad") : ""}">
+    return `<li class="lc-q${result ? (result.correct ? " is-ok" : " is-bad") : kept ? " is-ok is-kept" : ""}">
       <div class="lc-q-head"><span class="lc-q-num">${index + 1}</span><span class="lc-q-type">${esc(TYPE_LABELS[question.type])}</span></div>
       <p class="lc-q-prompt">${L.formatInline(question.prompt)}</p>
       <div class="lc-q-body" data-qbody="${esc(checkpoint.id)}:${esc(question.id)}">${renderQuestionBody(checkpoint, question, cpState)}</div>
@@ -730,13 +737,19 @@
   }
 
   function openCount(checkpoint, cpState) {
-    return checkpoint.questions.filter(question => !L.isAnswered(question, cpState.answers[question.id])).length;
+    return L.openQuestionCount(checkpoint, cpState);
+  }
+
+  function isRetryRound(cpState) {
+    return Object.keys(cpState.locked || {}).length > 0;
   }
 
   function checkControls(checkpoint, cpState) {
     const open = openCount(checkpoint, cpState);
+    const noun = open === 1 ? "Frage" : "Fragen";
+    const status = !open ? "Alle Fragen beantwortet" : isRetryRound(cpState) ? `Noch ${open} ${noun} nochmals lösen` : `Noch ${open} ${noun} offen`;
     return `<button class="button lc-btn-primary" type="button" data-action="check" data-cp="${esc(checkpoint.id)}" ${open ? "disabled" : ""}>Checkpoint prüfen</button>
-      <span class="lc-muted" data-open-count>${open ? `Noch ${open} ${open === 1 ? "Frage" : "Fragen"} offen` : "Alle Fragen beantwortet"}</span>`;
+      <span class="lc-muted" data-open-count>${status}</span>`;
   }
 
   function renderCheckpoint(session, checkpoint) {
@@ -751,7 +764,7 @@
       </div>`;
     } else if (cpState.phase === "failed") {
       footer = `<div class="lc-feedback is-fail" tabindex="-1" data-feedback>
-        <strong>${cpState.grade.correctCount} von ${total} richtig.</strong><span>Für den Checkpoint braucht es alle ${total}. Schau dir die richtigen Antworten an und versuch es nochmal.</span>
+        <strong>${cpState.grade.correctCount} von ${total} richtig.</strong><span>Für den Checkpoint braucht es alle ${total}. Schau dir die richtigen Antworten an. Beim nächsten Versuch löst du nur noch die Fragen, die nicht richtig waren.</span>
         <button class="button lc-btn-primary" type="button" data-action="retry" data-cp="${esc(checkpoint.id)}">Nochmal versuchen</button>
       </div>`;
     }
@@ -759,7 +772,7 @@
     return `<article class="lc-card lc-checkpoint">
       <div class="lc-card-top"><p class="lc-card-eyebrow">${step}</p>${already ? badge("passed") : ""}</div>
       <h2>${esc(checkpoint.title || "Checkpoint")}</h2>
-      <p class="lc-card-lead">${already ? "Du hast diesen Checkpoint bereits bestanden. Du kannst ihn zur Übung nochmals lösen oder direkt weitergehen." : `Beantworte alle ${total} Fragen richtig, um weiterzukommen.`}</p>
+      <p class="lc-card-lead">${already ? "Du hast diesen Checkpoint bereits bestanden. Du kannst ihn zur Übung nochmals lösen oder direkt weitergehen." : isRetryRound(cpState) ? "Die richtigen Antworten bleiben stehen. Löse nur noch die offenen Fragen." : `Beantworte alle ${total} Fragen richtig, um weiterzukommen.`}</p>
       <ol class="lc-questions">${checkpoint.questions.map((question, index) => renderQuestion(checkpoint, question, index, cpState)).join("")}</ol>
       ${footer}
     </article>`;
@@ -920,10 +933,11 @@
     root.querySelector("[data-feedback]")?.scrollIntoView({ block: "nearest", behavior: "smooth" });
   }
 
+  /* Richtiges bleibt richtig: richtige Antworten bleiben gesperrt stehen, nur falsche und halb falsche Fragen werden geleert. */
   function retry(checkpointId) {
-    const session = state.session;
-    if (!session) return;
-    delete session.checkpoints[checkpointId];
+    const found = currentCheckpoint(checkpointId);
+    if (!found || found.cpState.phase !== "failed") return;
+    L.prepareRetry(found.checkpoint, found.cpState, questionLayout);
     render();
     scrollToStage();
     root.querySelector(".lc-q input:not([disabled]), .lc-q button:not([disabled])")?.focus({ preventScroll: true });
@@ -960,7 +974,7 @@
     if (action === "order-add" || action === "order-remove") {
       const found = currentCheckpoint(target.dataset.cp);
       const question = found?.checkpoint.questions.find(item => item.id === target.dataset.q);
-      if (!found || !question || found.cpState.phase !== "answer") return;
+      if (!found || !question || found.cpState.phase !== "answer" || L.isQuestionLocked(found.cpState, question.id)) return;
       const built = Array.isArray(found.cpState.answers[question.id]) ? found.cpState.answers[question.id].slice() : [];
       let focus = null;
       if (action === "order-add") {
@@ -991,7 +1005,7 @@
     if (!input.matches?.(".lc-option input")) return;
     const found = currentCheckpoint(input.dataset.cp);
     const question = found?.checkpoint.questions.find(item => item.id === input.dataset.q);
-    if (!found || !question || found.cpState.phase !== "answer") return;
+    if (!found || !question || found.cpState.phase !== "answer" || L.isQuestionLocked(found.cpState, question.id)) return;
     if (question.type === "single") {
       found.cpState.answers[question.id] = Number(input.value);
     } else {
@@ -1018,7 +1032,7 @@
     const input = event.target;
     if (!input.matches?.(".lc-text")) return;
     const found = currentCheckpoint(input.dataset.cp);
-    if (!found || found.cpState.phase !== "answer") return;
+    if (!found || found.cpState.phase !== "answer" || L.isQuestionLocked(found.cpState, input.dataset.q)) return;
     found.cpState.answers[input.dataset.q] = input.value;
     refreshControls(found.checkpoint, found.cpState);
   });

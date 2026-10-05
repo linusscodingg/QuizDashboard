@@ -54,6 +54,15 @@ window.QUIZ_CATALOG = {
       maximumScore: 100
     },
     {
+      id: "dheal-w4-regression",
+      subject: "DHEAL",
+      week: 4,
+      title: "Regression: Predicting Continuous Outcomes",
+      source: "04_digital-health_regression_moodle.pdf",
+      path: "quizzes/DHEAL/W4_Regression.html",
+      maximumScore: 100
+    },
+    {
       id: "sws1-w2-secure-development-lifecycle",
       subject: "SWS1",
       week: 2,
