@@ -18,6 +18,15 @@ window.QUIZ_CATALOG = {
       maximumScore: 100
     },
     {
+      id: "cns1-w5-routing-ospf-isis",
+      subject: "CNS1",
+      week: 5,
+      title: "Routing Part 2: OSPF, OSPFv3, IS-IS",
+      source: "W5_CNS1-sld-05-routing-2.pdf",
+      path: "quizzes/CNS1/W5_Routing_OSPF_ISIS.html",
+      maximumScore: 100
+    },
+    {
       id: "cns1-w2-ipv6-part2",
       subject: "CNS1",
       week: 2,
