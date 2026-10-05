@@ -43,6 +43,54 @@ assert.equal(grade.results.o.correct, false);
 grade = L.gradeCheckpoint(checkpoint, { t: "SIP", m: [0, 2], o: [0, 1, 2, 3] });
 assert.equal(grade.passed, true);
 
+/* ---------- Nochmal versuchen: Richtiges bleibt richtig ---------- */
+
+{
+  const retryState = {
+    answers: { t: "SIP", m: [0], o: [0, 1, 3, 2] },   // t richtig, m halb richtig, o halb richtig
+    phase: "failed",
+    grade: L.gradeCheckpoint(checkpoint, { t: "SIP", m: [0], o: [0, 1, 3, 2] }),
+    layout: { m: [3, 1, 0, 2], o: [3, 2, 1, 0] },
+    locked: {}
+  };
+  assert.equal(retryState.grade.correctCount, 1);
+  assert.deepEqual(L.prepareRetry(checkpoint, retryState, question => (question.type === "multi" ? [0, 1, 2, 3] : question.type === "order" ? [1, 0, 3, 2] : undefined)),
+    { kept: 1, reopened: 2 });
+  assert.equal(retryState.phase, "answer", "Phase geht zurück auf answer");
+  assert.equal(retryState.grade, null);
+  assert.deepEqual(retryState.locked, { t: true }, "nur die richtige Frage ist gesperrt");
+  assert.equal(retryState.answers.t, "SIP", "richtige Antwort bleibt stehen");
+  assert.equal("m" in retryState.answers, false, "halb richtige multi-Frage wird geleert");
+  assert.equal("o" in retryState.answers, false, "halb richtige order-Frage wird geleert");
+  assert.deepEqual(retryState.layout, { m: [0, 1, 2, 3], o: [1, 0, 3, 2] }, "freigegebene Fragen bekommen ein neues Layout");
+  assert.equal(L.isQuestionLocked(retryState, "t"), true);
+  assert.equal(L.isQuestionLocked(retryState, "m"), false);
+  assert.equal(L.openQuestionCount(checkpoint, retryState), 2, "nur die zwei offenen Fragen zählen");
+
+  retryState.answers.m = [0, 2];
+  assert.equal(L.openQuestionCount(checkpoint, retryState), 1);
+  retryState.answers.o = [0, 1, 2, 3];
+  assert.equal(L.openQuestionCount(checkpoint, retryState), 0);
+  const second = L.gradeCheckpoint(checkpoint, retryState.answers);
+  assert.equal(second.passed, true, "bestanden, sobald alle Fragen richtig sind, egal in welchem Versuch");
+
+  // zweiter Fehlversuch: gesperrte Fragen bleiben gesperrt, neu Richtiges kommt dazu
+  const again = {
+    answers: { t: "SIP", m: [0, 2], o: [0, 1, 3, 2] }, phase: "failed",
+    grade: L.gradeCheckpoint(checkpoint, { t: "SIP", m: [0, 2], o: [0, 1, 3, 2] }),
+    layout: {}, locked: { t: true }
+  };
+  assert.deepEqual(L.prepareRetry(checkpoint, again), { kept: 2, reopened: 1 });
+  assert.deepEqual(again.locked, { t: true, m: true });
+  assert.equal(L.openQuestionCount(checkpoint, again), 1);
+
+  // ohne Bewertung passiert nichts
+  const untouched = { answers: { t: "x" }, phase: "answer", grade: null, layout: {}, locked: {} };
+  assert.deepEqual(L.prepareRetry(checkpoint, untouched), { kept: 0, reopened: 0 });
+  assert.deepEqual(untouched.answers, { t: "x" });
+  assert.equal(L.openQuestionCount(checkpoint, { answers: {}, locked: {} }), 3, "ohne gesperrte Fragen zählt jede unbeantwortete");
+}
+
 /* ---------- Mischen ---------- */
 
 let seed = 1;
