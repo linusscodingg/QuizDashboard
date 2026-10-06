@@ -1,5 +1,26 @@
 /*
  * Lerncoach-Inhalte für Digital Health.
+ * Woche 1: Lecture 01 Introduction to Digital Health.pdf, vollständig Folien 1–40 gelesen.
+ *   A: Bedarf, Wirkungskette, Fehlerfolgen, Canvas und Einsatzentscheidung (4, 10–39)
+ *      -> Fall-Reveals, cp-scope/workflow/care-data/evidence/system/transfer, W1-Quiz.
+ *   B: Stakeholder und Wertdimensionen (13–15) -> Vergleich und cp-workflow.
+ *   C: Kursorganisation (5–8), Studienzahlen -> Orientierung, keine Zahlenabfrage.
+ *   Lab01_patient_data_to_decision_template.ipynb, besonders Abschnitte 8, 11–14:
+ *      -> Beobachtungseinheit und Entscheidungszeit als Brücke zu Woche 2.
+ * Woche 2: Lecture 02  Healthcare Data.pdf, vollständig Folien 1–36 gelesen.
+ *   A: Datenentstehung, Semantik, Zeitfenster, Missingness, Proxy-Labels, Leakage (5–35)
+ *      -> Tabellen/Rechnungen/Transfers, cp-care/semantics/longitudinal/quality/clock/reality.
+ *   B: Modalitäten, Provenance, DICOM/PACS/FHIR (10–13, 22, 24–27)
+ *      -> Strukturen und cp-semantics/labels-systems.
+ *   C: Kursübersicht und einzelne Messzahlen -> Kontext, Zahlenverständnis statt Memorieren.
+ *   Lab_02_Healthcare_Data_template.ipynb, Abschnitte 1–6:
+ *      -> IDs, Nenner, Aggregation, 0–24-h-Features und Data Reality Check.
+ * W1/W2: Folien visuell gelesen; Foliennummer = PDF-Seite. Exakte Belege je Schritt.
+ * W1 Folie 21: zweiter Absatz ist als False negatives beschriftet, beschreibt aber
+ * False Positives; anhand Definition und Grafik derselben Folie kenntlich berichtigt.
+ * Eigene Fälle/Zahlen sind ausdrücklich markiert. Originaldateien bleiben ausserhalb des Repos.
+ * Keine medizinischen Handlungsschwellen oder zusätzlichen Prüfungsregeln abgeleitet.
+ *
  * Woche 3 aus: DHEAL/Lectures/03.digital-health.data-exploration_moodle.pdf
  *   (Lecture 03: Data Processing – Scaling, Visualisation, Sampling, Javier Montoya, HS 2026).
  *
@@ -26,7 +47,7 @@
  *   C, nur einordnen     – Course Overview, konkrete Fallwerte, einzelne Streupunkte, formale Notation,
  *                          exakte Beispielzahlen, die Überschriften der Folien 43–44.
  *
- * Alle Tabellen und Diagramme sind eigene Nachbauten mit den Zahlen der Folien.
+ * W3/W4: Tabellen und Diagramme sind eigene Nachbauten mit den Zahlen der Folien.
  * Folienbilder werden bewusst nicht kopiert.
  * Erklärungen und Checkpoints auf Deutsch, englische Fachbegriffe bleiben erhalten.
  */
@@ -36,7 +57,2246 @@ Lerncoach.registerSubject({
   description: "Healthcare data, systems and clinical AI",
   accent: "#237274",
   weeks: [
-    { id: "w2", number: 2, title: "Healthcare Data: From Clinical Care to AI-Ready Data", status: "soon" },
+    {
+      "id": "w1",
+      "number": 1,
+      "title": "Introduction: Vom Patienten zur klinischen Wirkung",
+      "status": "ready",
+      "items": [
+        {
+          "type": "slide",
+          "title": "Die Leitfrage: Was verbessert sich für wen?",
+          "body": [
+            "Ein digitales System kann sehr genaue Vorhersagen liefern und trotzdem wenig im Versorgungsalltag verändern. Diese Woche verfolgt deshalb die ganze Wirkungskette: vom klinischen Problem über Daten und Entscheidungen bis zur Handlung und ihrem Ergebnis.",
+            {
+              "flow": {
+                "steps": [
+                  {
+                    "title": "Problem",
+                    "text": "Welche Versorgungslücke besteht?"
+                  },
+                  {
+                    "title": "System im Workflow",
+                    "text": "Wer erhält wann welche Information?"
+                  },
+                  {
+                    "title": "Wirkung",
+                    "text": "Welche Handlung und welches Ergebnis ändern sich?"
+                  }
+                ]
+              }
+            },
+            {
+              "reveal": {
+                "question": "Eigener Einstieg: Ein Modell erkennt ein Risiko, aber niemand erhält die Meldung. Welches Glied der Wirkungskette fehlt?",
+                "answer": "Die Information erreicht keine zuständige Person und löst keine Entscheidung oder Handlung aus. Modellleistung allein schliesst diese Lücke nicht.",
+                "label": "Eigene Antwort vergleichen"
+              }
+            },
+            "Quelle: Lecture 01 Introduction to Digital Health.pdf, Folien 4, 10, 38–39"
+          ],
+          "remember": "Beginne mit dem Versorgungsproblem und dem vorgesehenen Einsatz."
+        },
+        {
+          "type": "slide",
+          "title": "Kursrahmen und Lernprioritäten",
+          "body": [
+            "Die Lernziele verlangen, Digital Health abzugrenzen, Beteiligte und Workflow zu benennen, Fehlerfolgen zu erklären und den Einsatz eines Systems anhand von Evidenz zu beurteilen. Deshalb übst du hier begründete Entscheidungen statt nur Begriffe.",
+            {
+              "table": {
+                "head": [
+                  "Angabe auf Folie 8",
+                  "Gewicht / Format"
+                ],
+                "rows": [
+                  [
+                    "Labs / Jupyter Notebooks",
+                    "30 %"
+                  ],
+                  [
+                    "Semesterprojekt",
+                    "40 %"
+                  ],
+                  [
+                    "Individuelle mündliche Prüfung",
+                    "30 %; 20 Minuten: Fallstudie und Vorlesungsthema"
+                  ]
+                ],
+                "caption": "Stand der bereitgestellten Einführungsfolien; spätere Kursmitteilungen können Angaben ändern."
+              }
+            },
+            "Moodle enthält Folien, Notebooks, Datensätze und Ankündigungen. Die Kursübersicht ordnet später Datenaufbereitung, Lernverfahren, Evaluation und Integration ein. Organisatorische Details sind hier Orientierung, kein Auswendiglernziel.",
+            "Quelle: Lecture 01 Introduction to Digital Health.pdf, Folien 4–8"
+          ],
+          "remember": "Verständnis zeigt sich daran, dass du technische und klinische Aspekte verbinden kannst."
+        },
+        {
+          "type": "slide",
+          "title": "Digital Health, Health IT und Medical AI",
+          "body": [
+            "Digital Health ist der Oberbegriff für digitale Technologien zur Unterstützung von Gesundheit und Versorgung. Dazu gehören auch Fernversorgung, Patientenportale, Wearables und Infrastruktur wie Austausch, Sicherheit und Governance.",
+            {
+              "cards": [
+                {
+                  "title": "Health IT",
+                  "text": "Information erfassen, speichern, austauschen und wiederfinden; etwa EHR, Labor- oder Bildsysteme."
+                },
+                {
+                  "title": "Digitale Versorgung",
+                  "text": "Digital unterstützen, etwa durch Kommunikation, Monitoring, Koordination oder Behandlung."
+                },
+                {
+                  "title": "Medical AI",
+                  "text": "Aus Daten etwas ableiten: vorhersagen, klassifizieren, generieren oder empfehlen."
+                }
+              ]
+            },
+            {
+              "reveal": {
+                "question": "Eigenes Beispiel: Ein vollständig digitales Spital verwendet kein lernendes Modell. Ist das ein Widerspruch?",
+                "answer": "Nein. Digitale Infrastruktur und digitale Versorgung benötigen nicht zwingend AI. Umgekehrt garantiert ein gutes AI-Modell noch keine nützliche Versorgungslösung.",
+                "label": "Eigene Antwort vergleichen"
+              }
+            },
+            "Quelle: Lecture 01 Introduction to Digital Health.pdf, Folien 10–11"
+          ],
+          "remember": "Digital Health ist breiter als Medical AI."
+        },
+        {
+          "type": "checkpoint",
+          "id": "cp-scope",
+          "title": "Checkpoint: Ausgangspunkt und Begriffe",
+          "questions": [
+            {
+              "id": "start",
+              "type": "single",
+              "prompt": "Ein Team möchte AI einsetzen. Welche erste Frage entspricht der Vorlesung?",
+              "options": [
+                "Welches Modell hat die meisten Parameter?",
+                "Welches Versorgungsproblem betrifft welche Menschen?",
+                "Welche GPU ist am schnellsten?"
+              ],
+              "correct": 1,
+              "explanation": "Das klinische Problem bestimmt den sinnvollen Technologieeinsatz. Quelle: Lecture 01 Introduction to Digital Health.pdf, Folien 4, 10–11"
+            },
+            {
+              "id": "scope",
+              "type": "multi",
+              "prompt": "Welche Aussagen stimmen?",
+              "options": [
+                "Ein Patientenportal kann zu Digital Health gehören.",
+                "Health IT setzt immer AI voraus.",
+                "Medical AI leitet Informationen aus Daten ab.",
+                "Ein gutes Modell garantiert klinischen Nutzen."
+              ],
+              "correct": [
+                0,
+                2
+              ],
+              "explanation": "Digital Health umfasst mehr als AI; Nutzen muss im klinischen System entstehen. Quelle: Lecture 01 Introduction to Digital Health.pdf, Folien 4, 10–11"
+            },
+            {
+              "id": "it",
+              "type": "type",
+              "prompt": "Welche zweibuchstabige Abkürzung ergänzt den Vorlesungsbegriff „Health …“ für Informationsinfrastruktur?",
+              "accept": [
+                "IT",
+                "Information Technology",
+                "Informationstechnologie"
+              ],
+              "explanation": "Health IT bezeichnet hier die Informationsinfrastruktur. Quelle: Lecture 01 Introduction to Digital Health.pdf, Folien 4, 10–11"
+            }
+          ]
+        },
+        {
+          "type": "slide",
+          "title": "Ein System, mehrere Beteiligte",
+          "body": [
+            "Patientinnen und Patienten, klinisches Personal, Spitäler, Kostenträger, Aufsicht und Entwicklung betrachten dasselbe System aus unterschiedlichen Perspektiven. Ein Vorteil für eine Gruppe kann mit Aufwand oder Risiken für eine andere verbunden sein.",
+            {
+              "table": {
+                "head": [
+                  "Perspektive",
+                  "Typische Frage"
+                ],
+                "rows": [
+                  [
+                    "Patient",
+                    "Verbessert sich meine Versorgung oder Erfahrung?"
+                  ],
+                  [
+                    "Klinisches Personal",
+                    "Hilft die Information bei einer Entscheidung?"
+                  ],
+                  [
+                    "Spital",
+                    "Verbessern sich Qualität, Kapazität und Abläufe?"
+                  ],
+                  [
+                    "Kostenträger",
+                    "Rechtfertigt der Nutzen die eingesetzten Mittel?"
+                  ],
+                  [
+                    "Entwicklung",
+                    "Lässt sich das System zuverlässig betreiben und verbessern?"
+                  ]
+                ],
+                "caption": "In eigenen Worten nach der Stakeholder-Darstellung"
+              }
+            },
+            {
+              "reveal": {
+                "question": "Eigener Fall: Die Spitalleitung spart Zeit, die Patienten müssen aber deutlich mehr Eingaben machen. Genügt „effizienter“ als Nutzenbegründung?",
+                "answer": "Nein. Die Perspektive und die verteilten Belastungen müssen sichtbar sein. Eine Prozessverbesserung ist nicht automatisch ein Vorteil für alle Beteiligten.",
+                "label": "Eigene Antwort vergleichen"
+              }
+            },
+            "Quelle: Lecture 01 Introduction to Digital Health.pdf, Folien 13"
+          ],
+          "remember": "Nutzen immer einer betroffenen Gruppe und einem konkreten Ziel zuordnen."
+        },
+        {
+          "type": "slide",
+          "title": "Vier Dimensionen von Wert",
+          "body": [
+            {
+              "cards": [
+                {
+                  "title": "Patient Value",
+                  "text": "Ergebnis, Erfahrung und Belastung aus Patientensicht."
+                },
+                {
+                  "title": "Clinical Value",
+                  "text": "Sicherere Entscheidungen, frühere Erkennung, weniger vermeidbare Fehler."
+                },
+                {
+                  "title": "Operational Value",
+                  "text": "Wartezeiten, Kapazität und reibungsarme Abläufe."
+                },
+                {
+                  "title": "Economic Value",
+                  "text": "Ressourcen wirksam einsetzen und den Betrieb tragfähig gestalten."
+                }
+              ]
+            },
+            "Das Frühwarnbeispiel der Folien verbindet frühere Erkennung mit mehr Alarmen und mehr Arbeitslast. Diese Effekte können gleichzeitig auftreten.",
+            {
+              "reveal": {
+                "question": "Eigener Transfer: Mehr Warnungen werden als Erfolg gemeldet. Welche ergänzende Frage stellst du?",
+                "answer": "Welche Warnungen führen zu sinnvollen Handlungen und besseren Ergebnissen, und welchen zusätzlichen Aufwand beziehungsweise Schaden verursachen sie? Die Zahl der Meldungen allein reicht nicht.",
+                "label": "Eigene Antwort vergleichen"
+              }
+            },
+            "Quelle: Lecture 01 Introduction to Digital Health.pdf, Folien 14–15"
+          ],
+          "remember": "Ein Nutzenargument muss auch Zielkonflikte erklären."
+        },
+        {
+          "type": "slide",
+          "title": "Den Workflow als Wirkungskette lesen",
+          "body": [
+            {
+              "flow": {
+                "steps": [
+                  {
+                    "title": "Patient",
+                    "text": "Ein klinisches Anliegen entsteht."
+                  },
+                  {
+                    "title": "Data",
+                    "text": "Information wird erhoben."
+                  },
+                  {
+                    "title": "Interpretation",
+                    "text": "Die Information bekommt Bedeutung."
+                  },
+                  {
+                    "title": "Decision",
+                    "text": "Ein Vorgehen wird gewählt."
+                  },
+                  {
+                    "title": "Action",
+                    "text": "Das Vorgehen wird umgesetzt."
+                  },
+                  {
+                    "title": "Outcome",
+                    "text": "Die Wirkung wird beobachtet."
+                  }
+                ]
+              }
+            },
+            "Ein Sensor kann die Datenerhebung unterstützen, Bildanalyse die Interpretation, Entscheidungshilfe die Auswahl eines Vorgehens und Fernnachsorge die spätere Beobachtung. Der Einbauort bestimmt, wer die Ausgabe benötigt.",
+            {
+              "reveal": {
+                "question": "Eigener Mini-Fall: „Risiko erhöht“ erscheint auf einem Bildschirm. Ist das bereits eine Handlung?",
+                "answer": "Nein. Das ist eine Information beziehungsweise Systemausgabe. Erst eine zuständige Person oder ein definierter Prozess entscheidet, was daraus folgt, und setzt eine Handlung um.",
+                "label": "Eigene Antwort vergleichen"
+              }
+            },
+            "Quelle: Lecture 01 Introduction to Digital Health.pdf, Folien 17–18"
+          ],
+          "remember": "Ausgabe, Entscheidung, Handlung und Ergebnis getrennt benennen."
+        },
+        {
+          "type": "checkpoint",
+          "id": "cp-workflow",
+          "title": "Checkpoint: Wert und Workflow",
+          "questions": [
+            {
+              "id": "chain",
+              "type": "order",
+              "prompt": "Ordne die Wirkungskette der Folien.",
+              "items": [
+                "Patient",
+                "Data",
+                "Interpretation",
+                "Decision",
+                "Action",
+                "Outcome"
+              ],
+              "explanation": "Die Wirkung wird erst nach der Auswahl und Umsetzung eines Vorgehens beobachtet. Quelle: Lecture 01 Introduction to Digital Health.pdf, Folien 13–18"
+            },
+            {
+              "id": "operational",
+              "type": "single",
+              "prompt": "Ein Terminportal verkürzt die Wartezeit. Welche Wertdimension wird damit unmittelbar beschrieben?",
+              "options": [
+                "Operational Value",
+                "Ausschliesslich Modellgenauigkeit",
+                "Automatisch ein besseres Krankheitsoutcome"
+              ],
+              "correct": 0,
+              "explanation": "Wartezeit gehört zur operativen Dimension; weitere Wirkungen benötigen eigene Evidenz. Quelle: Lecture 01 Introduction to Digital Health.pdf, Folien 13–18"
+            },
+            {
+              "id": "tradeoff",
+              "type": "multi",
+              "prompt": "Ein Frühwarnsystem erkennt früher, erzeugt aber viel Zusatzarbeit. Was gehört in die Bewertung?",
+              "options": [
+                "Der mögliche Nutzen früherer Erkennung",
+                "Arbeitslast für das Personal",
+                "Nur die Zahl erzeugter Alarme",
+                "Mögliche Belastungen durch unnötige Folgeaktionen"
+              ],
+              "correct": [
+                0,
+                1,
+                3
+              ],
+              "explanation": "Ein vollständiges Nutzenbild berücksichtigt unterschiedliche Perspektiven und Folgen. Quelle: Lecture 01 Introduction to Digital Health.pdf, Folien 13–18"
+            }
+          ]
+        },
+        {
+          "type": "slide",
+          "title": "Warum ein Benchmark nicht das ganze System abbildet",
+          "body": [
+            "Die Vorlesung nennt sechs Besonderheiten: Fehlerfolgen, unsichere Ground Truth, versorgungsabhängige Datenerhebung, Unterschiede zwischen Einsatzorten, menschliches Verhalten und zusätzliche Evidenzanforderungen.",
+            {
+              "cards": [
+                {
+                  "title": "Daten und Wahrheit",
+                  "text": "Welche Situation zeigen die Daten, und wie wurde das Label bestimmt?"
+                },
+                {
+                  "title": "Menschen und Setting",
+                  "text": "Wer nutzt die Ausgabe, und was ändert sich an einem anderen Standort?"
+                },
+                {
+                  "title": "Folgen und Evidenz",
+                  "text": "Welche Wirkung haben Fehler und richtige Hinweise im tatsächlichen Ablauf?"
+                }
+              ]
+            },
+            "Die folgenden Folien machen aus diesen Stichwörtern konkrete Fragen, mit denen du ein System beurteilen kannst.",
+            "Quelle: Lecture 01 Introduction to Digital Health.pdf, Folien 20"
+          ],
+          "remember": "Hohe Testgenauigkeit beantwortet nur einen Teil der Systemfragen."
+        },
+        {
+          "type": "slide",
+          "title": "False Negative und False Positive: unterschiedliche Folgen",
+          "body": [
+            {
+              "table": {
+                "head": [
+                  "Fehler",
+                  "Situation",
+                  "Mögliche Folge im Screening-Beispiel"
+                ],
+                "rows": [
+                  [
+                    "False Negative (FN)",
+                    "Erkrankung vorhanden, vom System übersehen",
+                    "Notwendige Abklärung oder Versorgung verzögert sich."
+                  ],
+                  [
+                    "False Positive (FP)",
+                    "Alarm, obwohl Erkrankung nicht vorhanden",
+                    "Unnötige Abklärung, Belastung oder Eingriffe können folgen."
+                  ]
+                ],
+                "caption": "Begriffe und mögliche Folgen aus der Vorlesung"
+              }
+            },
+            {
+              "callout": {
+                "tone": "warn",
+                "title": "Beschriftung der Originalfolie",
+                "text": "Der zweite Absatz auf Folie 21 trägt nochmals „False negatives“. Seine Beschreibung (Alarm bei abwesender Erkrankung), der Einleitungstext und das FP-Diagramm zeigen: Dort sind False Positives gemeint."
+              }
+            },
+            {
+              "reveal": {
+                "question": "Warum ist „beide sind ein Fehler“ für eine Nutzenbewertung zu wenig?",
+                "answer": "Die Folgen unterscheiden sich. Eine gleiche Anzahl Fehler kann je nach Art und Einsatz sehr unterschiedliche Belastungen verursachen.",
+                "label": "Eigene Antwort vergleichen"
+              }
+            },
+            "Quelle: Lecture 01 Introduction to Digital Health.pdf, Folien 21"
+          ],
+          "remember": "Fehler nicht nur zählen, sondern ihre Folgen im Workflow erklären."
+        },
+        {
+          "type": "slide",
+          "title": "Ground Truth ist eine begründete Referenz",
+          "body": [
+            "Diagnosen können sich mit zusätzlichen Untersuchungen und dem Verlauf ändern. Fachpersonen können dieselbe Aufnahme unterschiedlich beurteilen. Ein Label ist deshalb nicht immer die unmittelbare Messung einer unstrittigen Wahrheit.",
+            {
+              "compare": {
+                "left": {
+                  "title": "Frühe Bildbeurteilung",
+                  "points": [
+                    "Bezieht sich auf die damals sichtbare Evidenz",
+                    "Kann unsicher sein oder zwischen Personen variieren"
+                  ]
+                },
+                "right": {
+                  "title": "Spätere klinische Diagnose",
+                  "points": [
+                    "Nutzt gegebenenfalls Verlauf und weitere Tests",
+                    "Beantwortet eine anders abgegrenzte Referenzfrage"
+                  ]
+                }
+              }
+            },
+            {
+              "reveal": {
+                "question": "Eigener Fall: Zwei Fachpersonen vergeben unterschiedliche Labels. Darfst du ohne weitere Prüfung eine davon als Datenfehler löschen?",
+                "answer": "Nein. Zuerst Definition, Zeitpunkt, verfügbare Evidenz und Referenzverfahren klären. Uneinigkeit kann echte Unsicherheit der Beurteilung darstellen.",
+                "label": "Eigene Antwort vergleichen"
+              }
+            },
+            "Quelle: Lecture 01 Introduction to Digital Health.pdf, Folien 22"
+          ],
+          "remember": "Benennen, was das Referenzlabel bedeutet und wann es entstanden ist."
+        },
+        {
+          "type": "slide",
+          "title": "Daten spiegeln den Versorgungsprozess",
+          "body": [
+            "Messungen entstehen aus Symptomen, Verdacht, Abläufen und Zugang zur Versorgung. Sie erfolgen deshalb nicht zwingend regelmässig. Auch das Fehlen einer Messung kann etwas über den Prozess verraten. Missingness bezeichnet das Fehlen von Werten.",
+            {
+              "reveal": {
+                "question": "Eigener Fall: Bei einem Patienten wurde ein Laborwert wegen eines Verdachts erhoben, bei einem anderen nicht. Bedeutet der fehlende Wert automatisch „gesund“?",
+                "answer": "Nein. Die fehlende Messung zeigt zunächst nur, dass im betrachteten Datenbestand kein Wert vorliegt. Eine klinische Entscheidung kann ein Grund sein; andere Gründe müssen ebenfalls geprüft werden.",
+                "label": "Eigene Antwort vergleichen"
+              }
+            },
+            {
+              "callout": {
+                "tone": "tip",
+                "title": "Verbindung zu Woche 2",
+                "text": "Dort trennst du genauer: nicht angeordnet, nicht durchgeführt, anderswo dokumentiert oder technisch nicht verfügbar."
+              }
+            },
+            "Quelle: Lecture 01 Introduction to Digital Health.pdf, Folien 23"
+          ],
+          "remember": "Ein Datensatz beschreibt auch, wie Versorgung organisiert war."
+        },
+        {
+          "type": "checkpoint",
+          "id": "cp-care-data",
+          "title": "Checkpoint: Fehler und Datenentstehung",
+          "questions": [
+            {
+              "id": "fp",
+              "type": "single",
+              "prompt": "Eigener Screening-Fall: Das System meldet eine Erkrankung, die nach der festgelegten Referenz nicht vorliegt. Wie heisst dieser Fehler?",
+              "options": [
+                "False Negative",
+                "False Positive",
+                "True Positive"
+              ],
+              "correct": 1,
+              "explanation": "Ein positiver Befund ohne Erkrankung gemäss Referenz ist falsch positiv. Quelle: Lecture 01 Introduction to Digital Health.pdf, Folien 20–23"
+            },
+            {
+              "id": "truth",
+              "type": "multi",
+              "prompt": "Welche Gründe können unterschiedliche Referenzlabels erklären?",
+              "options": [
+                "Ein späterer Diagnosezeitpunkt",
+                "Zusätzliche Untersuchungen",
+                "Abweichende Falldefinitionen",
+                "Nur ein sicherer Programmierfehler"
+              ],
+              "correct": [
+                0,
+                1,
+                2
+              ],
+              "explanation": "Ground Truth hängt von Definition, Zeitpunkt und Evidenz ab; Uneinigkeit ist nicht automatisch ein technischer Fehler. Quelle: Lecture 01 Introduction to Digital Health.pdf, Folien 20–23"
+            },
+            {
+              "id": "missing",
+              "type": "type",
+              "prompt": "Wie lautet der englische Begriff für das Fehlen von Werten als Dateneigenschaft?",
+              "accept": [
+                "missingness",
+                "informative missingness",
+                "missing data"
+              ],
+              "explanation": "Missingness kann Informationen über die Datenerhebung enthalten, ohne den Grund im Einzelfall zu beweisen. Quelle: Lecture 01 Introduction to Digital Health.pdf, Folien 20–23"
+            }
+          ]
+        },
+        {
+          "type": "slide",
+          "title": "Distribution Shift: Die Umgebung verändert sich",
+          "body": [
+            "Ein unverändertes Modell kann in einem anderen Spital auf andere Populationen, Häufigkeiten, Geräte, Aufnahmeprotokolle oder Arbeitsweisen treffen. Gute Ergebnisse am Entwicklungsort übertragen sich daher nicht automatisch.",
+            {
+              "table": {
+                "head": [
+                  "Eigener Standortwechsel",
+                  "Zu untersuchende Änderung"
+                ],
+                "rows": [
+                  [
+                    "Anderer Scanner",
+                    "Bildaufnahme und Darstellung"
+                  ],
+                  [
+                    "Andere Patientengruppe",
+                    "Zusammensetzung und klinische Situationen"
+                  ],
+                  [
+                    "Andere Arbeitsabläufe",
+                    "Mess- und Dokumentationsmuster"
+                  ]
+                ],
+                "caption": "Eigene Beispiele zu den Kategorien der Folie"
+              }
+            },
+            {
+              "reveal": {
+                "question": "Ein Modell ist technisch exakt gleich geblieben. Kann sich seine Leistung trotzdem ändern?",
+                "answer": "Ja. Die Datenverteilung und der Einsatzkontext können sich ändern. Genau das ist der zentrale Punkt des Standortbeispiels.",
+                "label": "Eigene Antwort vergleichen"
+              }
+            },
+            "Quelle: Lecture 01 Introduction to Digital Health.pdf, Folien 24"
+          ],
+          "remember": "Unveränderte Software bedeutet nicht unveränderte Einsatzbedingungen."
+        },
+        {
+          "type": "slide",
+          "title": "Mensch und Modell bilden das eingesetzte System",
+          "body": [
+            "Fachpersonen können eine Ausgabe akzeptieren, prüfen, ignorieren oder ihr zu stark vertrauen. Eine richtige Empfehlung kann helfen; eine falsche kann auch eine vorher richtige Einschätzung verschlechtern.",
+            {
+              "callout": {
+                "tone": "def",
+                "title": "Automation Bias",
+                "text": "Übermässiges Vertrauen in automatisierte Hinweise kann dazu führen, dass eine falsche Empfehlung die eigene richtige Einschätzung verdrängt."
+              }
+            },
+            {
+              "reveal": {
+                "question": "Eigener Fall: Nach Einführung einer AI ändern sich Entscheidungen, obwohl das Modell dieselben Kennzahlen wie im Test erreicht. Was fehlt einer reinen Modellbewertung?",
+                "answer": "Wie die Nutzenden Hinweise verstehen und darauf reagieren. Das Zusammenspiel kann den Nutzen oder Schaden des gesamten Systems verändern.",
+                "label": "Eigene Antwort vergleichen"
+              }
+            },
+            "Quelle: Lecture 01 Introduction to Digital Health.pdf, Folien 25"
+          ],
+          "remember": "Modellleistung und Leistung des Mensch-System-Verbunds getrennt untersuchen."
+        },
+        {
+          "type": "slide",
+          "title": "Evidenz: Was verbessert sich tatsächlich?",
+          "body": [
+            "Ein korrektes Resultat beweist noch nicht, dass sich Versorgung verbessert. Die Vorlesung unterscheidet technische Leistung, Einbindung in Abläufe und Auswirkungen auf Entscheidungen, Prozesse oder Patienten.",
+            {
+              "compare": {
+                "left": {
+                  "title": "Technischer Nachweis",
+                  "points": [
+                    "Vergleich der Ausgaben mit einer definierten Referenz"
+                  ]
+                },
+                "right": {
+                  "title": "Nachweis im Einsatz",
+                  "points": [
+                    "Nutzbarkeit im Workflow",
+                    "Sinnvolle veränderte Entscheidungen und Handlungen",
+                    "Nutzen, Belastungen und Schäden"
+                  ]
+                }
+              }
+            },
+            {
+              "reveal": {
+                "question": "Eigener Transfer: In einer Untersuchung wird die Dokumentation besser, aber ein patientenbezogenes Ergebnis ist nicht verbessert. Was darfst du berichten?",
+                "answer": "Die nachgewiesene Prozessverbesserung. Ein zusätzlicher Nutzen für das Patientenoutcome ist damit noch nicht gezeigt. Unterschiedliche Endpunkte nicht gleichsetzen.",
+                "label": "Eigene Antwort vergleichen"
+              }
+            },
+            "Quelle: Lecture 01 Introduction to Digital Health.pdf, Folien 26, 38–39"
+          ],
+          "remember": "Nur die Wirkung behaupten, für die tatsächlich Evidenz vorliegt."
+        },
+        {
+          "type": "checkpoint",
+          "id": "cp-evidence",
+          "title": "Checkpoint: Übertragbarkeit und Nutzung",
+          "questions": [
+            {
+              "id": "shift",
+              "type": "multi",
+              "prompt": "Was kann bei unverändertem Modell zu Distribution Shift beitragen?",
+              "options": [
+                "Andere Patientenzusammensetzung",
+                "Anderes Aufnahmeprotokoll",
+                "Andere klinische Dokumentation",
+                "Nur eine Änderung der Modellgewichte"
+              ],
+              "correct": [
+                0,
+                1,
+                2
+              ],
+              "explanation": "Änderungen der Datenentstehung reichen aus; Modellgewichte müssen sich nicht ändern. Quelle: Lecture 01 Introduction to Digital Health.pdf, Folien 24–26"
+            },
+            {
+              "id": "bias",
+              "type": "type",
+              "prompt": "Wie heisst das übermässige Vertrauen in automatische Hinweise?",
+              "accept": [
+                "Automation Bias",
+                "Automationsbias",
+                "Automatisierungsbias",
+                "Automatisierungs-Bias"
+              ],
+              "explanation": "Ein automatischer Hinweis kann dadurch selbst eine richtige Einschätzung verdrängen. Quelle: Lecture 01 Introduction to Digital Health.pdf, Folien 24–26"
+            },
+            {
+              "id": "benefit",
+              "type": "single",
+              "prompt": "Ein Modell erreicht hohe Genauigkeit im Testdatensatz. Welche Aussage ist begründet?",
+              "options": [
+                "Damit ist jeder klinische Einsatz nützlich.",
+                "Die gemessene Modellleistung ist ein Baustein; Nutzen im Workflow braucht weitere Evidenz.",
+                "Menschen spielen im Einsatz keine Rolle mehr."
+              ],
+              "correct": 1,
+              "explanation": "Genauigkeit allein belegt weder Integration noch einen positiven Versorgungseffekt. Quelle: Lecture 01 Introduction to Digital Health.pdf, Folien 24–26"
+            }
+          ]
+        },
+        {
+          "type": "slide",
+          "title": "Clinical AI System Canvas: zehn Fragen",
+          "body": [
+            "Der Canvas strukturiert das System, bevor der Algorithmus diskutiert wird. Die Fragen verbinden Bedarf, Einbauort, verfügbare Information und Konsequenzen.",
+            {
+              "table": {
+                "head": [
+                  "Bereich",
+                  "Fragen in eigenen Worten"
+                ],
+                "rows": [
+                  [
+                    "Clinical Need",
+                    "Welches Problem? Für welche Population?"
+                  ],
+                  [
+                    "Clinical Context",
+                    "Wer nutzt die Ausgabe? Wo im Workflow?"
+                  ],
+                  [
+                    "System",
+                    "Welche Daten liegen dort vor? Welche Ausgabe entsteht?"
+                  ],
+                  [
+                    "Consequence",
+                    "Welche Entscheidung? Welche Handlung? Welcher erwartete Nutzen? Welcher wichtigste Fehlerfall?"
+                  ]
+                ],
+                "caption": "Vier Bereiche, insgesamt zehn Fragen"
+              }
+            },
+            {
+              "reveal": {
+                "question": "Eigener Fall: „Wir liefern einen Risikoscore.“ Welche Angaben fehlen damit noch?",
+                "answer": "Mindestens Problem, Population, Nutzende, Zeitpunkt im Ablauf, verfügbare Daten, beeinflusste Entscheidung, anschliessende Handlung, erwarteter Nutzen und Fehlerfolgen.",
+                "label": "Eigene Antwort vergleichen"
+              }
+            },
+            "Quelle: Lecture 01 Introduction to Digital Health.pdf, Folien 28, 30"
+          ],
+          "remember": "Eine Systembeschreibung geht über den Output hinaus."
+        },
+        {
+          "type": "slide",
+          "title": "Vorlesungsfall: autonomes Retinopathie-Screening",
+          "body": [
+            "Im vorgestellten Fall werden bei einem regulären Primärversorgungsbesuch Netzhautbilder aufgenommen. Das System prüft ihre Qualität und beurteilt, ob mehr als milde diabetische Retinopathie erkannt wird. Das Ergebnis soll Personen für weitere Abklärung identifizieren.",
+            {
+              "flow": {
+                "steps": [
+                  {
+                    "title": "Aufnahme",
+                    "text": "Personal erstellt Netzhautbilder."
+                  },
+                  {
+                    "title": "Qualitätsprüfung",
+                    "text": "Reichen die Bilder für die Beurteilung?"
+                  },
+                  {
+                    "title": "Autonome Beurteilung",
+                    "text": "Systemausgabe zum Zielbefund."
+                  },
+                  {
+                    "title": "Weiterer Versorgungsschritt",
+                    "text": "Zuständigkeit und weitere Abklärung klären."
+                  }
+                ]
+              }
+            },
+            {
+              "callout": {
+                "tone": "tip",
+                "title": "Fallgrenze",
+                "text": "Der letzte Schritt ist Teil der Systemanalyse. Ein positives Screeningresultat ist weder eine bereits ausgeführte Überweisung noch der Nachweis einer erfolgreichen Behandlung."
+              }
+            },
+            "Quelle: Lecture 01 Introduction to Digital Health.pdf, Folien 29–30"
+          ],
+          "remember": "Auch eine autonome Beurteilung braucht einen funktionierenden nachgelagerten Prozess."
+        },
+        {
+          "type": "slide",
+          "title": "Usefulness Test: Vorher, Ausgabe, Nachher",
+          "body": [
+            {
+              "table": {
+                "head": [
+                  "Frage",
+                  "Anwendung auf den Vorlesungsfall"
+                ],
+                "rows": [
+                  [
+                    "Vorher",
+                    "Was würde ohne den Hinweis geschehen?"
+                  ],
+                  [
+                    "System Output",
+                    "Welche neue relevante Information entsteht?"
+                  ],
+                  [
+                    "Nachher",
+                    "Welche Entscheidung und Handlung ändern sich dadurch?"
+                  ]
+                ],
+                "caption": "Nützlichkeit anhand eines konkreten Ablaufs beurteilen"
+              }
+            },
+            {
+              "reveal": {
+                "question": "Eigener Fall: Ein auffälliges Screeningresultat wird korrekt erzeugt, aber keine Stelle übernimmt die Terminvermittlung. Wo ist die Evidenzkette unterbrochen?",
+                "answer": "Zwischen der Information und einer tatsächlich ausgeführten Folgehandlung. Man kann nicht vom richtigen Befund direkt auf eine verbesserte Versorgung schliessen.",
+                "label": "Eigene Antwort vergleichen"
+              }
+            },
+            "Quelle: Lecture 01 Introduction to Digital Health.pdf, Folien 31–32"
+          ],
+          "remember": "Frage ausdrücklich nach der Handlung, die sich gegenüber dem bisherigen Ablauf verändert."
+        },
+        {
+          "type": "slide",
+          "title": "Fehlerpfad: Failure, Consequence, Recovery",
+          "body": [
+            "Gehe einen Fall Schritt für Schritt durch. Ein Fehler kann schon vor der Klassifikation entstehen oder erst nach einem richtigen Resultat auftreten.",
+            {
+              "table": {
+                "head": [
+                  "Eigener Fehlerfall",
+                  "Mögliche Konsequenz",
+                  "Zu prüfende Absicherung"
+                ],
+                "rows": [
+                  [
+                    "Unzureichende Bildqualität",
+                    "Keine verlässliche Beurteilung möglich",
+                    "Qualitätsfehler erkennen und definierten Ersatzweg vorsehen"
+                  ],
+                  [
+                    "Falsches Ergebnis",
+                    "Nötige Abklärung bleibt aus oder unnötige Abklärung folgt",
+                    "Folgen und Umgang mit Fehlentscheidungen untersuchen"
+                  ],
+                  [
+                    "Keine Folgehandlung",
+                    "Die korrekte Meldung verändert die Versorgung nicht",
+                    "Zuständigkeit und Nachverfolgung klären"
+                  ]
+                ],
+                "caption": "Eigene begründete Vorschläge zur Analyseaufgabe, keine offizielle Musterlösung"
+              }
+            },
+            {
+              "reveal": {
+                "question": "Warum hilft es nicht, nur den Fehlernamen aufzuschreiben?",
+                "answer": "Eine Einsatzentscheidung braucht zusätzlich die Konsequenz für den Patienten und die Möglichkeit, den Fehler zu erkennen oder abzufangen.",
+                "label": "Eigene Antwort vergleichen"
+              }
+            },
+            "Quelle: Lecture 01 Introduction to Digital Health.pdf, Folien 33–34"
+          ],
+          "remember": "Fehler → Systemfolge → mögliche Versorgungsfolge → Absicherung."
+        },
+        {
+          "type": "checkpoint",
+          "id": "cp-system",
+          "title": "Checkpoint: System statt Algorithmus",
+          "questions": [
+            {
+              "id": "canvas",
+              "type": "single",
+              "prompt": "Welche Angabe beschreibt im Canvas primär den User?",
+              "options": [
+                "Die Person, die den Output sieht oder nutzt",
+                "Die Modellarchitektur",
+                "Nur der Patient, unabhängig vom Workflow"
+              ],
+              "correct": 0,
+              "explanation": "Der User ist über den Umgang mit der Systemausgabe definiert. Quelle: Lecture 01 Introduction to Digital Health.pdf, Folien 28–34"
+            },
+            {
+              "id": "screen",
+              "type": "order",
+              "prompt": "Ordne den vereinfachten Screeningpfad.",
+              "items": [
+                "Bilder aufnehmen",
+                "Bildqualität prüfen",
+                "Zielbefund beurteilen",
+                "Geeignete Folgehandlung organisieren"
+              ],
+              "explanation": "Qualität, Beurteilung und anschliessende Handlung sind unterschiedliche Prozessschritte. Quelle: Lecture 01 Introduction to Digital Health.pdf, Folien 28–34"
+            },
+            {
+              "id": "failure",
+              "type": "multi",
+              "prompt": "Welche Fragen gehören zur Fehlerpfadanalyse?",
+              "options": [
+                "Was kann schiefgehen?",
+                "Was bedeutet das für die betroffene Person?",
+                "Kann der Fehler erkannt oder korrigiert werden?",
+                "Nur: Wie viele Modellparameter gibt es?"
+              ],
+              "correct": [
+                0,
+                1,
+                2
+              ],
+              "explanation": "Die Analyse verbindet Failure, Consequence und Recovery. Quelle: Lecture 01 Introduction to Digital Health.pdf, Folien 28–34"
+            }
+          ]
+        },
+        {
+          "type": "slide",
+          "title": "Deploy, Not yet oder Do not deploy?",
+          "body": [
+            {
+              "cards": [
+                {
+                  "title": "Deploy",
+                  "text": "Evidenz, Population und Einsatz sind ausreichend geklärt; Nutzen, Ablauf und Absicherungen tragen den Einsatz."
+                },
+                {
+                  "title": "Not yet",
+                  "text": "Der Anwendungsfall ist plausibel, aber wichtige Evidenz oder eine Absicherung fehlt noch."
+                },
+                {
+                  "title": "Do not deploy",
+                  "text": "Im vorgeschlagenen Einsatz überwiegen Probleme: etwa unvertretbarer Schaden, fehlende nützliche Handlung oder unpassende Population."
+                }
+              ]
+            },
+            "Eine begründete Empfehlung nennt die Entscheidung, den stärksten Grund und eine konkrete zusätzliche Erkenntnis oder Änderung, die die Entscheidung beeinflussen würde.",
+            {
+              "reveal": {
+                "question": "Eigener Fall: Der Nutzen ist plausibel, aber lokale Leistung und Zuständigkeit bei Alarmen sind ungeklärt. Welche Empfehlung passt als begründeter Vorschlag?",
+                "answer": "Not yet: Vor einem Einsatz die lokale Leistung und einen belastbaren Reaktionsprozess prüfen. Das ist eine Entscheidung unter den genannten Annahmen, kein Urteil über sämtliche möglichen Einsatzorte.",
+                "label": "Eigene Antwort vergleichen"
+              }
+            },
+            "Quelle: Lecture 01 Introduction to Digital Health.pdf, Folien 35–36"
+          ],
+          "remember": "Entscheidung + stärkster Grund + Bedingung für ein Umdenken."
+        },
+        {
+          "type": "slide",
+          "title": "Lab-Brücke: Patient, Encounter und Entscheidungszeit",
+          "body": [
+            "Im MIMIC-IV-ED-Lab bezeichnet `subject_id` die Person und `stay_id` einen bestimmten Notfallaufenthalt. Ein Aufenthalt kann mehrere Vitalmessungen haben. Eine Messzeile ist deshalb nicht automatisch ein neuer Patient.",
+            {
+              "table": {
+                "head": [
+                  "Eigener Fall: Entscheidung zwei Stunden nach Ankunft",
+                  "Als Input nutzbar?"
+                ],
+                "rows": [
+                  [
+                    "Messwert nach 30 Minuten, sofort verfügbar",
+                    "Ja, sofern für die Aufgabe passend."
+                  ],
+                  [
+                    "Messwert nach vier Stunden",
+                    "Nein, liegt nach der Entscheidungszeit."
+                  ],
+                  [
+                    "Später kodierte Abschlussdiagnose",
+                    "Nicht als damals schon bekannter Input behandeln."
+                  ]
+                ],
+                "caption": "Eigene Zeitbeispiele nach Lab-Abschnitt 8"
+              }
+            },
+            {
+              "reveal": {
+                "question": "Das Lab verwendet eine einfache Regel, die Alarme erzeugt. Belegt das Zählen dieser Alarme einen klinischen Nutzen?",
+                "answer": "Nein. Dafür fehlen unter anderem ein geeigneter Zielbezug, die Untersuchung von Fehlalarmen und übersehenen Fällen sowie die tatsächliche Reaktion im Workflow. Die Regel ist laut Notebook nur ein Lehrbeispiel und kein validierter klinischer Score.",
+                "label": "Eigene Antwort vergleichen"
+              }
+            },
+            "Quelle: Lab01_patient_data_to_decision_template.ipynb, Abschnitte 1, 3–9, 12–14"
+          ],
+          "remember": "Was weiss das System zu diesem Zeitpunkt, und was geschieht mit seiner Ausgabe?"
+        },
+        {
+          "type": "slide",
+          "title": "Transfer: eine Einführungsempfehlung begründen",
+          "body": [
+            {
+              "reveal": {
+                "question": "Eigener Transfer: Ein digitales Nachsorgesystem meldet zuverlässig auffällige Verläufe. Es gibt aber keine Kapazität, die Meldungen zu bearbeiten. Formuliere Entscheidung, stärksten Grund und mögliche Änderung.",
+                "answer": "Begründeter Vorschlag: Not yet. Die fehlende Bearbeitungskapazität unterbricht den Weg vom Hinweis zur Handlung. Neu beurteilen, wenn Zuständigkeit, Reaktionszeit und Kapazität geklärt und im passenden Setting geprüft sind.",
+                "label": "Eigene Antwort vergleichen"
+              }
+            },
+            {
+              "checklist": {
+                "title": "Kann ich das erklären und anwenden?",
+                "items": [
+                  "Ich unterscheide Digital Health, Health IT und Medical AI.",
+                  "Ich beschreibe Beteiligte, Nutzen und Zielkonflikte.",
+                  "Ich trenne Ausgabe, Entscheidung, Handlung und Outcome.",
+                  "Ich erkläre Fehlerfolgen, unsichere Labels, Shift und menschlichen Einfluss.",
+                  "Ich nutze Canvas, Fehlerpfad und Evidenz für eine begründete Empfehlung."
+                ]
+              }
+            },
+            "Zusatzwissen: Kursorganisation und einzelne Studienbeispiele helfen bei der Orientierung. Die zentralen Lernziele liegen im Begründen und Übertragen, nicht im Auswendiglernen von Autorennamen oder Fallzahlen.",
+            "Quelle: Lecture 01 Introduction to Digital Health.pdf, Folien 4, 28–39"
+          ],
+          "remember": "Die beste Begründung verbindet Bedarf, Daten, Workflow, Folgen und Evidenz."
+        },
+        {
+          "type": "checkpoint",
+          "id": "cp-transfer",
+          "title": "Checkpoint: Einführung beurteilen",
+          "questions": [
+            {
+              "id": "decision",
+              "type": "type",
+              "prompt": "Welche englische Zweiwort-Empfehlung bedeutet: plausibler Einsatz, aber wichtige Evidenz oder Absicherung fehlt noch?",
+              "accept": [
+                "Not yet",
+                "not-yet",
+                "noch nicht"
+              ],
+              "explanation": "Not yet beschreibt eine begründete vorläufige Zurückstellung. Quelle: Lecture 01 Introduction to Digital Health.pdf, Folien 35–39; Lab 01: Patient Data to Decision (Notebook), Abschnitte 8, 11–14"
+            },
+            {
+              "id": "recommendation",
+              "type": "multi",
+              "prompt": "Welche Bestandteile verlangt die Empfehlung der Folie 36?",
+              "options": [
+                "Klare Entscheidung",
+                "Stärkster Grund",
+                "Was die Entscheidung ändern würde",
+                "Garantie, dass nie ein Fehler auftritt"
+              ],
+              "correct": [
+                0,
+                1,
+                2
+              ],
+              "explanation": "Eine begründete Empfehlung benennt Evidenz und verbleibende Unsicherheit. Quelle: Lecture 01 Introduction to Digital Health.pdf, Folien 35–39; Lab 01: Patient Data to Decision (Notebook), Abschnitte 8, 11–14"
+            },
+            {
+              "id": "time",
+              "type": "single",
+              "prompt": "Eigener Lab-Fall: Das System soll zwei Stunden nach Ankunft entscheiden. Welche Information ist eindeutig zu spät?",
+              "options": [
+                "Ein bei Ankunft verfügbarer Wert",
+                "Eine nach vier Stunden erstmals erhobene Messung",
+                "Eine bei Minute 30 sofort dokumentierte Beobachtung"
+              ],
+              "correct": 1,
+              "explanation": "Zukünftige Informationen dürfen eine frühere Entscheidung nicht nachträglich besser aussehen lassen. Quelle: Lecture 01 Introduction to Digital Health.pdf, Folien 35–39; Lab 01: Patient Data to Decision (Notebook), Abschnitte 8, 11–14"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "w2",
+      "number": 2,
+      "title": "Healthcare Data: From Clinical Care to AI-Ready Data",
+      "status": "ready",
+      "items": [
+        {
+          "type": "slide",
+          "title": "Vom Versorgungsvorgang zum Datensatz",
+          "body": [
+            "Ein Patient erzeugt nicht von selbst eine fertige Tabellenzeile. Registrierung, Triage, Tests, Bildgebung, Behandlung und Entlassung erzeugen unterschiedliche Beobachtungen zu unterschiedlichen Zeitpunkten. Ein Analysedatensatz entsteht erst durch eine Auswahl für eine konkrete Frage.",
+            {
+              "flow": {
+                "steps": [
+                  {
+                    "title": "Versorgung",
+                    "text": "Beobachtungen und Entscheidungen im klinischen Alltag"
+                  },
+                  {
+                    "title": "Dokumentation",
+                    "text": "Verteilte Einträge mit unterschiedlichen Zeitpunkten"
+                  },
+                  {
+                    "title": "Analysedatensatz",
+                    "text": "Definierte Population, Beobachtungseinheit, Features und Zielgrösse"
+                  }
+                ]
+              }
+            },
+            {
+              "reveal": {
+                "question": "Eigener Einstieg: „Wir exportieren einfach alles und trainieren.“ Welche Entscheidung steckt schon vor dem Training darin?",
+                "answer": "Unter anderem, welche Personen und Ereignisse eingehen, was eine Zeile bedeutet, welche Zeitpunkte genutzt und welche Zielgrössen konstruiert werden.",
+                "label": "Eigene Antwort vergleichen"
+              }
+            },
+            "Quelle: Lecture 02  Healthcare Data.pdf, Folien 5–8"
+          ],
+          "remember": "Datensatzerstellung ist bereits eine Modellierungsentscheidung."
+        },
+        {
+          "type": "slide",
+          "title": "Wo die Informationen liegen",
+          "body": [
+            {
+              "cards": [
+                {
+                  "title": "EHR / HIS",
+                  "text": "Dokumentation und Organisation von Versorgung, etwa Kontakte, Diagnosen, Aufträge und Notizen."
+                },
+                {
+                  "title": "LIS",
+                  "text": "Laboranforderungen und Laborergebnisse im Laborinformationssystem."
+                },
+                {
+                  "title": "RIS / PACS",
+                  "text": "Radiologische Abläufe, Bilddaten und zugehörige Informationen."
+                },
+                {
+                  "title": "Weitere Systeme",
+                  "text": "Geräte, Monitoring und andere Anwendungen tragen zusätzliche Beobachtungen bei."
+                }
+              ]
+            },
+            "Die Beziehungen sind many-to-many: Ein Versorgungsvorgang kann mehrere Systeme berühren, und ein System unterstützt mehrere Vorgänge. Kein einzelner Export garantiert eine vollständige digitale Patientengeschichte.",
+            {
+              "reveal": {
+                "question": "Eigener Fall: Im EHR-Export fehlt ein Befund, der im externen Labor vorliegt. Was darfst du daraus nicht schliessen?",
+                "answer": "Dass die Untersuchung nie stattgefunden hat. Das Fehlen kann durch Systemgrenzen oder die Extraktion entstehen.",
+                "label": "Eigene Antwort vergleichen"
+              }
+            },
+            "Quelle: Lecture 02  Healthcare Data.pdf, Folien 7–8, 24"
+          ],
+          "remember": "Frage nach relevanten Quellen und ihrer Verknüpfung."
+        },
+        {
+          "type": "slide",
+          "title": "Eine Zeile: Patient, Aufnahme oder Messung?",
+          "body": [
+            "Im Lab beschreibt `patients` Personen, `admissions` Spitalaufenthalte und `labs` einzelne Messungen. `subject_id` verbindet eine Person über Aufenthalte hinweg; `hadm_id` bezeichnet einen bestimmten Spitalaufenthalt.",
+            {
+              "table": {
+                "head": [
+                  "Person",
+                  "Aufnahme",
+                  "Messwert"
+                ],
+                "rows": [
+                  [
+                    "A",
+                    "A1",
+                    "10"
+                  ],
+                  [
+                    "A",
+                    "A1",
+                    "14"
+                  ],
+                  [
+                    "A",
+                    "A2",
+                    "12"
+                  ],
+                  [
+                    "B",
+                    "B1",
+                    "16"
+                  ]
+                ],
+                "caption": "Eigene illustrative Zeilen, keine Original-Patientendaten"
+              }
+            },
+            {
+              "reveal": {
+                "question": "Wie viele Messzeilen, Aufnahmen und Personen zeigt die Tabelle?",
+                "answer": "Vier Messzeilen, drei Aufnahmen und zwei Personen. Ein Join kann die Zeilen vervielfachen, ohne neue Personen zu erzeugen.",
+                "label": "Eigene Antwort vergleichen"
+              }
+            },
+            {
+              "callout": {
+                "tone": "warn",
+                "title": "Beobachtungseinheit vor dem Zählen",
+                "text": "Zeilenzahl ist nicht automatisch Patientenzahl. Wiederholte Aufnahmen derselben Person sind zudem für eine spätere Trennung von Trainings- und Testdaten relevant."
+              }
+            },
+            "Quelle: Lecture 02  Healthcare Data.pdf, Folien 7, 12, 27; Lab_02_Healthcare_Data_template.ipynb, Abschnitte 1–2"
+          ],
+          "remember": "Erst die Bedeutung einer Zeile definieren, dann zählen und zusammenführen."
+        },
+        {
+          "type": "checkpoint",
+          "id": "cp-care",
+          "title": "Checkpoint: Von Versorgung zu Daten",
+          "questions": [
+            {
+              "id": "unit",
+              "type": "single",
+              "prompt": "Eigene Tabelle: Person A hat zwei Aufnahmen mit je drei Labormessungen. Wie viele Personen sind das?",
+              "options": [
+                "Sechs",
+                "Zwei",
+                "Eine"
+              ],
+              "correct": 2,
+              "explanation": "Mehrere Ereignisse und Aufnahmen können derselben Person gehören. Quelle: Lecture 02  Healthcare Data.pdf, Folien 7–8, 27; Lab_02_Healthcare_Data_template.ipynb, Abschnitte 1–2"
+            },
+            {
+              "id": "systems",
+              "type": "multi",
+              "prompt": "Welche Aussagen stimmen?",
+              "options": [
+                "Daten entstehen zu verschiedenen Zeitpunkten.",
+                "Alle Systeme enthalten zwangsläufig dieselbe vollständige Akte.",
+                "Eine Analysezeile wird für eine bestimmte Fragestellung konstruiert.",
+                "Ein Join kann die Anzahl Zeilen verändern."
+              ],
+              "correct": [
+                0,
+                2,
+                3
+              ],
+              "explanation": "Verteilte Daten und unterschiedliche Beobachtungseinheiten verlangen explizite Konstruktionsregeln. Quelle: Lecture 02  Healthcare Data.pdf, Folien 7–8, 27; Lab_02_Healthcare_Data_template.ipynb, Abschnitte 1–2"
+            },
+            {
+              "id": "admission-id",
+              "type": "type",
+              "prompt": "Welcher Schlüssel bezeichnet im Lab 02 einen Spitalaufenthalt: subject_id oder hadm_id?",
+              "accept": [
+                "hadm_id",
+                "hadm id",
+                "HADM-ID"
+              ],
+              "explanation": "subject_id steht für die Person, hadm_id für eine bestimmte Aufnahme. Quelle: Lecture 02  Healthcare Data.pdf, Folien 7–8, 27; Lab_02_Healthcare_Data_template.ipynb, Abschnitte 1–2"
+            }
+          ]
+        },
+        {
+          "type": "slide",
+          "title": "Modalitäten haben unterschiedliche Strukturen",
+          "body": [
+            "Tabellarische Angaben, Text, Bilder, Signale, Omics und Wearables erfassen verschiedene Aspekte derselben Person. Mehr Modalitäten liefern nicht automatisch mehr nützliche Information: Frage, Qualität, Zeitpunkt und Kombination sind entscheidend.",
+            {
+              "table": {
+                "head": [
+                  "Modalität",
+                  "Struktur",
+                  "Was Bedeutung trägt"
+                ],
+                "rows": [
+                  [
+                    "Klinischer Text",
+                    "Wort- oder Tokenfolge",
+                    "Kontext, Verneinung und Zeitbezug"
+                  ],
+                  [
+                    "CT im Folienbeispiel",
+                    "Räumliches Volumen und Metadaten",
+                    "Anatomie, Intensität und Aufnahmeparameter"
+                  ],
+                  [
+                    "ECG",
+                    "Messfolge über die Zeit",
+                    "Wellenform, Rhythmus und zeitliche Dynamik"
+                  ],
+                  [
+                    "Tabellarische Messung",
+                    "Wert mit definierten Feldern",
+                    "Variable, Einheit, Zeitpunkt und Kontext"
+                  ]
+                ],
+                "caption": "Strukturen in eigenen Worten; nicht jede Bildmodalität ist ein 3D-Volumen"
+              }
+            },
+            {
+              "reveal": {
+                "question": "Eigener Fall: Ein Text enthält „kein Fieber“. Warum genügt das Auftreten des Wortes „Fieber“ nicht für ein positives Label?",
+                "answer": "Die Verneinung verändert die Bedeutung. Die natürliche Struktur des Textes darf nicht ignoriert werden.",
+                "label": "Eigene Antwort vergleichen"
+              }
+            },
+            "Quelle: Lecture 02  Healthcare Data.pdf, Folien 10, 13"
+          ],
+          "remember": "Die Repräsentation muss zur Informationsstruktur passen."
+        },
+        {
+          "type": "slide",
+          "title": "Spaltennamen sind noch keine Definitionen",
+          "body": [
+            {
+              "table": {
+                "head": [
+                  "Spaltenname",
+                  "Offene Bedeutungsfrage"
+                ],
+                "rows": [
+                  [
+                    "Age",
+                    "Bei Aufnahme oder später bestimmt?"
+                  ],
+                  [
+                    "Weight",
+                    "Gemessen oder geschätzt, in welcher Einheit und wann?"
+                  ],
+                  [
+                    "Medication",
+                    "Angeordnet, abgegeben oder tatsächlich verabreicht?"
+                  ],
+                  [
+                    "Diagnosis",
+                    "Verdacht oder Bestätigung, bei Aufnahme oder Entlassung?"
+                  ]
+                ],
+                "caption": "Fragen nach Semantik, nicht nur nach Datentyp"
+              }
+            },
+            {
+              "reveal": {
+                "question": "Eigener Fall: Zwei Systeme haben beide eine Spalte „medication“. Darfst du die Werte ohne Prüfung gleich behandeln?",
+                "answer": "Nein. Das eine könnte eine Verordnung, das andere eine dokumentierte Verabreichung abbilden. Gleicher Name bedeutet nicht gleiche klinische Bedeutung.",
+                "label": "Eigene Antwort vergleichen"
+              }
+            },
+            "Quelle: Lecture 02  Healthcare Data.pdf, Folien 11"
+          ],
+          "remember": "Bedeutung entsteht aus Definition, Zeitpunkt und Entstehungsprozess."
+        },
+        {
+          "type": "slide",
+          "title": "Metadaten und Provenance ergänzen den Wert",
+          "body": [
+            "„Glucose = 100“ ist ohne Einheit, Zeitpunkt und Kontext unvollständig. Provenance bedeutet hier die nachvollziehbare Herkunft und Verarbeitung der Information.",
+            {
+              "cards": [
+                {
+                  "title": "Who / Why",
+                  "text": "Wer oder was erzeugte den Wert, und aus welchem Anlass?"
+                },
+                {
+                  "title": "When / How",
+                  "text": "Wann und wie wurde gemessen oder dokumentiert?"
+                },
+                {
+                  "title": "Where / What afterwards",
+                  "text": "Aus welchem System stammt er, und wie wurde er danach transformiert, gefiltert oder aggregiert?"
+                }
+              ]
+            },
+            {
+              "reveal": {
+                "question": "Eigener Fall: Zwei identische Zahlen stammen aus unterschiedlichen Einheiten und unterschiedlichen Messsituationen. Sind es dieselben Informationen?",
+                "answer": "Nein. Gleiche numerische Darstellung kann verschiedene Messgrössen oder Situationen abbilden. Erst Einheit, Messverfahren, Zeitpunkt und Kontext erlauben eine sinnvolle Interpretation.",
+                "label": "Eigene Antwort vergleichen"
+              }
+            },
+            "Quelle: Lecture 02  Healthcare Data.pdf, Folien 18, 22"
+          ],
+          "remember": "Ein Wert ohne seine Metadaten ist nicht vollständig beschrieben."
+        },
+        {
+          "type": "checkpoint",
+          "id": "cp-semantics",
+          "title": "Checkpoint: Struktur und Bedeutung",
+          "questions": [
+            {
+              "id": "modalities",
+              "type": "multi",
+              "prompt": "Welche Zuordnungen passen?",
+              "options": [
+                "ECG: zeitliche Signalfolge",
+                "Text: Bedeutung unter anderem durch Verneinung",
+                "Jede medizinische Aufnahme: nur eine einzelne Zahl",
+                "CT-Volumen: räumliche Struktur und Metadaten"
+              ],
+              "correct": [
+                0,
+                1,
+                3
+              ],
+              "explanation": "Modalitäten enthalten Information in unterschiedlichen Strukturen. Quelle: Lecture 02  Healthcare Data.pdf, Folien 10–13, 18, 22"
+            },
+            {
+              "id": "medication",
+              "type": "single",
+              "prompt": "Ein Feld enthält eine Medikamentenverordnung. Was ist damit allein noch nicht nachgewiesen?",
+              "options": [
+                "Dass etwas angeordnet wurde",
+                "Dass die Gabe tatsächlich erfolgte",
+                "Dass der Datensatz eine Information enthält"
+              ],
+              "correct": 1,
+              "explanation": "Verordnung und Verabreichung sind verschiedene Ereignisse. Quelle: Lecture 02  Healthcare Data.pdf, Folien 10–13, 18, 22"
+            },
+            {
+              "id": "provenance",
+              "type": "type",
+              "prompt": "Wie heisst die Herkunfts- und Verarbeitungsgeschichte von Daten als englischer Fachbegriff?",
+              "accept": [
+                "Provenance",
+                "Data Provenance",
+                "Datenprovenienz",
+                "Provenienz"
+              ],
+              "explanation": "Provenance umfasst Erzeugung, Herkunft und nachfolgende Bearbeitung. Quelle: Lecture 02  Healthcare Data.pdf, Folien 10–13, 18, 22"
+            }
+          ]
+        },
+        {
+          "type": "slide",
+          "title": "Der Patient verändert sich – und der Wissensstand auch",
+          "body": [
+            "Eine Patientengeschichte besteht aus Kontakten, Aufnahmen, Entlassung und weiteren Beobachtungen. Erkrankung, Behandlung und vorhandenes Wissen verändern sich. Messungen sind häufig unregelmässig und unvollständig.",
+            {
+              "compare": {
+                "left": {
+                  "title": "Patientenzustand",
+                  "points": [
+                    "Kann sich über die Zeit verändern"
+                  ]
+                },
+                "right": {
+                  "title": "Beobachtungsprozess",
+                  "points": [
+                    "Entscheidet, was wann sichtbar wird",
+                    "Hängt von Verdacht, Protokollen, Setting und Ressourcen ab"
+                  ]
+                }
+              }
+            },
+            {
+              "reveal": {
+                "question": "Eigener Fall: Bei Person A wird zweimal, bei Person B sechsmal gemessen. Beweist das, dass B dreimal so krank ist?",
+                "answer": "Nein. Krankheitsschwere ist eine mögliche Erklärung, aber auch Protokolle, klinischer Verdacht oder Arbeitsabläufe können die Messhäufigkeit beeinflussen.",
+                "label": "Eigene Antwort vergleichen"
+              }
+            },
+            "Quelle: Lecture 02  Healthcare Data.pdf, Folien 15–16"
+          ],
+          "remember": "Messhäufigkeit ist ein Prozesssignal, keine eindeutige Diagnose."
+        },
+        {
+          "type": "slide",
+          "title": "Eine Messreihe, mehrere mögliche Features",
+          "body": [
+            {
+              "table": {
+                "head": [
+                  "Uhrzeit",
+                  "Kreatinin [µmol/L]"
+                ],
+                "rows": [
+                  [
+                    "08:14",
+                    "105"
+                  ],
+                  [
+                    "14:32",
+                    "118"
+                  ],
+                  [
+                    "21:17",
+                    "127"
+                  ],
+                  [
+                    "22:00",
+                    "Prediction time"
+                  ]
+                ],
+                "caption": "Werte aus Folie 12, Darstellung neu erstellt"
+              }
+            },
+            {
+              "reveal": {
+                "question": "Bestimme ersten Wert, letzten Wert, Maximum, Mittelwert und Veränderung bis 22:00.",
+                "answer": "Erster Wert 105; letzter Wert 127; Maximum 127; Mittelwert (105+118+127)/3 = 116,67, gerundet 117; Veränderung 127−105 = +22 µmol/L. Voraussetzung: Die verwendeten Werte sind bis 22:00 auch tatsächlich verfügbar.",
+                "label": "Eigene Antwort vergleichen"
+              }
+            },
+            "Der Mittelwert beschreibt das Niveau im Fenster; der letzte Wert den letzten verfügbaren Stand. Die Veränderung beschreibt den Unterschied zwischen den gewählten Endpunkten. Gleiche Rohdaten können deshalb unterschiedliche Fragen beantworten.",
+            "Quelle: Lecture 02  Healthcare Data.pdf, Folien 12"
+          ],
+          "remember": "Fenster und Aggregation gehören zur Definition eines Features."
+        },
+        {
+          "type": "slide",
+          "title": "Eigene Rechnung: erst das Zeitfenster, dann der Mittelwert",
+          "body": [
+            {
+              "table": {
+                "head": [
+                  "Zeit nach Aufnahme",
+                  "Illustrativer Messwert",
+                  "Sofort verfügbar"
+                ],
+                "rows": [
+                  [
+                    "8 h",
+                    "10",
+                    "Ja"
+                  ],
+                  [
+                    "20 h",
+                    "14",
+                    "Ja"
+                  ],
+                  [
+                    "26 h",
+                    "18",
+                    "Ja"
+                  ]
+                ],
+                "caption": "Eigene Zahlen ohne klinische Interpretation; Vorhersage bei 24 h"
+              }
+            },
+            {
+              "reveal": {
+                "question": "Welchen Mittelwert darfst du für das abgeschlossene 0–24-h-Fenster bilden?",
+                "answer": "(10+14)/2 = 12. Der Wert 18 aus Stunde 26 gehört nicht in ein Feature für Stunde 24. Der Mittelwert aller drei Werte wäre 14 und würde Zukunftsinformation einbeziehen.",
+                "label": "Eigene Antwort vergleichen"
+              }
+            },
+            {
+              "flow": {
+                "steps": [
+                  {
+                    "title": "Zeitbezug klären",
+                    "text": "Messzeit und Verfügbarkeit festlegen"
+                  },
+                  {
+                    "title": "Fenster auswählen",
+                    "text": "Nur zulässige Beobachtungen aufnehmen"
+                  },
+                  {
+                    "title": "Aggregieren",
+                    "text": "Definierte Zusammenfassung berechnen"
+                  }
+                ]
+              }
+            },
+            "Quelle: Lecture 02  Healthcare Data.pdf, Folien 12, 29–31; Lab_02_Healthcare_Data_template.ipynb, Abschnitte 5–6"
+          ],
+          "remember": "Eine mathematisch korrekte Rechnung kann zeitlich unzulässig sein."
+        },
+        {
+          "type": "checkpoint",
+          "id": "cp-longitudinal",
+          "title": "Checkpoint: Messreihe und Fenster",
+          "questions": [
+            {
+              "id": "change",
+              "type": "type",
+              "prompt": "Folie 12: erster Wert 105, letzter Wert 127. Wie gross ist letzter minus erster in µmol/L?",
+              "accept": [
+                "22",
+                "+22",
+                "22 µmol/L",
+                "+22 µmol/L",
+                "22 umol/L"
+              ],
+              "explanation": "127−105 = +22. Das ist eine Veränderung, kein Mittelwert. Quelle: Lecture 02  Healthcare Data.pdf, Folien 12, 15–16, 29–31; Lab_02_Healthcare_Data_template.ipynb, Abschnitte 5–6"
+            },
+            {
+              "id": "measurement",
+              "type": "multi",
+              "prompt": "Welche Faktoren können Messhäufigkeit beeinflussen?",
+              "options": [
+                "Klinischer Verdacht",
+                "Behandlungsprotokoll",
+                "Verfügbare Ressourcen",
+                "Ausschliesslich ein unveränderlicher Messplan"
+              ],
+              "correct": [
+                0,
+                1,
+                2
+              ],
+              "explanation": "Der Beobachtungsprozess ist Teil des klinischen Alltags. Quelle: Lecture 02  Healthcare Data.pdf, Folien 12, 15–16, 29–31; Lab_02_Healthcare_Data_template.ipynb, Abschnitte 5–6"
+            },
+            {
+              "id": "window",
+              "type": "single",
+              "prompt": "Eigenes Beispiel: Werte 10 bei 8 h, 14 bei 20 h und 18 bei 26 h, jeweils sofort verfügbar. Welcher Mittelwert gehört zum 0–24-h-Fenster?",
+              "options": [
+                "12",
+                "14",
+                "18"
+              ],
+              "correct": 0,
+              "explanation": "Nur 10 und 14 liegen im erlaubten Fenster: (10+14)/2 = 12. Quelle: Lecture 02  Healthcare Data.pdf, Folien 12, 15–16, 29–31; Lab_02_Healthcare_Data_template.ipynb, Abschnitte 5–6"
+            }
+          ]
+        },
+        {
+          "type": "slide",
+          "title": "Missingness hat mehrere mögliche Ursachen",
+          "body": [
+            "Ein leeres Feld nennt seinen Entstehungsgrund nicht. Die Vorlesung unterscheidet unter anderem nicht angeordnet, nicht durchgeführt, in einem anderen System dokumentiert und technisch beziehungsweise organisatorisch nicht verfügbar.",
+            {
+              "cards": [
+                {
+                  "title": "Klinischer Anlass",
+                  "text": "Ein Test war möglicherweise nicht angezeigt."
+                },
+                {
+                  "title": "Ablauf",
+                  "text": "Ein Auftrag wurde möglicherweise nicht ausgeführt."
+                },
+                {
+                  "title": "Systemgrenze",
+                  "text": "Das Ergebnis liegt möglicherweise anderswo."
+                },
+                {
+                  "title": "Verfügbarkeit",
+                  "text": "Ein technischer oder organisatorischer Ausfall verhindert den Zugriff."
+                }
+              ]
+            },
+            {
+              "reveal": {
+                "question": "Eigener Fall: Ein Modell nutzt „Laborwert fehlt“ erfolgreich als Merkmal. Warum kann das an einem anderen Spital scheitern?",
+                "answer": "Die Missingness kann lokale Messentscheidungen oder Systeme abbilden. Andere Routinen können diesen Zusammenhang verändern, auch wenn die Patienten ähnlich sind.",
+                "label": "Eigene Antwort vergleichen"
+              }
+            },
+            "Quelle: Lecture 02  Healthcare Data.pdf, Folien 16–17"
+          ],
+          "remember": "Vor dem Imputieren nach dem möglichen Entstehungsprozess fragen."
+        },
+        {
+          "type": "slide",
+          "title": "Fehlende Tests: der Nenner entscheidet",
+          "body": [
+            "Das Lab fragt, in welchem Anteil der Aufnahmen ein Test fehlt. Dafür zählen Aufnahmen mit mindestens einer Messung, nicht die Gesamtzahl einzelner Laborzeilen.",
+            {
+              "formula": {
+                "main": "Anteil ohne Test = 1 − Aufnahmen mit Test / alle betrachteten Aufnahmen",
+                "note": "Die Beobachtungseinheit im Zähler und Nenner muss zusammenpassen."
+              }
+            },
+            {
+              "reveal": {
+                "question": "Eigene Zahlen: 100 Aufnahmen, 60 davon mit mindestens einer Messung. Diese 60 erzeugen zusammen 250 Messzeilen. Wie gross ist der Anteil ohne Test?",
+                "answer": "40/100 = 0,4 = 40 %. Die 250 Messzeilen dürfen die 60 unterschiedlichen Aufnahmen im Zähler nicht ersetzen.",
+                "label": "Eigene Antwort vergleichen"
+              }
+            },
+            {
+              "callout": {
+                "tone": "tip",
+                "title": "Lab-Logik",
+                "text": "Die Liste aller betrachteten Aufnahmen als Grundgesamtheit erhalten. Sonst verschwinden Aufnahmen ohne Messung bereits beim Zusammenführen und das Fehlen wird unterschätzt."
+              }
+            },
+            "Quelle: Lab_02_Healthcare_Data_template.ipynb, Abschnitt 3 / Exercise 2; Lecture 02  Healthcare Data.pdf, Folien 17"
+          ],
+          "remember": "Eine Aufnahme mit vielen Messungen zählt für „Test vorhanden“ trotzdem nur einmal."
+        },
+        {
+          "type": "slide",
+          "title": "Ausreisser zuerst untersuchen",
+          "body": [
+            "Ein extremer Wert kann ein Artefakt oder eine klinisch wichtige Beobachtung sein. Mögliche Erklärungen sind etwa Messprobleme, falsche Eingabe, eine andere Einheit oder ein tatsächlicher Zustand. Die statistische Auffälligkeit allein entscheidet nicht.",
+            {
+              "flow": {
+                "steps": [
+                  {
+                    "title": "Auffälligkeit entdecken",
+                    "text": "Welche Beobachtung fällt auf?"
+                  },
+                  {
+                    "title": "Kontext prüfen",
+                    "text": "Einheit, Gerät, Zeit, Nachbarwerte und Dokumentation vergleichen"
+                  },
+                  {
+                    "title": "Entscheiden",
+                    "text": "Behalten, korrigieren oder mit Begründung ausschliessen"
+                  }
+                ]
+              }
+            },
+            {
+              "reveal": {
+                "question": "Eigener Fall: Ein ungewöhnlicher Wert passt zu benachbarten Messungen, aber nicht zum Durchschnitt der Stichprobe. Reicht das als Löschgrund?",
+                "answer": "Nein. Ein Abstand zum Durchschnitt beweist keinen Fehler. Der Kontext kann eine seltene, reale Beobachtung stützen.",
+                "label": "Eigene Antwort vergleichen"
+              }
+            },
+            "Quelle: Lecture 02  Healthcare Data.pdf, Folien 19"
+          ],
+          "remember": "Ungewöhnlich ist nicht gleich falsch."
+        },
+        {
+          "type": "checkpoint",
+          "id": "cp-quality",
+          "title": "Checkpoint: Missingness und Datenqualität",
+          "questions": [
+            {
+              "id": "causes",
+              "type": "multi",
+              "prompt": "Welche Ursachen können ein fehlendes Ergebnis erklären?",
+              "options": [
+                "Nicht angeordneter Test",
+                "Ergebnis in einem anderen System",
+                "Technischer Fehler",
+                "Sicherer Beweis, dass der Wert normal gewesen wäre"
+              ],
+              "correct": [
+                0,
+                1,
+                2
+              ],
+              "explanation": "Aus dem fehlenden Eintrag allein folgt kein normaler Messwert. Quelle: Lecture 02  Healthcare Data.pdf, Folien 16–19; Lab_02_Healthcare_Data_template.ipynb, Abschnitte 3–4"
+            },
+            {
+              "id": "fraction",
+              "type": "type",
+              "prompt": "Eigenes Beispiel: In 80 von 100 Aufnahmen wurde der Test mindestens einmal gemessen. Wie viel Prozent der Aufnahmen haben keine Messung?",
+              "accept": [
+                "20",
+                "20 %",
+                "20%",
+                "20 Prozent"
+              ],
+              "explanation": "20 Aufnahmen ohne Test geteilt durch 100 ergeben 20 %. Quelle: Lecture 02  Healthcare Data.pdf, Folien 16–19; Lab_02_Healthcare_Data_template.ipynb, Abschnitte 3–4"
+            },
+            {
+              "id": "outlier",
+              "type": "single",
+              "prompt": "Was ist bei einem extremen Wert der angemessene erste Schritt?",
+              "options": [
+                "Ohne weitere Prüfung löschen",
+                "Kontext, Einheit, Messung und Nachbarwerte prüfen",
+                "Immer unverändert als sicher korrekt deklarieren"
+              ],
+              "correct": 1,
+              "explanation": "Die Entscheidung benötigt Evidenz zum konkreten Wert. Quelle: Lecture 02  Healthcare Data.pdf, Folien 16–19; Lab_02_Healthcare_Data_template.ipynb, Abschnitte 3–4"
+            }
+          ]
+        },
+        {
+          "type": "slide",
+          "title": "Labels werden konstruiert",
+          "body": [
+            "Ein klinisches Konzept wie eine Erkrankung ist nicht immer direkt beobachtbar. Labels können aus Codes, Berichten, fachlichen Beurteilungen, Verordnungen oder einem Review abgeleitet werden. Jede dieser Quellen hat eigene Grenzen.",
+            {
+              "flow": {
+                "steps": [
+                  {
+                    "title": "Klinischer Zustand",
+                    "text": "Was interessiert uns?"
+                  },
+                  {
+                    "title": "Beobachtung und Dokumentation",
+                    "text": "Was wurde erhoben und festgehalten?"
+                  },
+                  {
+                    "title": "Label-Regel",
+                    "text": "Wie wird daraus die Zielvariable?"
+                  },
+                  {
+                    "title": "Lernaufgabe",
+                    "text": "Was lernt das Modell tatsächlich vorherzusagen?"
+                  }
+                ]
+              }
+            },
+            {
+              "reveal": {
+                "question": "Eigener Fall: Jede Antibiotikaverordnung wird als Pneumonie-Label verwendet. Welche Annahme wäre zu prüfen?",
+                "answer": "Dass die Verordnung zuverlässig das gewünschte Krankheitskonzept abbildet. Die Folie nennt sie als leicht beobachtbare, aber nicht spezifische Entscheidungsquelle.",
+                "label": "Eigene Antwort vergleichen"
+              }
+            },
+            "Quelle: Lecture 02  Healthcare Data.pdf, Folien 20"
+          ],
+          "remember": "Die Label-Regel operationalisiert ein Konzept und kann es dabei verändern."
+        },
+        {
+          "type": "slide",
+          "title": "Proxy-Label: ICU admission ist nicht nur Verschlechterung",
+          "body": [
+            "Eine Aufnahme auf die Intensivstation ist gut dokumentierbar. Sie hängt aber nicht allein vom Patientenzustand ab, sondern auch von Entscheidungen, Behandlungszielen, Bettverfügbarkeit und Spitalpraxis.",
+            {
+              "compare": {
+                "left": {
+                  "title": "Gewünschtes Konzept",
+                  "points": [
+                    "Physiologische Verschlechterung",
+                    "Bedarf an höherer Versorgungsintensität"
+                  ]
+                },
+                "right": {
+                  "title": "Beobachteter Proxy",
+                  "points": [
+                    "Dokumentierte ICU-Aufnahme",
+                    "Beeinflusst durch Person und Gesundheitssystem"
+                  ]
+                }
+              }
+            },
+            {
+              "reveal": {
+                "question": "Eigener Fall: Zwei Standorte haben unterschiedliche Aufnahmepraxis für die ICU. Was könnte ein Modell mit ICU-Aufnahme als Label zusätzlich lernen?",
+                "answer": "Den lokalen Entscheidungs- und Ressourcenprozess. Eine hohe Vorhersagegüte für diesen Proxy beweist nicht automatisch eine gleich gute Erkennung physiologischer Verschlechterung.",
+                "label": "Eigene Antwort vergleichen"
+              }
+            },
+            "Quelle: Lecture 02  Healthcare Data.pdf, Folien 21"
+          ],
+          "remember": "Ein leicht verfügbares Label kann eine andere Frage beantworten als die beabsichtigte."
+        },
+        {
+          "type": "slide",
+          "title": "DICOM und PACS haben verschiedene Rollen",
+          "body": [
+            {
+              "flow": {
+                "steps": [
+                  {
+                    "title": "Scanner",
+                    "text": "Erzeugt die Untersuchung."
+                  },
+                  {
+                    "title": "DICOM-Darstellung",
+                    "text": "Bilddaten und interpretierbare Metadaten."
+                  },
+                  {
+                    "title": "PACS",
+                    "text": "Archivierung und Wiederauffinden."
+                  },
+                  {
+                    "title": "Viewer und Report",
+                    "text": "Betrachtung, Interpretation und Bericht."
+                  }
+                ]
+              }
+            },
+            "Zu den Metadaten gehören etwa Modalität, Aufnahmezeit, Protokoll, räumliche Orientierung, Pixelabstand und Schichtdicke. Ein medizinisches Bild ist deshalb mehr als ein beliebiges Pixelarray.",
+            {
+              "reveal": {
+                "question": "Eigener Fall: Nach dem Export ist die Intensität der Pixel erhalten, aber die räumliche Orientierung fehlt. Ist die medizinische Repräsentation unverändert?",
+                "answer": "Nein. Für die Interpretation relevante Metadaten fehlen. Bildinhalt und Kontext müssen gemeinsam berücksichtigt werden.",
+                "label": "Eigene Antwort vergleichen"
+              }
+            },
+            "Quelle: Lecture 02  Healthcare Data.pdf, Folien 25"
+          ],
+          "remember": "DICOM beschreibt Daten und Metadaten; PACS ist ein Archivierungs- und Kommunikationssystem."
+        },
+        {
+          "type": "slide",
+          "title": "FHIR: verknüpfte Ressourcen statt Riesentabelle",
+          "body": [
+            "FHIR gibt klinischer Information standardisierte, verknüpfbare Strukturen. Die Folie zeigt unter anderem Patient, Encounter, Observation, Condition, MedicationRequest und DiagnosticReport.",
+            {
+              "table": {
+                "head": [
+                  "Ressource im Folienbeispiel",
+                  "Beitrag"
+                ],
+                "rows": [
+                  [
+                    "Patient",
+                    "Wem gehört die Information?"
+                  ],
+                  [
+                    "Encounter",
+                    "Welcher Kontakt oder Aufenthalt?"
+                  ],
+                  [
+                    "Observation",
+                    "Was wurde gemessen?"
+                  ],
+                  [
+                    "Condition",
+                    "Welches Problem oder welche Diagnose?"
+                  ],
+                  [
+                    "MedicationRequest",
+                    "Was wurde verordnet?"
+                  ],
+                  [
+                    "DiagnosticReport",
+                    "Was wurde als Untersuchungsergebnis berichtet?"
+                  ]
+                ],
+                "caption": "Vereinfachte Rollen nach Folie 26"
+              }
+            },
+            {
+              "reveal": {
+                "question": "Eigener Fall: Ein Herzfrequenzwert enthält Referenzen auf Patient und Encounter. Welchen Vorteil haben diese Beziehungen?",
+                "answer": "Die Messung lässt sich der Person und dem konkreten Versorgungskontakt zuordnen. Beim Austausch bleiben diese Zusammenhänge explizit, statt nur eine isolierte Zahl zu übertragen.",
+                "label": "Eigene Antwort vergleichen"
+              }
+            },
+            "Quelle: Lecture 02  Healthcare Data.pdf, Folien 26"
+          ],
+          "remember": "Gemeinsame Struktur und Beziehungen unterstützen den Austausch von Bedeutung."
+        },
+        {
+          "type": "checkpoint",
+          "id": "cp-labels-systems",
+          "title": "Checkpoint: Labels und Informationssysteme",
+          "questions": [
+            {
+              "id": "proxy",
+              "type": "multi",
+              "prompt": "Warum ist ICU-Aufnahme ein möglicher Proxy statt einer reinen Messung der Verschlechterung?",
+              "options": [
+                "Bettverfügbarkeit kann mitwirken.",
+                "Klinische Entscheidungen können mitwirken.",
+                "Sie ist unabhängig vom Gesundheitssystem.",
+                "Lokale Praxis kann mitwirken."
+              ],
+              "correct": [
+                0,
+                1,
+                3
+              ],
+              "explanation": "Ein Proxy kann sowohl Patientenzustand als auch Systemprozesse kodieren. Quelle: Lecture 02  Healthcare Data.pdf, Folien 20–21, 25–26"
+            },
+            {
+              "id": "archive",
+              "type": "type",
+              "prompt": "Welche Abkürzung bezeichnet das Bildarchivierungs- und Kommunikationssystem der Folie?",
+              "accept": [
+                "PACS",
+                "Picture Archiving and Communication System",
+                "Picture Archiving & Communication System"
+              ],
+              "explanation": "DICOM ist die standardisierte Bild- und Metadatendarstellung; PACS übernimmt die Archivierungs- und Kommunikationsrolle. Quelle: Lecture 02  Healthcare Data.pdf, Folien 20–21, 25–26"
+            },
+            {
+              "id": "fhir",
+              "type": "single",
+              "prompt": "Welche Aussage beschreibt FHIR in der Vorlesung?",
+              "options": [
+                "Eine einzige Tabelle ohne Beziehungen",
+                "Standardisierte, verknüpfbare Ressourcen",
+                "Ein Verfahren, das alle Messfehler automatisch entfernt"
+              ],
+              "correct": 1,
+              "explanation": "FHIR unterstützt die Repräsentation und den Austausch zusammenhängender klinischer Informationen. Quelle: Lecture 02  Healthcare Data.pdf, Folien 20–21, 25–26"
+            }
+          ]
+        },
+        {
+          "type": "slide",
+          "title": "Was das Modell tatsächlich sieht",
+          "body": [
+            {
+              "flow": {
+                "steps": [
+                  {
+                    "title": "Clinical Reality",
+                    "text": "Patient, Zustand, Symptome und Kontext"
+                  },
+                  {
+                    "title": "Care Systems",
+                    "text": "Beobachtungen in EHR, LIS, PACS und Geräten"
+                  },
+                  {
+                    "title": "Raw Data",
+                    "text": "Extrahierte Tabellen, Texte, Bilder und Signale"
+                  },
+                  {
+                    "title": "Analysis Dataset",
+                    "text": "Ausgewählte Kohorte, Features und Labels"
+                  },
+                  {
+                    "title": "Model Input",
+                    "text": "Numerische Werte, Tokens, Pixel oder andere Repräsentationen"
+                  }
+                ]
+              }
+            },
+            "Jeder Übergang enthält Entscheidungen. Wird etwa eine Aufnahme ausgeschlossen, eine Messreihe gemittelt oder ein Diagnosecode zum Label, verändert das die spätere Lernaufgabe.",
+            {
+              "reveal": {
+                "question": "Eigener Fall: Ein Modell erkennt im Datensatz ein Muster. Was kannst du ohne Kenntnis der Transformationen nicht sicher sagen?",
+                "answer": "Ob das Muster primär den Patienten, die Datenerhebung, die Selektion oder eine Verarbeitung widerspiegelt. Das Modell sieht die konstruierte Repräsentation.",
+                "label": "Eigene Antwort vergleichen"
+              }
+            },
+            "Quelle: Lecture 02  Healthcare Data.pdf, Folien 24, 27"
+          ],
+          "remember": "Transformationen sind Teil der fachlichen Begründung eines Modells."
+        },
+        {
+          "type": "slide",
+          "title": "Prediction Time und Prediction Horizon",
+          "body": [
+            "Die Vorlesung konkretisiert die Frage auf t₀ = 24 Stunden nach Aufnahme und Verschlechterung in den nächsten 48 Stunden. Das Beobachtungsfenster liefert verfügbare Inputs; der Vorhersagehorizont beschreibt den künftigen Zielzeitraum.",
+            {
+              "flow": {
+                "steps": [
+                  {
+                    "title": "0 h: Aufnahme",
+                    "text": "Beginn des gewählten Beobachtungsfensters"
+                  },
+                  {
+                    "title": "24 h: t₀",
+                    "text": "Modell wird mit den bis dahin verfügbaren Inputs ausgeführt"
+                  },
+                  {
+                    "title": "Bis 72 h",
+                    "text": "Ende des 48-h-Vorhersagehorizonts nach t₀"
+                  }
+                ],
+                "note": "Der Horizont beginnt am Vorhersagezeitpunkt, nicht nochmals bei Aufnahme."
+              }
+            },
+            {
+              "reveal": {
+                "question": "Ist „innerhalb der ersten 24 Stunden“ dieselbe Aufgabenbeschreibung wie „genau bei Stunde 24“?",
+                "answer": "Nein. Ein variabler früherer Vorhersagezeitpunkt würde andere verfügbare Daten und eine andere Zeitdefinition verlangen. Der konkrete Task muss eindeutig sein.",
+                "label": "Eigene Antwort vergleichen"
+              }
+            },
+            "Quelle: Lecture 02  Healthcare Data.pdf, Folien 29–30"
+          ],
+          "remember": "Population, t₀, verfügbare Inputs, Ziel und Horizont vor dem Modell festlegen."
+        },
+        {
+          "type": "slide",
+          "title": "Gemessen ist nicht zwingend schon verfügbar",
+          "body": [
+            {
+              "table": {
+                "head": [
+                  "Eigene Zeitbeispiele; t₀ = 24 h",
+                  "Als Input bei t₀?"
+                ],
+                "rows": [
+                  [
+                    "Messung bei 8 h, Ergebnis sofort verfügbar",
+                    "Zeitlich zulässig"
+                  ],
+                  [
+                    "Probe bei 23 h, Ergebnis erst bei 26 h verfügbar",
+                    "Nicht zulässig"
+                  ],
+                  [
+                    "ICU-Transfer bei 36 h",
+                    "Nicht zulässig"
+                  ],
+                  [
+                    "Alter bei Aufnahme bekannt",
+                    "Zeitlich zulässig"
+                  ]
+                ],
+                "caption": "Verfügbarkeit und Messzeit getrennt betrachten"
+              }
+            },
+            {
+              "reveal": {
+                "question": "Warum kann eine Probe vor t₀ trotzdem Leakage erzeugen?",
+                "answer": "Das Modell dürfte den erst später bekannten Ergebniswert zum damaligen Zeitpunkt nicht kennen. Ein frühes Proben- oder Messdatum genügt nicht als Verfügbarkeitsnachweis.",
+                "label": "Eigene Antwort vergleichen"
+              }
+            },
+            "Auch Gesamtaufenthaltsdauer, Entlassungsdiagnose und später gestartete Medikamente können Zukunftsinformation verraten. Entscheidend ist die konkrete Aufgabe und wann die jeweilige Information bekannt war.",
+            "Quelle: Lecture 02  Healthcare Data.pdf, Folien 30–31"
+          ],
+          "remember": "Nicht nur „Welche Variable?“, sondern „Wann war dieser Wert bekannt?“ fragen."
+        },
+        {
+          "type": "slide",
+          "title": "Eine überprüfbare Vorhersageaufgabe formulieren",
+          "body": [
+            "Ein Task benennt Population, Beobachtungseinheit, Beobachtungsfenster, Vorhersagezeit, Ziel und vorgesehenen Nutzen. Eine praktische Präzisierung ist zudem, welche Fälle zu t₀ noch für eine Zukunftsvorhersage infrage kommen.",
+            {
+              "table": {
+                "head": [
+                  "Eigener Task-Baustein",
+                  "Beispielhafte Festlegung"
+                ],
+                "rows": [
+                  [
+                    "Population / Einheit",
+                    "Definierte stationäre Aufnahmen; eine Zeile pro Aufnahme"
+                  ],
+                  [
+                    "Zeit",
+                    "Vorhersage genau 24 h nach Aufnahme"
+                  ],
+                  [
+                    "Inputs",
+                    "Nur bis t₀ verfügbare Informationen aus dem definierten Fenster"
+                  ],
+                  [
+                    "Target / Horizont",
+                    "Vorab definierte Verschlechterung in den folgenden 48 h"
+                  ],
+                  [
+                    "Nutzen",
+                    "Unterstützung einer benannten Entscheidung durch zuständige Nutzende"
+                  ]
+                ],
+                "caption": "Eigenes Spezifikationsbeispiel, keine geprüfte klinische Einsatzempfehlung"
+              }
+            },
+            {
+              "reveal": {
+                "question": "Eine Zielvariable ist bereits vor t₀ eingetreten. Warum muss man den Fall im Task ausdrücklich behandeln?",
+                "answer": "Sonst vermischt man das Erkennen eines bereits bestehenden Zustands mit einer Zukunftsvorhersage. Auswahlregeln und Definition des Zielereignisses müssen das klären.",
+                "label": "Eigene Antwort vergleichen"
+              }
+            },
+            "Quelle: Lecture 02  Healthcare Data.pdf, Folien 5, 29–32; Lab_02_Healthcare_Data_template.ipynb, Abschnitte 7–8"
+          ],
+          "remember": "Eine konkrete Zeit- und Zieldefinition verhindert scheinbar gute, aber unbrauchbare Ergebnisse."
+        },
+        {
+          "type": "checkpoint",
+          "id": "cp-clock",
+          "title": "Checkpoint: Vorhersage hat eine Uhr",
+          "questions": [
+            {
+              "id": "horizon",
+              "type": "type",
+              "prompt": "t₀ liegt 24 h nach Aufnahme. Der Horizont umfasst die folgenden 48 h. Bei welcher Stunde nach Aufnahme endet er?",
+              "accept": [
+                "72",
+                "72 h",
+                "72h",
+                "72 Stunden"
+              ],
+              "explanation": "24+48 = 72 Stunden nach Aufnahme. Quelle: Lecture 02  Healthcare Data.pdf, Folien 29–31"
+            },
+            {
+              "id": "allowed",
+              "type": "multi",
+              "prompt": "Eigener Task bei 24 h: Welche Inputs sind zeitlich zulässig, wenn die genannten verfügbaren Informationen zur Fragestellung passen?",
+              "options": [
+                "Bei Aufnahme bekanntes Alter",
+                "Ergebnis aus einer Probe bei 23 h, erst bei 26 h bekannt",
+                "Sofort verfügbarer Messwert bei 8 h",
+                "Erst nach Entlassung bekannte Gesamtaufenthaltsdauer"
+              ],
+              "correct": [
+                0,
+                2
+              ],
+              "explanation": "Die tatsächliche Verfügbarkeit bei t₀ entscheidet. Quelle: Lecture 02  Healthcare Data.pdf, Folien 29–31"
+            },
+            {
+              "id": "leakage",
+              "type": "single",
+              "prompt": "Ein Modell verwendet für t₀ = 24 h die erst bei 60 h zugewiesene Abschlussdiagnose. Was ist das Problem?",
+              "options": [
+                "Temporal Leakage",
+                "Zu kurze Spaltennamen",
+                "Die Einheit von Zeit spielt keine Rolle"
+              ],
+              "correct": 0,
+              "explanation": "Später bekannt gewordene Information fliesst unzulässig in eine frühere Vorhersage ein. Quelle: Lecture 02  Healthcare Data.pdf, Folien 29–31"
+            }
+          ]
+        },
+        {
+          "type": "slide",
+          "title": "Lab-Brücke: ein Feature pro Aufnahme bauen",
+          "body": [
+            "Im Lab werden Messungen mit Aufnahmedaten verknüpft, das 0–24-h-Fenster ausgewählt und Mittelwerte pro Aufnahme und Labortest gebildet. Die resultierende Tabelle soll eine Zeile pro `hadm_id` haben.",
+            {
+              "flow": {
+                "steps": [
+                  {
+                    "title": "Verknüpfen",
+                    "text": "Messungen dem richtigen Aufenthalt zuordnen"
+                  },
+                  {
+                    "title": "Filtern",
+                    "text": "Zeitfenster und verfügbare Testarten festlegen"
+                  },
+                  {
+                    "title": "Aggregieren",
+                    "text": "Definierte Zusammenfassung je Aufnahme und Test"
+                  },
+                  {
+                    "title": "Prüfen",
+                    "text": "Eindeutigkeit, fehlende Features und Zukunftsinformation kontrollieren"
+                  }
+                ]
+              }
+            },
+            {
+              "callout": {
+                "tone": "warn",
+                "title": "Vereinfachung im Notebook",
+                "text": "Der gezeigte Code verwendet charttime zum Filtern. Für einen echten Einsatz muss zusätzlich geklärt werden, ob dieser Zeitstempel die tatsächliche Ergebnisverfügbarkeit abbildet. Die Vorlesung unterscheidet Messzeit und Bekanntwerden ausdrücklich."
+              }
+            },
+            {
+              "reveal": {
+                "question": "Das Notebook verwendet bei fehlendem Datenzugriff einen synthetischen Fallback. Darfst du dessen Häufigkeiten als klinische Befunde interpretieren?",
+                "answer": "Nein. Der Fallback übt Strukturen und Verarbeitungsschritte. Er ist keine empirische Aussage über Patienten oder Spitäler; die Datenquelle muss benannt bleiben.",
+                "label": "Eigene Antwort vergleichen"
+              }
+            },
+            "Quelle: Lab_02_Healthcare_Data_template.ipynb, Abschnitte 5–9; Lecture 02  Healthcare Data.pdf, Folien 12, 27, 30–31"
+          ],
+          "remember": "Ein strukturell korrektes Feature braucht auch einen fachlich gültigen Zeitbezug."
+        },
+        {
+          "type": "slide",
+          "title": "Data Reality Check und Transfer",
+          "body": [
+            {
+              "checklist": {
+                "title": "Kann ich das erklären und anwenden?",
+                "items": [
+                  "Population: Wer ist ein- und ausgeschlossen?",
+                  "Time: Wann wurde die Information wirklich bekannt?",
+                  "Measurement: Wie wurde sie erzeugt?",
+                  "Missingness: Warum könnte sie fehlen?",
+                  "Target: Welches Konzept oder welcher Proxy wird vorhergesagt?",
+                  "Setting: Was könnte sich anderswo ändern?"
+                ]
+              }
+            },
+            {
+              "reveal": {
+                "question": "Eigener Transfer: Eine Klinik misst einen Test routinemässig, eine andere nur bei Verdacht. Ein Modell nutzt die Messhäufigkeit. Wo erwartest du eine Übertragbarkeitsfrage?",
+                "answer": "Beim Beobachtungsprozess und Setting. Das Merkmal kann lokale Routinen statt nur Patientenzustand abbilden. Ein gleicher Spaltenname beseitigt diese Differenz nicht.",
+                "label": "Eigene Antwort vergleichen"
+              }
+            },
+            {
+              "reveal": {
+                "question": "Eigener Transfer: Ein Modell ist auffällig gut. Sein Datensatz enthält letzte Messungen vor Entlassung, soll aber bei Aufnahme vorhersagen. Welche Prüfung hat Vorrang?",
+                "answer": "Die Verfügbarkeit der Inputs am vorgesehenen Vorhersagezeitpunkt. Zukünftige Messungen können die Leistung künstlich erhöhen; eine Modelloptimierung würde dieses Grundproblem nicht beheben.",
+                "label": "Eigene Antwort vergleichen"
+              }
+            },
+            "Zusatzwissen: Die konkreten Modalitätsbeispiele illustrieren Strukturen. Entscheidend sind Bedeutung, Zeitbezug und Konstruktion der Repräsentation; spätere Wochen vertiefen Aufbereitung und Modelle.",
+            "Quelle: Lecture 02  Healthcare Data.pdf, Folien 32, 34–35"
+          ],
+          "remember": "Prüfe die Datenrealität, bevor du das Modell optimierst."
+        },
+        {
+          "type": "checkpoint",
+          "id": "cp-reality",
+          "title": "Checkpoint: Gesamtbeurteilung",
+          "questions": [
+            {
+              "id": "representation",
+              "type": "order",
+              "prompt": "Ordne die Repräsentationskette der Vorlesung.",
+              "items": [
+                "Clinical Reality",
+                "Care Systems",
+                "Raw Data",
+                "Analysis Dataset",
+                "Model Input"
+              ],
+              "explanation": "Das Modell erhält die am Ende erzeugte Repräsentation, nicht den Patienten unmittelbar. Quelle: Lecture 02  Healthcare Data.pdf, Folien 20–22, 27, 30–35; Lab_02_Healthcare_Data_template.ipynb, Abschnitte 6–9"
+            },
+            {
+              "id": "check",
+              "type": "multi",
+              "prompt": "Welche Punkte gehören zum Data Reality Check?",
+              "options": [
+                "Population und Setting",
+                "Zeit und Messprozess",
+                "Missingness und Target",
+                "Nur die Wahl des leistungsfähigsten Algorithmus"
+              ],
+              "correct": [
+                0,
+                1,
+                2
+              ],
+              "explanation": "Die sechs Fragen prüfen Eignung und Bedeutung der Daten vor dem Modell. Quelle: Lecture 02  Healthcare Data.pdf, Folien 20–22, 27, 30–35; Lab_02_Healthcare_Data_template.ipynb, Abschnitte 6–9"
+            },
+            {
+              "id": "synthetic",
+              "type": "single",
+              "prompt": "Eigener Lab-Fall: Die Auswertung basiert auf dem ausdrücklich synthetischen Fallback. Welche Aussage ist angemessen?",
+              "options": [
+                "Die Häufigkeiten beschreiben alle realen Spitalpatienten.",
+                "Die Verarbeitung lässt sich üben; die Zahlen sind keine klinischen Befunde.",
+                "Synthetische Daten beseitigen jede methodische Frage."
+              ],
+              "correct": 1,
+              "explanation": "Die Herkunft begrenzt, welche Schlussfolgerungen zulässig sind. Quelle: Lecture 02  Healthcare Data.pdf, Folien 20–22, 27, 30–35; Lab_02_Healthcare_Data_template.ipynb, Abschnitte 6–9"
+            }
+          ]
+        }
+      ]
+    },
     {
       id: "w3",
       number: 3,

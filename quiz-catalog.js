@@ -45,6 +45,15 @@ window.QUIZ_CATALOG = {
       maximumScore: 100
     },
     {
+      id: "dheal-w1-introduction",
+      subject: "DHEAL",
+      week: 1,
+      title: "Introduction: Vom Patienten zur klinischen Wirkung",
+      source: "Lecture 01 Introduction to Digital Health.pdf",
+      path: "quizzes/DHEAL/W1_Introduction.html",
+      maximumScore: 100
+    },
+    {
       id: "dheal-w2-healthcare-data",
       subject: "DHEAL",
       week: 2,

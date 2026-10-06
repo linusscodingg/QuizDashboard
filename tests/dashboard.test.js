@@ -89,13 +89,13 @@ context.window.addEventListener = (type, handler) => { windowListeners[type] = h
 
 vm.runInContext(catalogCode, context, { filename: "quiz-catalog.js" });
 const catalog = context.window.QUIZ_CATALOG;
-assert.equal(catalog.quizzes.length, 15);
+assert.equal(catalog.quizzes.length, 16);
 for (const quiz of catalog.quizzes) {
   assert.ok(fs.existsSync(path.resolve(dashboardDirectory, quiz.path)), `Missing quiz file: ${quiz.path}`);
 }
 
 vm.runInContext(inlineScripts[0], context, { filename: "dashboard-inline.js" });
-assert.equal(elements.completedTotal.textContent, "0 / 15");
+assert.equal(elements.completedTotal.textContent, "0 / 16");
 assert.equal(elements.averageGrade.textContent, "–");
 
 openQuizButton.click();
@@ -146,7 +146,7 @@ assert.equal(resumeMessage.type, "quiz-resume");
 assert.deepEqual(resumeMessage.progress.quizState.answers["icmp-role"], [1, 2]);
 
 report("attempt-1", 70);
-assert.equal(elements.completedTotal.textContent, "1 / 15");
+assert.equal(elements.completedTotal.textContent, "1 / 16");
 assert.equal(elements.averagePercent.textContent, "70 %");
 assert.equal(elements.averageGrade.textContent, "4.5");
 assert.equal(String(elements.attemptTotal.textContent), "1");
