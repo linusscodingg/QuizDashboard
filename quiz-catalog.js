@@ -81,6 +81,33 @@ window.QUIZ_CATALOG = {
       maximumScore: 100
     },
     {
+      id: "sws1-w1-introduction-software-security",
+      subject: "SWS1",
+      week: 1,
+      title: "Introduction to Software Security",
+      source: "IntroSoftwareSecurity.pdf",
+      path: "quizzes/SWS1/W1_Introduction_Software_Security.html",
+      maximumScore: 100
+    },
+    {
+      id: "sws1-w3-web-application-security-testing-1",
+      subject: "SWS1",
+      week: 3,
+      title: "Web Application Security Testing 1: Injection",
+      source: "WebAppSecurityTesting1.pdf",
+      path: "quizzes/SWS1/W3_Web_Application_Security_Testing_1.html",
+      maximumScore: 100
+    },
+    {
+      id: "sws1-w4-web-application-security-testing-2",
+      subject: "SWS1",
+      week: 4,
+      title: "Web Application Security Testing 2: Authentication, Sessions and XSS",
+      source: "WebAppSecurityTesting2.pdf",
+      path: "quizzes/SWS1/W4_Web_Application_Security_Testing_2.html",
+      maximumScore: 100
+    },
+    {
       id: "sws1-w2-secure-development-lifecycle",
       subject: "SWS1",
       week: 2,
@@ -92,9 +119,9 @@ window.QUIZ_CATALOG = {
     {
       id: "sws1-w3-software-security-errors",
       subject: "SWS1",
-      week: 3,
+      week: 2,
       title: "Software Security Errors",
-      source: "W3_SoftwareSecurityErrors.pdf",
+      source: "SoftwareSecurityErrors.pdf",
       path: "quizzes/SWS1/W3_Software_Security_Errors.html",
       maximumScore: 124
     },

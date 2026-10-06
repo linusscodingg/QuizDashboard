@@ -3,19 +3,19 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta name="description" content="Interactive SWS1 review on Software Security Errors.">
-  <title>SWS1 - Software Security Errors - Lecture Review</title>
+  <meta name="description" content="Interactive SWS1 review on Web Application Security Testing 1: Injection.">
+  <title>SWS1 - Web Application Security Testing 1: Injection - Lecture Review</title>
   <style>
     :root {
-      --ink: #222c3a;
-      --muted: #647083;
-      --teal: #435a86;
-      --teal-dark: #293a62;
-      --mint: #e5ebf7;
+      --ink: #2f241f;
+      --muted: #74655c;
+      --teal: #9a4f24;
+      --teal-dark: #713515;
+      --mint: #f8e7d8;
       --blue: #367fba;
       --paper: #fff;
-      --wash: #f0f3f9;
-      --line: #d3dbea;
+      --wash: #faf2eb;
+      --line: #ead3c2;
       --green: #198754;
       --amber: #a96c00;
       --red: #b9343b;
@@ -43,7 +43,7 @@
       padding: 25px;
       color: #fff;
       border-radius: 24px;
-      background: linear-gradient(120deg, #293a62, #435a86 62%, #687cab);
+      background: linear-gradient(120deg, #713515, #9a4f24 62%, #c46d35);
       box-shadow: var(--shadow);
     }
     .eyebrow { margin: 0 0 6px; color: #c8f4ed; font-size: .78rem; font-weight: 850; letter-spacing: .14em; text-transform: uppercase; }
@@ -122,7 +122,7 @@
     .dot.wrong, .dot.skipped { color: #fff; border-color: var(--red); background: var(--red); }
     .result { display: none; }
     .result.show { display: block; }
-    .result-hero { padding: 24px; color: #fff; border-radius: 18px; background: linear-gradient(120deg, #293a62, #435a86); }
+    .result-hero { padding: 24px; color: #fff; border-radius: 18px; background: linear-gradient(120deg, #713515, #9a4f24); }
     .result-hero h2 { margin: 0 0 8px; font-size: 2rem; }
     .result-big { font-size: clamp(2.5rem, 7vw, 4.8rem); font-weight: 900; line-height: 1; }
     .result-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin: 18px 0; }
@@ -152,9 +152,9 @@
   <main class="shell">
     <header class="topbar">
       <div>
-        <p class="eyebrow">SWS1 · Week 2</p>
-        <h1>Software Security Errors</h1>
-        <p class="subtitle">Active understanding check on the 7 (+1) Kingdoms and typical software security errors</p>
+        <p class="eyebrow">SWS1 · Week 3</p>
+        <h1>Web Application Security Testing 1: Injection</h1>
+        <p class="subtitle">SQL, OS command, JSON/XML and XXE injection — reason about causes, evidence and defenses</p>
       </div>
       <div class="scorebox" aria-live="polite"><strong id="scoreText">0 / 100 points</strong><span id="percentText">0 % · no final grade yet</span></div>
       <div class="progress-wrap">
@@ -180,7 +180,7 @@
           <button class="btn ghost" id="newQuizBtn" type="button">Start new quiz</button>
         </div>
         <p class="save-note" id="saveNotice" aria-live="polite">Changes are also saved locally and automatically.</p>
-        <p class="source-note">Source: <strong>SoftwareSecurityErrors.pdf</strong>, Slides 1–23. The grade is a self-assessment, not an official university grade.</p>
+        <p class="source-note">Source: <strong>WebAppSecurityTesting1.pdf</strong>, Slides 1–59. The grade is a self-assessment, not an official university grade.</p>
       </aside>
     </div>
   </main>
@@ -188,401 +188,315 @@
   <script>
     const questions = [
       {
-        "id": "taxonomy",
+        "id": "boundary",
         "type": "single",
-        "topic": "Taxonomy",
-        "points": 6,
-        "prompt": "Why does the lecture use the 7 (+1) Kingdoms of Software Security Errors?",
+        "topic": "Injection mechanism",
+        "prompt": "Which event is the essential cause of an injection vulnerability?",
+        "solution": "The same underlying failure can occur in SQL, shell commands and constructed JSON/XML.",
+        "reference": "WebAppSecurityTesting1.pdf, slides 7–12",
+        "concepts": [
+          "Injection mechanism"
+        ],
         "options": [
-          "Because only eight concrete vulnerabilities exist.",
-          "Because many concrete errors are based on a few fundamental problem classes, and the taxonomy is broadly applicable.",
-          "Because the taxonomy covers web applications only.",
-          "Because it automatically fixes every software error with a tool."
+          "A browser sends data with POST.",
+          "Untrusted data changes the structure or meaning of instructions interpreted downstream.",
+          "The application accepts any punctuation.",
+          "A request contains JSON instead of a form."
         ],
         "correct": 1,
         "optionExplanations": [
-          "There is a broad spectrum of concrete errors; the kingdoms group their fundamental causes.",
-          "The taxonomy provides a general classification with a reasonable number of major error classes and is not limited to one application domain.",
-          "Its general applicability is presented as an advantage over classifications focused on specific domains.",
-          "A taxonomy supports understanding and classification; it does not repair software automatically."
+          "POST is only a transport choice.",
+          "The boundary between data and instructions is broken.",
+          "Legitimate data can contain punctuation; safe handling matters.",
+          "JSON can be handled safely or unsafely."
         ],
-        "solution": "The kingdoms reduce a wide spectrum of concrete software security errors to a manageable set of fundamental classes. This helps developers understand recurring causes and countermeasures systematically.",
-        "reference": "Slides 5–7",
-        "concepts": [
-          "7 (+1) Kingdoms",
-          "Taxonomy"
-        ]
+        "points": 6
       },
       {
-        "id": "kingdom-order",
-        "type": "order",
-        "topic": "The seven kingdoms",
-        "points": 7,
-        "prompt": "Arrange the seven numbered kingdoms in the order of importance given in the lecture. Environment is the additional +1 and is not part of this list.",
-        "items": [
-          "Input Validation and Representation",
-          "API Abuse",
-          "Security Features",
-          "Time and State",
-          "Error Handling",
-          "Code Quality",
-          "Encapsulation"
-        ],
-        "initial": [
-          4,
-          0,
-          6,
-          2,
-          1,
-          5,
-          3
-        ],
-        "correct": [
-          0,
-          1,
-          2,
-          3,
-          4,
-          5,
-          6
-        ],
-        "solution": "1 Input Validation and Representation → 2 API Abuse → 3 Security Features → 4 Time and State → 5 Error Handling → 6 Code Quality → 7 Encapsulation. Environment is listed separately as the +1 kingdom.",
-        "reference": "Slide 7",
-        "concepts": [
-          "7 (+1) Kingdoms",
-          "Taxonomy"
-        ]
-      },
-      {
-        "id": "command-injection",
-        "type": "text",
-        "topic": "Input Validation and Representation",
-        "points": 8,
-        "prompt": "A server method constructs the shell command `ls ` + directory. Explain the attack using the input `/etc; cat /etc/passwd`, and name a basic countermeasure.",
-        "solution": "The shell interprets the semicolon as a command separator. Instead of only listing a directory, the server also executes `cat /etc/passwd` with the privileges of its process. The cause is unvalidated input placed directly into a command context. The lecture names proper input validation as the basic fix. In practice, shell-string concatenation should also be avoided by using a safe API with separate arguments or a direct directory-listing API.",
-        "reference": "Slides 3–4 and 8–9",
-        "concepts": [
-          "Input Validation",
-          "Command Injection",
-          "Representation"
-        ]
-      },
-      {
-        "id": "input-examples",
-        "type": "multi",
-        "topic": "Input Validation and Representation",
-        "points": 8,
-        "prompt": "Which errors are presented as examples of this kingdom?",
-        "options": [
-          "Buffer Overflow",
-          "SQL Injection",
-          "Cross-Site Scripting",
-          "Path Traversal",
-          "Deadlock",
-          "Empty Catch Block"
-        ],
-        "correct": [
-          0,
-          1,
-          2,
-          3
-        ],
-        "optionExplanations": [
-          "Unchecked lengths can cause writes beyond an allocated buffer.",
-          "Unvalidated input can alter the structure of an SQL statement.",
-          "Incorrect handling of input and output can cause attacker-controlled JavaScript to execute in another user's browser.",
-          "Manipulated path components such as `../` can escape the intended directory.",
-          "Deadlocks result from problematic interaction and locking and belong to Time and State.",
-          "An empty catch block belongs to Error Handling."
-        ],
-        "solution": "Buffer overflows, injection attacks, Cross-Site Scripting, and Path Traversal are examples involving missing or bypassable validation and problematic data representation.",
-        "reference": "Slides 8–9",
-        "concepts": [
-          "Input Validation",
-          "Injection",
-          "Path Traversal"
-        ]
-      },
-      {
-        "id": "api-abuse",
+        "id": "union-shape",
         "type": "single",
-        "topic": "API Abuse",
-        "points": 8,
-        "prompt": "A server authorizes clients based on a host name obtained through reverse DNS. What is the central software security error?",
+        "topic": "SQL UNION prerequisites",
+        "prompt": "Own controlled-lab example: the original SELECT returns three columns: text, text, integer. Which UNION result shape is the best candidate, assuming compatible DBMS types?",
+        "solution": "UNION requires equal column counts and compatible types in corresponding positions. Exact coercion rules depend on the DBMS.",
+        "reference": "WebAppSecurityTesting1.pdf, slides 19–23, 27",
+        "concepts": [
+          "SQL UNION prerequisites"
+        ],
         "options": [
-          "The developer wrote the API call with invalid syntax.",
-          "The developer incorrectly assumes that the host name returned by reverse DNS securely proves the client's identity.",
-          "Every DNS request inevitably causes a buffer overflow.",
-          "The only problem is an overly broad exception handler."
+          "Two text columns",
+          "Three columns: text, text, integer",
+          "Four columns: text, text, integer, integer",
+          "Any number of columns if table names match"
         ],
         "correct": 1,
         "optionExplanations": [
-          "The function may be called correctly at the programming level; the problem is the incorrect security assumption about its result.",
-          "DNS responses are generally not suitable as strong authentication and may be spoofed by an attacker on the communication channel.",
-          "A buffer overflow is neither required nor the stated cause in this scenario.",
-          "Exception handling is not the core of this access-control mistake."
+          "The column count must match.",
+          "Count and positional type compatibility both match.",
+          "The extra column makes the shapes incompatible.",
+          "Table names do not remove shape constraints."
         ],
-        "solution": "API Abuse includes incorrect assumptions about offered functionality. Reverse DNS does not provide reliable proof of identity and is therefore an unsafe basis for access control.",
-        "reference": "Slides 10–11",
-        "concepts": [
-          "API Abuse",
-          "Wrong security assumptions",
-          "DNS"
-        ]
+        "points": 6
       },
       {
-        "id": "security-features",
-        "type": "multi",
-        "topic": "Security Features",
-        "points": 8,
-        "prompt": "Which situations are examples of incorrect use of security features?",
-        "options": [
-          "Using a predictable PRNG to generate cryptographic keys",
-          "Failing to enforce access control on every protected access",
-          "Leaving obsolete weak algorithms enabled in TLS for backward compatibility",
-          "Correctly configuring an established cryptographic library according to current standards",
-          "Keeping sensitive session state exclusively on the server"
-        ],
-        "correct": [
-          0,
-          1,
-          2
-        ],
-        "optionExplanations": [
-          "Predictable random values can produce weak or guessable key material.",
-          "Incomplete access control can expose privileged functionality or data.",
-          "A protocol may support secure and insecure choices at the same time; weak configuration remains dangerous.",
-          "This is the recommended direction, not an error example.",
-          "Server-side session state prevents clients from directly manipulating important authorization data."
-        ],
-        "solution": "Even established security features are secure only when correctly selected, configured, and consistently used. Developers should avoid inventing their own cryptographic mechanisms.",
-        "reference": "Slide 12",
-        "concepts": [
-          "Security Features",
-          "Cryptography",
-          "Access Control"
-        ]
-      },
-      {
-        "id": "time-state",
+        "id": "probe",
         "type": "single",
-        "topic": "Time and State",
-        "points": 8,
-        "prompt": "A program checks a file and opens it later. An attacker replaces the file between the check and the use. What is this problem called, and why does it occur?",
-        "options": [
-          "A TOCTOU race condition; the check and use are separate, non-atomic steps with an exploitable time window.",
-          "SQL Injection; the file name changes a database statement.",
-          "A memory leak; the file is not released.",
-          "Cross-Site Request Forgery; a browser sends a request."
-        ],
-        "correct": 0,
-        "optionExplanations": [
-          "Time of Check – Time of Use precisely describes the gap between validating and using a mutable resource.",
-          "No database query is involved in this scenario.",
-          "Resource cleanup is not the cause of the file substitution.",
-          "CSRF concerns unwanted requests made through an authenticated web session, not this file-access race."
-        ],
-        "solution": "In parallel or distributed execution, state can change between two program steps. A previous check must therefore not be assumed to remain valid when the resource is used later.",
-        "reference": "Slides 13–14",
+        "topic": "Evidence and uncertainty",
+        "prompt": "A quote inserted into a search value causes a database syntax error in an authorized test. What is the best conclusion?",
+        "solution": "Investigate the specific data flow and verify the suspected weakness. Conversely, absence of visible errors does not prove safety.",
+        "reference": "WebAppSecurityTesting1.pdf, slides 16–18",
         "concepts": [
-          "Time and State",
-          "TOCTOU",
-          "Race Condition"
-        ]
+          "Evidence and uncertainty"
+        ],
+        "options": [
+          "The error proves that every table can be read.",
+          "It is strong evidence of unsafe SQL handling that needs controlled verification.",
+          "The application is safe because it rejected the request.",
+          "Changing GET to POST would remove the cause."
+        ],
+        "correct": 1,
+        "optionExplanations": [
+          "Reachable data depends on the query, privileges and other constraints.",
+          "The symptom is meaningful but does not establish every possible impact.",
+          "Failure may reveal that data was interpreted as syntax.",
+          "The HTTP method does not separate SQL code from data."
+        ],
+        "points": 6
       },
       {
-        "id": "error-handling",
+        "id": "sql-defense",
         "type": "multi",
-        "topic": "Error Handling",
-        "points": 8,
-        "prompt": "Which statements about Error Handling are correct?",
-        "options": [
-          "Detailed internal error messages shown to users can provide useful information to attackers.",
-          "An empty catch block can hide failures and cause unexpected program behavior.",
-          "An overly broad catch block may later handle newly introduced exceptions inappropriately.",
-          "Exceptions always simplify control flow so much that explicit error handling is unnecessary.",
-          "Errors should generally be ignored unless the process crashes immediately."
-        ],
-        "correct": [
-          0,
-          1,
-          2
-        ],
-        "optionExplanations": [
-          "System state, failed queries, and internal details can assist subsequent attacks.",
-          "Ignored exceptions hide causes and may damage availability or data consistency.",
-          "Newly added code may throw different exceptions that receive insufficiently specific treatment in a general handler.",
-          "Exceptions introduce a second control flow and are therefore difficult to handle correctly.",
-          "Even an error that does not immediately crash the process may leave the system in an unsafe or inconsistent state."
-        ],
-        "solution": "Secure Error Handling limits externally visible details, handles failures deliberately and specifically, and avoids empty or excessively broad handlers.",
-        "reference": "Slide 15",
+        "topic": "SQL defenses",
+        "prompt": "Own code review: a search concatenates an untrusted name into SQL. Which changes provide appropriate defenses?",
+        "solution": "Parameter binding is the primary fix for values; validation, controlled error reporting and least privilege complement it. Prepared statements are not merely a promise to escape quotes.",
+        "reference": "WebAppSecurityTesting1.pdf, slides 44; clarification: OWASP SQL Injection Prevention Cheat Sheet",
         "concepts": [
-          "Error Handling",
-          "Information leakage",
-          "Exceptions"
-        ]
-      },
-      {
-        "id": "code-quality",
-        "type": "multi",
-        "topic": "Code Quality",
-        "points": 8,
-        "prompt": "Which statements about Code Quality are correct?",
+          "SQL defenses"
+        ],
         "options": [
-          "Memory that is never freed can be exhausted and cause availability problems.",
-          "File handles or sockets that are not released can exhaust system resources.",
-          "Deprecated APIs may be deprecated because of security defects and should be replaced.",
-          "A null dereference is always harmless because modern operating systems repair it automatically.",
-          "Compiler warnings are only style suggestions and can generally be ignored."
-        ],
-        "correct": [
-          0,
-          1,
-          2
-        ],
-        "optionExplanations": [
-          "Memory leaks can consume the available memory and eventually terminate the program.",
-          "Other system resources are limited as well; missing cleanup can prevent the system from functioning.",
-          "Deprecation can indicate unsafe semantics or known defects, and a safer replacement is usually available.",
-          "A null dereference often terminates the program and can therefore harm availability.",
-          "Warnings frequently indicate real errors such as uninitialized values or insecure functions."
-        ],
-        "solution": "Unreadable code and lack of care increase the likelihood of security-relevant errors. Resource leaks, deprecated code, null dereferences, and uninitialized variables are typical examples.",
-        "reference": "Slides 16–17",
-        "concepts": [
-          "Code Quality",
-          "Resource exhaustion",
-          "Deprecated code"
-        ]
-      },
-      {
-        "id": "encapsulation-environment",
-        "type": "multi",
-        "topic": "Encapsulation and Environment",
-        "points": 9,
-        "prompt": "Which statements classify the examples correctly?",
-        "options": [
-          "Trusting a hidden form field containing `role=admin` as session state violates Encapsulation.",
-          "CSRF can trigger requests in another user's authenticated session and belongs to Encapsulation.",
-          "A framework that generates session IDs with insufficient length or randomness is an Environment problem.",
-          "A compiler optimization that removes an overwrite of sensitive memory is an Environment problem.",
-          "Environment includes only physical hardware, not libraries, the JVM, or network services."
+          "Bind the search value through a parameterized query.",
+          "Validate expected input properties on the server.",
+          "Hide detailed database errors from users.",
+          "Rely exclusively on JavaScript validation in the form.",
+          "Use the minimum database privileges required."
         ],
         "correct": [
           0,
           1,
           2,
-          3
-        ],
-        "optionExplanations": [
-          "Client-side hidden fields can be read and modified; authoritative session state must be protected on the server.",
-          "CSRF violates the intended boundary between the user's intention and the authenticated session.",
-          "The application depends on framework properties outside its own code.",
-          "The compiler is part of the security-critical environment and may change intended protection operations.",
-          "Environment includes compilers, operating systems, runtimes, frameworks, libraries, remote software, and network services."
-        ],
-        "solution": "Encapsulation protects boundaries between users, programs, and data. Environment covers external components on which the security of the developer's own code still depends.",
-        "reference": "Slides 18–19",
-        "concepts": [
-          "Encapsulation",
-          "Environment",
-          "Session state",
-          "CSRF"
-        ]
-      },
-      {
-        "id": "timing-attack",
-        "type": "text",
-        "topic": "Timing side channel",
-        "points": 10,
-        "prompt": "A password check returns immediately when the first incorrect character is found. Explain how this creates a timing attack, identify the kingdom, and state the basic fix.",
-        "solution": "The longer the correct prefix of the submitted password, the more characters are checked and the longer execution takes. An attacker can use timing differences to recover the password from left to right instead of brute-forcing complete candidates. The lecture assigns this to Time and State. The basic fix is to check all characters regardless of the first mismatch, preferably by using an appropriate constant-time comparison function.",
-        "reference": "Slides 21–22",
-        "concepts": [
-          "Time and State",
-          "Timing attack",
-          "Side channel"
-        ]
-      },
-      {
-        "id": "boss",
-        "type": "text",
-        "topic": "Boss Question – Classifying security errors",
-        "points": 12,
-        "prompt": "Analyze this small system: it takes a file path directly from a request, displays a complete stack trace when an error occurs, stores the user's role in a hidden form field, and reuses the same session ID after login. Assign each error to a kingdom and name one suitable countermeasure for each.",
-        "hint": "There are four problems across at least three different kingdoms.",
-        "solution": "Unvalidated file path: Input Validation and Representation; strictly validate and normalize allowed paths and restrict access to an intended root directory. Complete stack trace: Error Handling; log details internally and show only a neutral external error message. Role in a hidden field: Encapsulation; keep authoritative session state on the server and check authorization on every access. Same session ID across authentication: Time and State; regenerate the session ID after successful login to prevent session fixation. Strong answers may also note that libraries and framework configuration must be reviewed as part of Environment.",
-        "reference": "Slides 8–19",
-        "concepts": [
-          "Error classification",
-          "Input Validation",
-          "Error Handling",
-          "Encapsulation",
-          "Time and State"
-        ]
-      },
-      {
-        "id": "case-file-upload",
-        "type": "multi",
-        "topic": "Case study: profile picture upload",
-        "points": 12,
-        "prompt": "A web application lets users upload a profile picture. The server (1) trusts the file's declared MIME type without inspecting the actual file content, (2) builds the storage path by appending the user-supplied file name directly to a fixed upload folder without checking for path components such as `../`, (3) remembers the picture's owner ID in a hidden form field that a later \"replace picture\" request reads back from the client, and (4) returns the complete stack trace including the internal storage path whenever saving the file fails. Select every correct statement.",
-        "options": [
-          "The unchecked file name allows Path Traversal and is an Input Validation and Representation error.",
-          "Trusting the client-supplied owner ID from the hidden field instead of the server-side session is an Encapsulation error.",
-          "Returning the full stack trace is only a problem if the connection is not using HTTPS.",
-          "Trusting the declared MIME type without checking the actual file content is best classified under the Security Features kingdom.",
-          "If the hosting platform's file system permissions were misconfigured, that specific weakness would fall under the Environment kingdom rather than the application's own code."
-        ],
-        "correct": [
-          0,
-          1,
           4
         ],
         "optionExplanations": [
-          "A crafted file name such as `../../etc/passwd` can escape the intended upload directory because the path is not validated before use.",
-          "Session-relevant, authoritative state (who owns this resource) must live on the server; a client-controlled hidden field can be changed by the user before the request is sent.",
-          "Leaking internal paths and stack traces is an Error Handling problem regardless of transport encryption; HTTPS protects data in transit, not what the response body reveals.",
-          "Not checking the actual file content is a missing input check, so it belongs to Input Validation and Representation, not Security Features.",
-          "The application code did not cause this; a misconfiguration of something the application merely relies on (the file system it runs on) is exactly what the Environment kingdom covers."
+          "Binding values preserves the distinction between SQL structure and data.",
+          "Server validation enforces application constraints.",
+          "This limits information disclosure but is not the primary SQL injection fix.",
+          "A client or proxy can bypass browser checks.",
+          "Restricted privileges reduce possible damage."
         ],
-        "solution": "This single feature already touches three kingdoms: the unsanitized file name is a Path Traversal case under Input Validation and Representation, trusting client-supplied owner data instead of server-side session state is an Encapsulation error, and exposing the stack trace is an Error Handling information leak. A misconfigured hosting environment around the correctly written application would additionally be an Environment issue.",
-        "reference": "Original transfer case, combining Kingdoms 1, 5 and 7 plus Environment",
-        "concepts": [
-          "Path Traversal",
-          "Input Validation",
-          "Encapsulation",
-          "Error Handling",
-          "Environment"
-        ]
+        "hint": "Select all correct statements. Incorrect selections reduce partial credit.",
+        "points": 8
       },
       {
-        "id": "case-login-throttle",
-        "type": "text",
-        "topic": "Case study: login attempt counter",
-        "points": 12,
-        "prompt": "A login endpoint is supposed to lock an account after 5 failed attempts. On every request, the server first reads the current failed-attempt counter for that account from the database; if it is below 5, the server checks the password and, on failure, writes back counter + 1. Two login requests for the same account arrive from an attacker at almost the same time. Explain why both requests can still get a full guess at the password even though the counter logic looks correct, name the kingdom this belongs to, and describe a fix.",
-        "hint": "Think about what happens between the moment the counter is read and the moment it is written back, if two requests run this logic at the same time.",
-        "solution": "Reading the counter and later writing it back are two separate, non-atomic steps. If two requests execute concurrently, both can read the counter while it is still below 5, and both are allowed to try a password before either write happens - so the lockout is bypassed even though every single request individually respects the rule. This is a Time and State problem, structurally the same TOCTOU pattern as a file being replaced between a check and its use, just applied to a database counter instead of a file. The fix is to make the check-and-increment a single atomic operation, e.g. an atomic database increment with a condition (UPDATE ... SET counter = counter + 1 WHERE counter < 5), or by serializing access to that account's counter with a lock/transaction.",
-        "reference": "Original transfer case for Kingdom 4 (Time and State / TOCTOU)",
+        "id": "testing",
+        "type": "order",
+        "topic": "Testing workflow",
+        "prompt": "Own controlled-lab workflow: put these steps in a sensible evidence-based order.",
+        "solution": "Tools assist probing and comparison. A response-length outlier is a lead for investigation, not a complete proof by itself.",
+        "reference": "WebAppSecurityTesting1.pdf, slides 32–43",
         "concepts": [
-          "Time and State",
-          "TOCTOU",
-          "Race Condition",
-          "Concurrency"
-        ]
+          "Testing workflow"
+        ],
+        "items": [
+          "Record a normal request and response as a baseline.",
+          "Change one candidate input in a controlled probe.",
+          "Compare the resulting response with the baseline.",
+          "Manually verify the suspected issue and document its conditions."
+        ],
+        "correct": [
+          0,
+          1,
+          2,
+          3
+        ],
+        "initial": [
+          3,
+          2,
+          1,
+          0
+        ],
+        "points": 8
+      },
+      {
+        "id": "sql-logic",
+        "type": "single",
+        "topic": "SQL predicate reasoning",
+        "prompt": "Own simplified query: WHERE customer_id=7 AND password_ok=FALSE OR 1=1. With ordinary AND-before-OR precedence, which rows satisfy this predicate?",
+        "solution": "The entire predicate is true. Whether a particular application then authenticates a user depends on how it processes the returned rows.",
+        "reference": "WebAppSecurityTesting1.pdf, slides 13–15",
+        "concepts": [
+          "SQL predicate reasoning"
+        ],
+        "options": [
+          "Only customer 7",
+          "No rows",
+          "Every row",
+          "Only rows with a valid password"
+        ],
+        "correct": 2,
+        "optionExplanations": [
+          "The final OR true makes the complete predicate true.",
+          "The constant 1=1 is true.",
+          "(customer_id=7 AND password_ok=FALSE) OR TRUE is true regardless of the first part.",
+          "The OR branch does not require a successful password check."
+        ],
+        "points": 8
+      },
+      {
+        "id": "mitigation-map",
+        "type": "categorize",
+        "topic": "Match the interpreter",
+        "prompt": "Assign the most direct mitigation to each own example.",
+        "solution": "Match the control to the interpreter. Also enforce authorization and valid business data; a syntactically safe message can still request an unauthorized operation.",
+        "reference": "WebAppSecurityTesting1.pdf, slides 44, 47–59; clarification: OWASP XML External Entity Prevention Cheat Sheet",
+        "concepts": [
+          "Match the interpreter"
+        ],
+        "options": [
+          "Bind SQL values",
+          "Use a file API instead of a shell",
+          "Use structured JSON serialization",
+          "Disable external entity resolution / unnecessary DTDs"
+        ],
+        "statements": [
+          "A name is concatenated into a SELECT statement.",
+          "An endpoint builds /bin/sh -c plus cat and a supplied filename.",
+          "A registration service concatenates a password into a JSON string.",
+          "An XML parser fetches attacker-controlled external entities."
+        ],
+        "correct": [
+          0,
+          1,
+          2,
+          3
+        ],
+        "explanations": [
+          "The database must receive the value as data.",
+          "Removing shell interpretation removes this command-injection route.",
+          "A serializer encodes the value within the intended field.",
+          "The parser must not fetch these resources."
+        ],
+        "points": 8
+      },
+      {
+        "id": "limits",
+        "type": "multi",
+        "topic": "Capabilities and limits",
+        "prompt": "Which statements about injection impact and testing are correct?",
+        "solution": "Avoid assuming that every injection permits every action. Determine the interpreter, available operations and privileges.",
+        "reference": "WebAppSecurityTesting1.pdf, slides 28–32, 37, 51–52",
+        "concepts": [
+          "Capabilities and limits"
+        ],
+        "options": [
+          "Stacked SQL statements depend on driver/API configuration.",
+          "Hashing passwords automatically fixes injection in a concatenated username.",
+          "A response outlier should be manually checked.",
+          "Injected OS commands run with the application process’s effective privileges."
+        ],
+        "correct": [
+          0,
+          2,
+          3
+        ],
+        "optionExplanations": [
+          "The ability to execute multiple statements is environment-dependent.",
+          "Hashing a different value does not make username concatenation safe.",
+          "Outliers may reflect unrelated behavior.",
+          "The process privilege boundary determines accessible resources."
+        ],
+        "hint": "Select all correct statements. Incorrect selections reduce partial credit.",
+        "points": 8
+      },
+      {
+        "id": "shell-case",
+        "type": "text",
+        "topic": "OS command injection",
+        "prompt": "Own code review: a file viewer runs /bin/sh -c with a command assembled from cat and a user-supplied filename. Explain the trust-boundary failure, the preferred redesign and one remaining concern after that redesign.",
+        "solution": "Rubric: fully correct = explain that shell syntax in data can change the command, replace shell execution with a direct file-reading API, and retain path/authorization validation to prevent access to unintended files. Partially correct = identify injection and one suitable defense but miss the remaining file-access concern. Incorrect = assume double quotes or POST alone solve the problem.",
+        "reference": "WebAppSecurityTesting1.pdf, slides 45–52",
+        "concepts": [
+          "OS command injection"
+        ],
+        "hint": "Answer in English or German. Compare your reasoning with the rubric after checking.",
+        "points": 10
+      },
+      {
+        "id": "xxe-chain",
+        "type": "order",
+        "topic": "XXE data flow",
+        "prompt": "In the lecture’s vulnerable XML comment example, order this conditional disclosure chain. Assume external entity resolution is enabled and the process can read the target resource.",
+        "solution": "Entity resolution happens while parsing. Resource access depends on parser configuration and process permissions; reflecting the expanded content makes the disclosure visible in this example.",
+        "reference": "WebAppSecurityTesting1.pdf, slides 55–58",
+        "concepts": [
+          "XXE data flow"
+        ],
+        "items": [
+          "The request supplies an external entity declaration and a reference.",
+          "The parser resolves the entity and inserts the resource content.",
+          "The application stores the expanded comment text.",
+          "The response displays the stored comment to the requester."
+        ],
+        "correct": [
+          0,
+          1,
+          2,
+          3
+        ],
+        "initial": [
+          3,
+          2,
+          1,
+          0
+        ],
+        "points": 10
+      },
+      {
+        "id": "json-case",
+        "type": "text",
+        "topic": "Structured data injection",
+        "prompt": "Own case: a backend constructs JSON by concatenating a password between quote characters. An input causes a second account field to appear. Explain why valid JSON does not imply safety, why the final role may depend on the parser, and how to redesign this flow.",
+        "solution": "Rubric: fully correct = distinguish syntactic validity from unintended structure; explain that duplicate-member handling varies and must not be relied on; use an object plus a trusted serializer and derive/authorize the account role on the server. Partially correct = identify the injection and a suitable structural defense but miss role authorization or parser ambiguity. Incorrect = assume the last field always wins in every parser or that JSON is immune to injection.",
+        "reference": "WebAppSecurityTesting1.pdf, slides 53–54, 59",
+        "concepts": [
+          "Structured data injection"
+        ],
+        "hint": "Answer in English or German. Compare your reasoning with the rubric after checking.",
+        "points": 10
+      },
+      {
+        "id": "repair-plan",
+        "type": "text",
+        "topic": "Defense in depth",
+        "prompt": "Own incident review: a team hides SQL errors, bans apostrophes in the browser and gives the database account read-only access. It claims SQL injection is fixed. Assess all three actions and propose the missing primary repair.",
+        "solution": "Rubric: fully correct = explain that hidden errors reduce disclosure but do not change query construction; browser filtering is bypassable and can reject legitimate names; read-only access limits modification but can still expose sensitive data; bind values through parameterized queries and validate on the server. Partially correct = correct central repair with an incomplete assessment. Incorrect = accept any of the three measures as a complete fix.",
+        "reference": "WebAppSecurityTesting1.pdf, slides 16–18, 44",
+        "concepts": [
+          "Defense in depth"
+        ],
+        "hint": "Answer in English or German. Compare your reasoning with the rubric after checking.",
+        "points": 12
       }
     ];
 
-    const STORAGE_KEY = "sws1-w3-software-security-errors-review-v1";
-    const DASHBOARD_QUIZ_ID = "sws1-w3-software-security-errors";
+    const STORAGE_KEY = "sws1-w3-web-application-security-testing-1-review-v2";
+    const DASHBOARD_QUIZ_ID = "sws1-w3-web-application-security-testing-1";
     const maxPoints = questions.reduce((sum, question) => sum + question.points, 0);
     const defaultState = () => ({
       current: 0, answers: {}, order: {}, results: {}, revealed: {}, completed: false,
       attemptId: createAttemptId(), startedAt: new Date().toISOString(), completedAt: null, updatedAt: null
     });
     let state = loadState();
+    let dashboardReady = window.parent === window && !window.opener;
+    let pendingManualSave = false;
 
     function createAttemptId() {
       if (globalThis.crypto?.randomUUID) return globalThis.crypto.randomUUID();
@@ -597,6 +511,7 @@
     function saveState() {
       state.updatedAt = new Date().toISOString();
       localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+      if (dashboardReady && !state.completed && !state.completedAt) reportProgressToDashboard(false);
     }
     function escapeHtml(value) { return String(value ?? "").replace(/[&<>"']/g, char => ({"&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;","'":"&#39;"}[char])); }
     function resultFor(id) { return state.results[id]; }
@@ -743,6 +658,11 @@
         answers[Number(select.dataset.categoryIndex)] = select.value;
         state.answers[question.id] = answers; saveState();
       }));
+      document.getElementById("textAnswer")?.addEventListener("input", event => {
+        if (isSubmitted(question)) return;
+        state.answers[question.id] = event.target.value;
+        saveState();
+      });
       document.getElementById("checkBtn")?.addEventListener("click", () => gradeAuto(question));
       document.getElementById("saveTextBtn")?.addEventListener("click", () => {
         const text = document.getElementById("textAnswer").value.trim();
@@ -870,7 +790,7 @@
         }
         if (question.type === "categorize") {
           const values = correct ? question.correct : (state.answers[question.id] || []);
-          return question.statements.map((statement, index) => `${statement} → ${question.categories[Number(values[index])] || "No answer"}`).join("\n");
+          return question.statements.map((statement, index) => `${statement} → ${question.options[Number(values[index])] || "No answer"}`).join("\n");
         }
         const values = correct ? (Array.isArray(question.correct) ? question.correct : [question.correct]) : (state.answers[question.id] || []);
         return values.length ? values.map(index => question.options[index]).join(" · ") : "No answer";
@@ -892,8 +812,8 @@
 
     function resultPayload(score, percentage, concepts, resultClass) {
       return {
-        subject: "SWS1", lecture: "Week 2 – Software Security Errors",
-        source: "SoftwareSecurityErrors.pdf", date: state.completedAt || new Date().toISOString(), attemptId: state.attemptId,
+        subject: "SWS1", lecture: "Week 3 – Web Application Security Testing 1: Injection",
+        source: "WebAppSecurityTesting1.pdf", date: state.completedAt || new Date().toISOString(), attemptId: state.attemptId,
         totalScore: score, maximumScore: maxPoints, percentage, grade: Number(grade(score)), understanding: resultClass.status,
         questionResults: questions.map(question => ({ id: question.id, topic: question.topic, points: resultFor(question.id)?.points || 0, maximum: question.points, status: resultFor(question.id)?.status || "unanswered" })),
         weakConcepts: concepts.weak, partiallyUnderstoodConcepts: concepts.mixed, strongConcepts: concepts.strong
@@ -942,7 +862,7 @@
     }
 
     function reportProgressToDashboard(manual = false) {
-      if (state.completed) return;
+      if (state.completed || state.completedAt) return;
       const message = {
         source: "quiz-dashboard", version: 1, type: "quiz-progress", quizId: DASHBOARD_QUIZ_ID, manual,
         progress: {
@@ -965,7 +885,8 @@
       const text = document.getElementById("textAnswer");
       if (question?.type === "text" && text) state.answers[question.id] = text.value;
       saveState();
-      reportProgressToDashboard(true);
+      if (dashboardReady) reportProgressToDashboard(true);
+      else pendingManualSave = true;
       document.getElementById("saveNotice").textContent = `Progress saved · ${new Date().toLocaleTimeString("de-CH", { hour: "2-digit", minute: "2-digit" })}`;
     }
 
@@ -984,7 +905,7 @@
     document.getElementById("finishBtn").addEventListener("click", renderResult);
     function startNewQuiz() {
       if (!confirm("Start a new quiz? An unfinished saved state will be discarded. Earlier completed attempts remain in the dashboard.")) return;
-      localStorage.removeItem(STORAGE_KEY); clearDashboardProgress(); state = defaultState(); render();
+      localStorage.removeItem(STORAGE_KEY); clearDashboardProgress(); state = defaultState(); saveState(); render();
     }
 
     document.getElementById("newQuizBtn").addEventListener("click", startNewQuiz);
@@ -995,6 +916,9 @@
       if (!allowedSource || !message || message.source !== "quiz-dashboard" || message.version !== 1) return;
       if (message.type !== "quiz-resume" || message.quizId !== DASHBOARD_QUIZ_ID) return;
       restoreProgressFromDashboard(message.progress);
+      dashboardReady = true;
+      if (state.updatedAt && !state.completed && !state.completedAt) reportProgressToDashboard(pendingManualSave);
+      pendingManualSave = false;
     });
 
     const readyMessage = { source: "quiz-dashboard", version: 1, type: "quiz-ready", quizId: DASHBOARD_QUIZ_ID };

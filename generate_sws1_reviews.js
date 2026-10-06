@@ -199,11 +199,11 @@ const reviews = [
     file: "W3_Software_Security_Errors.html",
     id: "sws1-w3-software-security-errors",
     storage: "sws1-w3-software-security-errors-review-v1",
-    week: 3,
+    week: 2,
     maximumScore: 100,
     title: "Software Security Errors",
     subtitle: "Active understanding check on the 7 (+1) Kingdoms and typical software security errors",
-    source: "W3_SoftwareSecurityErrors.pdf",
+    source: "SoftwareSecurityErrors.pdf",
     pages: "Folien 1–23",
     exportBase: "SWS1_W3_SoftwareSecurityErrors",
     colors: {
