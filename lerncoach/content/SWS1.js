@@ -1,4 +1,26 @@
 /*
+ * Ergänzung 06.10.2026 nach Moodle Schedule and Videos (SW 1–4):
+ * https://moodle.zhaw.ch/mod/page/view.php?id=1989373
+ * Neue Wochen: W1 IntroSoftwareSecurity.pdf, 29/29 Seiten inkl. Notizen;
+ * OverviewSWS1.pdf, 5/5 Seiten. W4 WebAppSecurityTesting2.pdf, 47/47 Seiten inkl. Notizen.
+ * Text und sämtliche Seiten visuell geprüft. PDF-Seite = gedruckte Foliennummer.
+ * W1 A: CIA (4–5) -> cp-cia; Ansätze (19–22) -> cp-approaches;
+ * Begriffe/Risiko (24–29) -> cp-defects/risk; B: Angriffsketten (9–17) -> cp-incidents;
+ * C: Historie/CVE-Zahlen/Organisation. Eigene Fall-Reveals und Risikorechnung markiert.
+ * W4 A: Login/Recovery (3–10) -> cp-login; Sessions (11–19) -> cp-sessions;
+ * XSS (21–35) -> cp-xss-types/chain; Abwehr (35–38) -> cp-defenses;
+ * DOM (39–47) -> cp-dom. B: Testauswertung/Datenfluss; C: alte Tool-/Browserdetails.
+ * Gewichtung ist didaktisch. Videos/LCQ nicht transkribiert; vorhandene W2/W3 unverändert.
+ * Präzisierungen, Primärquellen geprüft 06.10.2026:
+ * https://cheatsheetseries.owasp.org/cheatsheets/Authentication_Cheat_Sheet.html
+ * https://cheatsheetseries.owasp.org/cheatsheets/Forgot_Password_Cheat_Sheet.html
+ * https://cheatsheetseries.owasp.org/cheatsheets/Session_Management_Cheat_Sheet.html
+ * https://cheatsheetseries.owasp.org/cheatsheets/Cross_Site_Scripting_Prevention_Cheat_Sheet.html
+ * https://developer.mozilla.org/en-US/docs/Web/HTTP/Guides/CSP
+ * https://developer.mozilla.org/en-US/docs/Web/HTTP/Reference/Headers/X-XSS-Protection
+ * Originalunterlagen verbleiben ausserhalb des Repos. Keine neuen eigenständigen Quizze.
+ */
+/*
  * Lerncoach-Inhalte für SWS1 (Software and System Security 1, ZHAW, Marc Rennhard / Gürkan Gür).
  * Woche 2 aus: W2_SecureDevelopmentLifecycle.pdf (Folien 1–26) und W2_1_SoftwareSecurityErrors.pdf (Folien 1–23).
  *   Gewichtung: A: Phasen/Aktivitäten-Zuordnung, Kette Threat Modeling → Requirements → Controls, 50/50 Bugs vs. Design Flaws,
@@ -16,6 +38,767 @@ Lerncoach.registerSubject({
   description: "Software- und Systemsicherheit",
   accent: "#9a4f24",
   weeks: [
+    {
+      "id": "w1",
+      "number": 1,
+      "title": "Introduction to Software Security",
+      "status": "ready",
+      "items": [
+        {
+          "type": "slide",
+          "title": "Was sichere Software leisten muss",
+          "body": [
+            "SWS1 verbindet sicheres Entwerfen, Implementieren und Prüfen. Kryptografie und sichere Protokolle sind Bausteine; erst die richtige Anwendung in einer konkreten Software schützt deren Daten und Funktionen.",
+            {
+              "flow": {
+                "steps": [
+                  {
+                    "title": "Schutzziel",
+                    "text": "Was muss geschützt werden?"
+                  },
+                  {
+                    "title": "Angriff verstehen",
+                    "text": "Was könnte dieses Ziel verletzen?"
+                  },
+                  {
+                    "title": "Massnahme begründen",
+                    "text": "Wie verhindern oder begrenzen wir das?"
+                  }
+                ]
+              }
+            },
+            {
+              "callout": {
+                "tone": "tip",
+                "title": "So lernst du diese Woche",
+                "text": "Erkläre CIA, vergleiche die drei Sicherheitsansätze und ordne konkrete Fälle den Fachbegriffen zu. Diese Gewichtung folgt den Lernzielen auf Folie 2; sie ist keine Zusage bestimmter Prüfungsfragen."
+              }
+            },
+            "Quelle: IntroSoftwareSecurity.pdf, PDF-Seite/Folie 2, 7 (inkl. Notizen); OverviewSWS1.pdf, Folie 3"
+          ],
+          "remember": "Funktionierende Software ist nicht automatisch sichere Software."
+        },
+        {
+          "type": "slide",
+          "title": "CIA: drei unterschiedliche Schutzziele",
+          "body": [
+            {
+              "cards": [
+                {
+                  "title": "Confidentiality – Vertraulichkeit",
+                  "text": "Nur berechtigte Personen dürfen sensible Informationen lesen."
+                },
+                {
+                  "title": "Integrity – Integrität",
+                  "text": "Daten und Systeme dürfen nicht unberechtigt verändert werden."
+                },
+                {
+                  "title": "Availability – Verfügbarkeit",
+                  "text": "Informationen und Funktionen müssen bei Bedarf nutzbar sein."
+                }
+              ]
+            },
+            {
+              "reveal": {
+                "question": "Eigener Fall: Jemand ändert eine Note, ohne Daten zu stehlen. Welches Ziel ist unmittelbar verletzt?",
+                "answer": "Integrität. Ein Angriff muss nicht alle drei Ziele gleichzeitig verletzen. Dass die Plattform weiterhin erreichbar ist, macht die Manipulation nicht harmlos.",
+                "label": "Eigene Antwort vergleichen"
+              }
+            },
+            "Quelle: IntroSoftwareSecurity.pdf, PDF-Seite/Folie 4 (inkl. Notizen)"
+          ],
+          "remember": "Lesen: C. Verändern: I. Bei Bedarf nutzen: A."
+        },
+        {
+          "type": "slide",
+          "title": "Schutzbedarf hängt vom Kontext ab",
+          "body": [
+            {
+              "table": {
+                "head": [
+                  "System der Folie",
+                  "Besonders anschaulicher Schutzbedarf"
+                ],
+                "rows": [
+                  [
+                    "E-Shop",
+                    "Zahlungsdaten geheim halten, Preise unverändert halten, Einkauf ermöglichen"
+                  ],
+                  [
+                    "Öffentlicher Fahrplan",
+                    "Korrekte Abfahrtszeiten und Erreichbarkeit; öffentliche Daten benötigen weniger Vertraulichkeit"
+                  ],
+                  [
+                    "Notenverwaltung",
+                    "Noten und Personendaten schützen; Ausfallfolgen hängen vom Zeitpunkt ab"
+                  ]
+                ]
+              }
+            },
+            {
+              "callout": {
+                "tone": "warn",
+                "title": "Priorität begründen",
+                "text": "Die Beispiele illustrieren Annahmen, keine dauerhafte Einstufung realer Dienste. Eine nächtliche Wartung und ein Ausfall unmittelbar vor einer Frist haben unterschiedliche Folgen."
+              }
+            },
+            "Quelle: IntroSoftwareSecurity.pdf, PDF-Seite/Folie 5 (inkl. Notizen)"
+          ],
+          "remember": "Sicherheitsziele gelten im Nutzungskontext und mit begründetem Schutzbedarf."
+        },
+        {
+          "type": "checkpoint",
+          "id": "cp-cia",
+          "title": "Checkpoint: Security Goals",
+          "questions": [
+            {
+              "id": "grade",
+              "type": "single",
+              "prompt": "An attacker changes a grade without permission. Which goal is directly violated?",
+              "options": [
+                "Availability",
+                "Integrity",
+                "Confidentiality"
+              ],
+              "correct": 1,
+              "explanation": "Unberechtigtes Verändern verletzt Integrität. Quelle: IntroSoftwareSecurity.pdf, PDF-Seite/Folie 4–7 (inkl. Notizen)"
+            },
+            {
+              "id": "public",
+              "type": "multi",
+              "prompt": "A timetable contains only public data. Which statements follow?",
+              "options": [
+                "Integrity still matters.",
+                "Availability can still matter.",
+                "Public data makes all security unnecessary.",
+                "Confidentiality may have lower priority."
+              ],
+              "correct": [
+                0,
+                1,
+                3
+              ],
+              "explanation": "Öffentlichkeit beseitigt nicht den Bedarf an korrekten und verfügbaren Daten. Quelle: IntroSoftwareSecurity.pdf, PDF-Seite/Folie 4–7 (inkl. Notizen)"
+            },
+            {
+              "id": "cia-a",
+              "type": "type",
+              "prompt": "Expand the A in CIA (one English term).",
+              "accept": [
+                "availability",
+                "Availability goal"
+              ],
+              "explanation": "Availability bedeutet Verfügbarkeit bei Bedarf. Quelle: IntroSoftwareSecurity.pdf, PDF-Seite/Folie 4–7 (inkl. Notizen)"
+            }
+          ]
+        },
+        {
+          "type": "slide",
+          "title": "Malware: Ausbreitungsart und Wirkung trennen",
+          "body": [
+            {
+              "compare": {
+                "left": {
+                  "title": "Virus und Worm",
+                  "points": [
+                    "Virus: kopiert sich in ein Wirtsprogramm oder Dokument.",
+                    "Worm: eigenständige Software; kann sich automatisiert weiterverbreiten."
+                  ]
+                },
+                "right": {
+                  "title": "Trojan und Ransomware",
+                  "points": [
+                    "Trojan: tarnt eine schädliche Funktion als erwünschte Software.",
+                    "Ransomware: erpresst durch blockierte oder verschlüsselte Daten; die Bezeichnung beschreibt die Wirkung."
+                  ]
+                }
+              }
+            },
+            {
+              "callout": {
+                "tone": "def",
+                "title": "Mehrere Begriffe können passen",
+                "text": "WannaCry ist das Beispiel für Ransomware, die sich als Wurm verbreitet. Die Kategorien sind keine vier sich ausschliessenden Schubladen."
+              }
+            },
+            "Quelle: IntroSoftwareSecurity.pdf, PDF-Seite/Folie 9–10, 16 (inkl. Notizen)"
+          ],
+          "remember": "Worm beschreibt Ausbreitung; Ransomware beschreibt eine schädliche Wirkung."
+        },
+        {
+          "type": "slide",
+          "title": "Morris und Code Red: warum Würmer so schnell wachsen",
+          "body": [
+            {
+              "flow": {
+                "steps": [
+                  {
+                    "title": "Erreichbares Ziel",
+                    "text": "Ein verwundbarer Dienst ist erreichbar."
+                  },
+                  {
+                    "title": "Ausnutzung",
+                    "text": "Die Schwachstelle ermöglicht eine Infektion."
+                  },
+                  {
+                    "title": "Weitere Quellen",
+                    "text": "Auch das neu infizierte System sucht weitere Ziele."
+                  }
+                ]
+              }
+            },
+            "Die Code-Red-Grafik auf Folie 12 zeigt zuerst langsames Wachstum, dann starke Beschleunigung und schliesslich Sättigung. Immer mehr infizierte Systeme suchen parallel; später bleiben weniger erreichbare verwundbare Ziele übrig.",
+            {
+              "reveal": {
+                "question": "Warum endet die steile Wachstumsphase, obwohl die infizierten Systeme weiter suchen?",
+                "answer": "Der Vorrat an erreichbaren verwundbaren Systemen ist begrenzt. Bereits infizierte oder geschützte Systeme erzeugen nicht ständig neue zusätzliche Opfer.",
+                "label": "Eigene Antwort vergleichen"
+              }
+            },
+            "Quelle: IntroSoftwareSecurity.pdf, PDF-Seite/Folie 9–12 (inkl. Notizen)"
+          ],
+          "remember": "Rückkopplung beschleunigt die Ausbreitung; begrenzte Ziele führen zur Sättigung."
+        },
+        {
+          "type": "slide",
+          "title": "Was die historischen Vorfälle gemeinsam zeigen",
+          "body": [
+            {
+              "table": {
+                "head": [
+                  "Vorfall",
+                  "Mechanismus aus der Vorlesung",
+                  "Lehre"
+                ],
+                "rows": [
+                  [
+                    "Code Red",
+                    "Verwundbarer IIS-Dienst, trotz verfügbarem Patch",
+                    "Ein vorhandener Patch muss auch wirksam ausgerollt sein."
+                  ],
+                  [
+                    "Heartland",
+                    "SQL-Injection als Einstieg; anschliessend Datendiebstahl",
+                    "Eine Anwendungslücke kann eine längere Angriffskette eröffnen."
+                  ],
+                  [
+                    "WannaCry",
+                    "SMB-Schwachstelle und Wurmverbreitung; Verschlüsselung",
+                    "Erreichbarkeit, Patchstand und Wiederherstellbarkeit beeinflussen den Schaden."
+                  ]
+                ]
+              }
+            },
+            "Die Beispiele können ohne einen anfänglichen Fehlklick auskommen. Andere Angriffe kombinieren Softwarefehler mit Social Engineering, manipulierten Downloads oder kompromittierten Lieferanten. Die Jahreszahlen und damaligen Schadensschätzungen sind Kontext, kein Massstab für das heutige Risiko.",
+            {
+              "callout": {
+                "tone": "warn",
+                "title": "Keine Zahlungsgarantie",
+                "text": "Die Folien beschreiben auch Erpressung mit gestohlenen Daten. Daraus folgt keine Zusage, dass eine Zahlung Daten zurückbringt oder eine Veröffentlichung verhindert."
+              }
+            },
+            "Quelle: IntroSoftwareSecurity.pdf, PDF-Seite/Folie 11, 13–17 (inkl. Notizen)"
+          ],
+          "remember": "Die Ursache und die unterbrechbare Angriffskette sind wichtiger als Opferzahlen."
+        },
+        {
+          "type": "checkpoint",
+          "id": "cp-incidents",
+          "title": "Checkpoint: Incidents and Attack Chains",
+          "questions": [
+            {
+              "id": "worm",
+              "type": "multi",
+              "prompt": "Which statements fit a worm?",
+              "options": [
+                "It can spread without a host document.",
+                "Each newly infected system may become another source.",
+                "It must always encrypt files.",
+                "It necessarily requires the user to open an attachment."
+              ],
+              "correct": [
+                0,
+                1
+              ],
+              "explanation": "Eigenständige Ausbreitung definiert den Wurm; Verschlüsselung oder Anhänge sind nicht zwingend. Quelle: IntroSoftwareSecurity.pdf, PDF-Seite/Folie 9–17 (inkl. Notizen)"
+            },
+            {
+              "id": "spread",
+              "type": "order",
+              "prompt": "Order the simplified propagation chain from the lecture.",
+              "items": [
+                "Reach a vulnerable service",
+                "Exploit the vulnerability",
+                "Infect the target",
+                "The new instance searches for further targets"
+              ],
+              "explanation": "Ein erfolgreicher Durchlauf erzeugt weitere Ausgangspunkte. Quelle: IntroSoftwareSecurity.pdf, PDF-Seite/Folie 9–17 (inkl. Notizen)"
+            },
+            {
+              "id": "patch",
+              "type": "single",
+              "prompt": "A patch existed before an incident. What does this prove?",
+              "options": [
+                "Every installation was safe.",
+                "Software design no longer matters.",
+                "Availability of a patch does not prove deployment."
+              ],
+              "correct": 2,
+              "explanation": "Code Red und WannaCry zeigen die Lücke zwischen verfügbarer und installierter Korrektur. Quelle: IntroSoftwareSecurity.pdf, PDF-Seite/Folie 9–17 (inkl. Notizen)"
+            }
+          ]
+        },
+        {
+          "type": "slide",
+          "title": "Penetrate and Patch: die reaktive Falle",
+          "body": [
+            "Gemeint ist hier: Software ohne ausreichende vorbeugende Sicherheitsarbeit veröffentlichen und erst auf entdeckte Lücken reagieren. Das ist nicht gleichbedeutend mit jedem sinnvollen Penetrationstest.",
+            {
+              "cards": [
+                {
+                  "title": "Zeitfenster",
+                  "text": "Ein Angreifer kann eine Lücke vor dem Hersteller kennen."
+                },
+                {
+                  "title": "Verteilung",
+                  "text": "Ein Patch schützt nur Systeme, auf denen er tatsächlich wirksam wird."
+                },
+                {
+                  "title": "Qualität",
+                  "text": "Unter Zeitdruck geschriebene Korrekturen können neue Fehler einführen."
+                }
+              ]
+            },
+            {
+              "reveal": {
+                "question": "Eigener Fall: Ein Team plant nur einen Sicherheitstest nach dem Release. Warum ist das unzureichend?",
+                "answer": "Fehler werden spät entdeckt, eventuell erst nach einem Angriff. Die Sicherheitsarbeit muss schon Anforderungen, Entwurf und Implementierung begleiten; Tests und Patches bleiben zusätzlich notwendig.",
+                "label": "Eigene Antwort vergleichen"
+              }
+            },
+            "Quelle: IntroSoftwareSecurity.pdf, PDF-Seite/Folie 19 (inkl. Notizen)"
+          ],
+          "remember": "Späte Reparatur allein lässt vermeidbare Risiken im Entwicklungsprozess bestehen."
+        },
+        {
+          "type": "slide",
+          "title": "WAF und IPS: Schutzschicht mit Grenzen",
+          "body": [
+            "Ein vorgeschaltetes Web Application Firewall- oder Intrusion Prevention System kann schädlichen Verkehr erkennen und blockieren. Es korrigiert aber nicht automatisch die Ursache im Anwendungscode.",
+            {
+              "compare": {
+                "left": {
+                  "title": "Hilfreiche Ergänzung",
+                  "points": [
+                    "Zusätzliche Erkennung und Filterung",
+                    "Teil einer mehrschichtigen Abwehr",
+                    "Konfiguration und Betrieb bleiben Arbeit"
+                  ]
+                },
+                "right": {
+                  "title": "Unzureichender Ersatz",
+                  "points": [
+                    "Nicht alle Varianten werden erkannt",
+                    "Ein Entwurfsfehler bleibt bestehen",
+                    "Ein einzelnes Gerät garantiert keine Sicherheit"
+                  ]
+                }
+              }
+            },
+            "Quelle: IntroSoftwareSecurity.pdf, PDF-Seite/Folie 20, 22 (inkl. Notizen)"
+          ],
+          "remember": "Eine WAF kann Risiko senken; sie ersetzt keinen sicheren Entwurf."
+        },
+        {
+          "type": "slide",
+          "title": "SDL und Defense in Depth zusammendenken",
+          "body": [
+            "Ein Secure Development Lifecycle integriert Sicherheitsaktivitäten in den gesamten Entwicklungsprozess. Man prüft nicht nur, ob die Software die erwünschten Funktionen erfüllt, sondern auch, wie sie missbraucht werden könnte.",
+            {
+              "flow": {
+                "steps": [
+                  {
+                    "title": "Vorbeugen",
+                    "text": "Sicherheitsziele, Entwurf und Implementierung"
+                  },
+                  {
+                    "title": "Prüfen",
+                    "text": "Fehler gezielt suchen und korrigieren"
+                  },
+                  {
+                    "title": "Betreiben",
+                    "text": "Überwachen, aktualisieren und auf Vorfälle reagieren"
+                  }
+                ]
+              }
+            },
+            {
+              "callout": {
+                "tone": "warn",
+                "title": "Restrisiko bleibt",
+                "text": "Auch ein SDL kann neue Angriffsmöglichkeiten oder übersehene Fehler nicht ausschliessen. Patching, geeignete zusätzliche Schutzschichten und Monitoring bleiben wichtig."
+              }
+            },
+            "Quelle: IntroSoftwareSecurity.pdf, PDF-Seite/Folie 21–22 (inkl. Notizen)"
+          ],
+          "remember": "SDL ist die Grundlage; ergänzende Abwehr und Betrieb behandeln das Restrisiko."
+        },
+        {
+          "type": "checkpoint",
+          "id": "cp-approaches",
+          "title": "Checkpoint: Secure Development Approaches",
+          "questions": [
+            {
+              "id": "pentest",
+              "type": "single",
+              "prompt": "Which describes the problematic penetrate-and-patch strategy here?",
+              "options": [
+                "Release without adequate preventive security work, then repair discovered defects.",
+                "Integrate security into each phase.",
+                "Use security testing as one activity within an SDL."
+              ],
+              "correct": 0,
+              "explanation": "Kritisiert wird das allein reaktive Vorgehen, nicht jeder Sicherheitstest. Quelle: IntroSoftwareSecurity.pdf, PDF-Seite/Folie 19–22 (inkl. Notizen)"
+            },
+            {
+              "id": "layers",
+              "type": "multi",
+              "prompt": "Which statements are justified?",
+              "options": [
+                "A WAF can complement secure development.",
+                "An SDL guarantees zero vulnerabilities.",
+                "Monitoring remains useful after release.",
+                "Patches still matter with an SDL."
+              ],
+              "correct": [
+                0,
+                2,
+                3
+              ],
+              "explanation": "SDL senkt Risiken, beseitigt sie aber nicht vollständig. Quelle: IntroSoftwareSecurity.pdf, PDF-Seite/Folie 19–22 (inkl. Notizen)"
+            },
+            {
+              "id": "lifecycle",
+              "type": "type",
+              "prompt": "What is the three-letter abbreviation for Secure Development Lifecycle?",
+              "accept": [
+                "SDL",
+                "Secure Development Lifecycle",
+                "Secure Development Life Cycle"
+              ],
+              "explanation": "SDL integriert Sicherheitsaktivitäten während der Entwicklung. Quelle: IntroSoftwareSecurity.pdf, PDF-Seite/Folie 19–22 (inkl. Notizen)"
+            }
+          ]
+        },
+        {
+          "type": "slide",
+          "title": "Bug, Design Flaw, Defect: nach der Ursache fragen",
+          "body": [
+            {
+              "compare": {
+                "left": {
+                  "title": "Security Bug",
+                  "points": [
+                    "Fehler bei der Implementierung",
+                    "Ein korrekt geplanter Längencheck wurde nicht programmiert.",
+                    "Code Review kann solche Fehler entdecken."
+                  ]
+                },
+                "right": {
+                  "title": "Security Design Flaw",
+                  "points": [
+                    "Fehler bereits im Entwurf",
+                    "Das Konzept sieht für bestimmte Zugriffe keine Berechtigungsprüfung vor.",
+                    "Threat Modeling hilft, solche Lücken aufzudecken."
+                  ]
+                }
+              }
+            },
+            {
+              "callout": {
+                "tone": "def",
+                "title": "Security Defect",
+                "text": "Oberbegriff für Bugs und Design Flaws. Dass ein Problem im Code sichtbar ist, beweist noch nicht, dass seine Ursache in der Implementierung liegt."
+              }
+            },
+            "Die Folie nennt ungefähr 50/50 als Verteilung. Lerne daraus, dass Entwurf und Code beide relevant sind; behandle die Zahl nicht als Naturgesetz für jedes Projekt.",
+            "Quelle: IntroSoftwareSecurity.pdf, PDF-Seite/Folie 24–25 (inkl. Notizen)"
+          ],
+          "remember": "Entstehungsphase und Ursache bestimmen die Einordnung, nicht der Fundort."
+        },
+        {
+          "type": "slide",
+          "title": "Planet Poker: korrekter Algorithmus, unsicherer Entwurf",
+          "body": [
+            "Im Folienbeispiel wird ein Pseudozufallszahlengenerator mit der Zeit seit Mitternacht initialisiert. Ein solcher Generator arbeitet deterministisch: Kennt man den Startwert, lässt sich seine Folge reproduzieren. Eine leicht eingrenzbare Zeit ist daher ein schlechter geheimer Startwert.",
+            {
+              "reveal": {
+                "question": "Die Implementierung des Generators ist korrekt. Warum kann das Kartenspiel trotzdem unsicher sein?",
+                "answer": "Die Entscheidung für einen vorhersagbaren Startwert ist der Entwurfsfehler. Ein korrekt arbeitender Algorithmus kann eine falsche Sicherheitsannahme nicht reparieren.",
+                "label": "Eigene Antwort vergleichen"
+              }
+            },
+            {
+              "callout": {
+                "tone": "tip",
+                "title": "Eigener Transfer",
+                "text": "Dasselbe Denkmuster gilt für Reset-Tokens: Eine lange Darstellung eines Zeitstempels ist nicht automatisch unvorhersagbar."
+              }
+            },
+            "Quelle: IntroSoftwareSecurity.pdf, PDF-Seite/Folie 26 (inkl. Notizen)"
+          ],
+          "remember": "Korrekte Umsetzung eines unsicheren Konzepts bleibt unsicher."
+        },
+        {
+          "type": "checkpoint",
+          "id": "cp-defects",
+          "title": "Checkpoint: Bugs and Design Flaws",
+          "questions": [
+            {
+              "id": "bounds",
+              "type": "single",
+              "prompt": "The design requires a bounds check, but the programmer omits it. Classify the root cause.",
+              "options": [
+                "Security bug",
+                "Security design flaw",
+                "No security defect"
+              ],
+              "correct": 0,
+              "explanation": "Die Sicherheitsanforderung war vorhanden; ihre Umsetzung ist fehlerhaft. Quelle: IntroSoftwareSecurity.pdf, PDF-Seite/Folie 24–26 (inkl. Notizen)"
+            },
+            {
+              "id": "seed",
+              "type": "single",
+              "prompt": "A correctly implemented PRNG uses a predictable timestamp seed by design. What is the problem?",
+              "options": [
+                "Only a documentation typo",
+                "Security design flaw",
+                "Guaranteed unpredictable output"
+              ],
+              "correct": 1,
+              "explanation": "Die unsichere Wahl des Seeds ist Teil des Entwurfs. Quelle: IntroSoftwareSecurity.pdf, PDF-Seite/Folie 24–26 (inkl. Notizen)"
+            },
+            {
+              "id": "defects",
+              "type": "multi",
+              "prompt": "Which claims are correct?",
+              "options": [
+                "Bugs and design flaws are security defects.",
+                "Finding a problem in code proves it is a bug.",
+                "Threat modeling can reveal conceptual flaws.",
+                "Code review can reveal implementation errors."
+              ],
+              "correct": [
+                0,
+                2,
+                3
+              ],
+              "explanation": "Ort der Entdeckung und Ursache des Fehlers sind zu unterscheiden. Quelle: IntroSoftwareSecurity.pdf, PDF-Seite/Folie 24–26 (inkl. Notizen)"
+            }
+          ]
+        },
+        {
+          "type": "slide",
+          "title": "Vulnerability, Threat und Exploit sauber trennen",
+          "body": [
+            {
+              "table": {
+                "head": [
+                  "Begriff",
+                  "Bedeutung",
+                  "Eigenes Beispiel"
+                ],
+                "rows": [
+                  [
+                    "Vulnerability",
+                    "Ausnutzbare Schwachstelle",
+                    "Eine Reset-Funktion akzeptiert erratbare Tokens."
+                  ],
+                  [
+                    "Threat",
+                    "Mögliche Gefahr",
+                    "Jemand könnte ein fremdes Konto übernehmen."
+                  ],
+                  [
+                    "Threat agent",
+                    "Handelnder Akteur",
+                    "Die Person, die das Konto angreifen will."
+                  ],
+                  [
+                    "Exploit",
+                    "Konkrete Ausnutzung",
+                    "Eine tatsächlich verwendete Folge von Anfragen nutzt das schwache Token aus."
+                  ]
+                ]
+              }
+            },
+            "Bedrohungen können auch unbeabsichtigt entstehen, etwa durch Feuer. In der Terminologie dieser Vorlesung ist nicht jeder Defect unter allen Randbedingungen ausnutzbar: zusätzliche Schutzmassnahmen und Aufwand beeinflussen die Ausnutzbarkeit.",
+            "Quelle: IntroSoftwareSecurity.pdf, PDF-Seite/Folie 27 (inkl. Notizen)"
+          ],
+          "remember": "Schwachstelle, mögliche Gefahr, Akteur und konkrete Ausnutzung sind verschiedene Dinge."
+        },
+        {
+          "type": "slide",
+          "title": "Asset, Risiko und Gegenmassnahme",
+          "body": [
+            "Assets sind Werte: Daten, Systeme, Hardware oder auch die Verfügbarkeit eines Dienstes. Risiko verbindet die Wahrscheinlichkeit eines erfolgreichen Angriffs mit seinen Folgen.",
+            {
+              "formula": {
+                "main": "Risiko ≈ Wahrscheinlichkeit × Auswirkung",
+                "note": "Modell der Folie: Für eine Rechnung müssen Zeitraum und Grössen zusammenpassen."
+              }
+            },
+            {
+              "reveal": {
+                "question": "Eigene vereinfachte Rechnung: 10 % jährliche Wahrscheinlichkeit und CHF 20 000 Schaden. Wie gross ist der erwartete jährliche Verlust? Was ändert eine Massnahme auf 2 %?",
+                "answer": "0,10 × 20 000 = CHF 2 000 pro Jahr; danach 0,02 × 20 000 = CHF 400 pro Jahr. Die Differenz ist CHF 1 600 im Modell. Das ist keine Vorhersage, dass in einem einzelnen Jahr genau dieser Verlust eintritt.",
+                "label": "Eigene Antwort vergleichen"
+              }
+            },
+            {
+              "callout": {
+                "tone": "def",
+                "title": "Countermeasure",
+                "text": "Eine technische oder organisatorische Massnahme senkt Wahrscheinlichkeit oder Schaden. Sie muss nicht jedes Risiko auf null setzen."
+              }
+            },
+            "Quelle: IntroSoftwareSecurity.pdf, PDF-Seite/Folie 28 (inkl. Notizen)"
+          ],
+          "remember": "Risiko braucht Wahrscheinlichkeit und Auswirkung; eine Gegenmassnahme kann an beiden ansetzen."
+        },
+        {
+          "type": "slide",
+          "title": "Vom Einzelfehler zum begründeten Schutz",
+          "body": [
+            {
+              "flow": {
+                "steps": [
+                  {
+                    "title": "Asset",
+                    "text": "Welcher Wert ist betroffen?"
+                  },
+                  {
+                    "title": "Defect / Vulnerability",
+                    "text": "Welche Ursache ist unter welchen Bedingungen ausnutzbar?"
+                  },
+                  {
+                    "title": "Threat / Impact",
+                    "text": "Was könnte passieren und wie schwer wäre das?"
+                  },
+                  {
+                    "title": "Countermeasure",
+                    "text": "Welche Massnahme unterbricht die Kette oder begrenzt den Schaden?"
+                  }
+                ]
+              }
+            },
+            {
+              "reveal": {
+                "question": "Eigener Fall: Ein Notenportal prüft laut Entwurf nur auf der Startseite die Berechtigung, nicht beim Abruf einer einzelnen Note. Begründe zwei sinnvolle Massnahmen.",
+                "answer": "Entwurfsfehler: Nicht jeder Zugriff wird autorisiert. Serverseitige Berechtigungsprüfung bei jedem Notenabruf adressiert die Ursache; Protokollierung auffälliger Zugriffe hilft ergänzend bei Erkennung und Untersuchung. Eine WAF allein behebt die fehlende Objektberechtigung nicht.",
+                "label": "Eigene Antwort vergleichen"
+              }
+            },
+            "Quelle: IntroSoftwareSecurity.pdf, PDF-Seite/Folie 24–29 (inkl. Notizen)"
+          ],
+          "remember": "Eine Massnahme ist überzeugend, wenn ihre Wirkung auf die konkrete Ursache erklärt wird."
+        },
+        {
+          "type": "checkpoint",
+          "id": "cp-risk",
+          "title": "Checkpoint: Terminology and Risk",
+          "questions": [
+            {
+              "id": "asset",
+              "type": "single",
+              "prompt": "In the grade-portal case, what is an asset?",
+              "options": [
+                "The attack script",
+                "The valuable grade records",
+                "The coding error"
+              ],
+              "correct": 1,
+              "explanation": "Die schützenswerten Notendaten sind der Wert. Quelle: IntroSoftwareSecurity.pdf, PDF-Seite/Folie 27–29 (inkl. Notizen)"
+            },
+            {
+              "id": "expected",
+              "type": "type",
+              "prompt": "Own model: annual probability 0.02, loss CHF 20,000. Expected annual loss in CHF (number only)?",
+              "accept": [
+                "400",
+                "400 CHF",
+                "CHF 400",
+                "400.00",
+                "400,00"
+              ],
+              "explanation": "0,02 × 20 000 = 400. Zeitraum und Einheiten sind vorgegeben. Quelle: IntroSoftwareSecurity.pdf, PDF-Seite/Folie 27–29 (inkl. Notizen)"
+            },
+            {
+              "id": "mitigation",
+              "type": "multi",
+              "prompt": "Which effects can a countermeasure have?",
+              "options": [
+                "Reduce probability",
+                "Reduce impact",
+                "Always eliminate every risk",
+                "Remove a vulnerability"
+              ],
+              "correct": [
+                0,
+                1,
+                3
+              ],
+              "explanation": "Gegenmassnahmen können Ursachen beseitigen oder Wahrscheinlichkeit beziehungsweise Folgen reduzieren. Quelle: IntroSoftwareSecurity.pdf, PDF-Seite/Folie 27–29 (inkl. Notizen)"
+            }
+          ]
+        },
+        {
+          "type": "slide",
+          "title": "Zusatzwissen richtig einordnen",
+          "body": [
+            "Die Kursübersicht stellt Lehrteam, Forschungsgruppe und Projektbeispiele vor. Für diese Lektion dienen sie der Orientierung. Der Schwerpunkt liegt auf den expliziten fachlichen Lernzielen.",
+            "Die CVE-Grafik auf Folie 6 zeigt gemeldete Schwachstellen mit CVE-Kennung bis zum dort genannten Stand Dezember 2025. Sie zählt Meldungen, nicht sämtliche Fehler oder Angriffe. Eine steigende Zahl allein misst nicht die Sicherheit deiner Anwendung.",
+            "Die Notizen ergänzen CIA um weitere Ziele wie Privacy, Accountability und Auditability. Die historischen Fallzahlen motivieren das Thema; übe vor allem Mechanismen und passende Gegenmassnahmen.",
+            "Quelle: IntroSoftwareSecurity.pdf, PDF-Seite/Folie 1–3, 4, 6, 8–17, 18, 23 (inkl. Notizen); OverviewSWS1.pdf, Folien 1–5"
+          ],
+          "remember": "Historische Zahlen und organisatorische Details sind Kontext; Begriffe und Anwendung tragen die Lektion."
+        },
+        {
+          "type": "slide",
+          "title": "Zwei Transferfälle und dein Lernzielcheck",
+          "body": [
+            {
+              "reveal": {
+                "question": "Eigener Fall: Ein öffentlicher Fahrplan ist durch einen Angriff eine Stunde nicht erreichbar; alle gespeicherten Zeiten bleiben korrekt. Welche CIA-Aussage kannst du sicher machen?",
+                "answer": "Die Verfügbarkeit ist betroffen. Integrität oder Vertraulichkeit sind aus diesen Angaben nicht als verletzt belegt.",
+                "label": "Eigene Antwort vergleichen"
+              }
+            },
+            {
+              "reveal": {
+                "question": "Eigener Fall: Ein Shop kauft eine WAF und streicht alle Security-Aktivitäten aus der Entwicklung. Wie begründest du deinen Widerspruch?",
+                "answer": "Die WAF filtert nur einen Teil der Angriffe und braucht passende Konfiguration. Sicherheitsarbeit in Entwurf und Implementierung muss Ursachen verhindern; Tests, Patches und Monitoring ergänzen sie.",
+                "label": "Eigene Antwort vergleichen"
+              }
+            },
+            {
+              "checklist": {
+                "title": "Kann ich das erklären und anwenden?",
+                "items": [
+                  "Ich kann CIA mit einem neuen Beispiel begründen.",
+                  "Ich kann Malware-Ausbreitung und Wirkung trennen.",
+                  "Ich kann SDL, Patching und WAF in ein gemeinsames Schutzkonzept einordnen.",
+                  "Ich kann Bug, Flaw, Defect, Vulnerability, Threat und Exploit unterscheiden.",
+                  "Ich kann ein Asset, ein Risiko und eine passende Gegenmassnahme nennen."
+                ]
+              }
+            },
+            "Quelle: IntroSoftwareSecurity.pdf, PDF-Seite/Folie 4–5, 19–29 (inkl. Notizen)"
+          ],
+          "remember": "Begründen können ist wichtiger als die Begriffe nur wiederzuerkennen."
+        }
+      ]
+    },
     {
       id: "w2",
       number: 2,
@@ -1350,6 +2133,959 @@ Lerncoach.registerSubject({
               explanation: "Quotes and angle brackets let an attacker create additional JSON/XML elements."
             }
           ]
+        }
+      ]
+    },
+    {
+      "id": "w4",
+      "number": 4,
+      "title": "Web Application Security Testing 2: Authentication, Sessions & XSS",
+      "status": "ready",
+      "items": [
+        {
+          "type": "slide",
+          "title": "Woche 4: vom Login bis zum Browser",
+          "body": [
+            "Diese Woche verbindet drei Fragen: Wer darf sich anmelden? Wie erkennt die Anwendung die angemeldete Sitzung? Und was passiert, wenn fremde Daten im Browser zu ausführbarem Code werden?",
+            {
+              "flow": {
+                "steps": [
+                  {
+                    "title": "Authentifizierung",
+                    "text": "Identität nachweisen"
+                  },
+                  {
+                    "title": "Session",
+                    "text": "Anfragen einer Sitzung zuordnen"
+                  },
+                  {
+                    "title": "Browser",
+                    "text": "Daten anzeigen, ohne fremden Code auszuführen"
+                  }
+                ]
+              }
+            },
+            {
+              "callout": {
+                "tone": "tip",
+                "title": "Ziel der Lektion",
+                "text": "Erkenne die Ursache einer Schwachstelle und wähle die passende Abwehr. Die Testszenarien sind eigene Lernbeispiele beziehungsweise Erläuterungen der isolierten WebGoat-Demos aus den Folien; hier werden keine Angriffe gegen reale Dienste ausgeführt."
+              }
+            },
+            "Quelle: WebAppSecurityTesting2.pdf, PDF-Seite/Folie 1–3, 21, 39–40 (inkl. Notizen)"
+          ],
+          "remember": "Sicheres Login, sichere Sessions und sichere Ausgabe lösen unterschiedliche Probleme."
+        },
+        {
+          "type": "slide",
+          "title": "Online-Passwortraten und Username Enumeration",
+          "body": [
+            "Bei einem Online-Angriff wird jede Passwortvermutung an die laufende Anwendung geschickt. Die Anwendung kann Versuche begrenzen. Unterschiedliche Fehlermeldungen oder Antwortzeiten können zuvor verraten, welche Benutzernamen überhaupt existieren.",
+            {
+              "compare": {
+                "left": {
+                  "title": "Enumeration",
+                  "points": [
+                    "Frage: Existiert dieses Konto?",
+                    "Signale: Meldung, Zeit, Registrierungsantwort"
+                  ]
+                },
+                "right": {
+                  "title": "Passwortraten",
+                  "points": [
+                    "Frage: Passt dieses Passwort zum Konto?",
+                    "Wirksamkeit hängt auch von Versuchsrate und Passwortqualität ab"
+                  ]
+                }
+              }
+            },
+            {
+              "reveal": {
+                "question": "Eigener Fall: Beide Fehlermeldungen lauten gleich, aber ein unbekanntes Konto antwortet deutlich schneller. Ist Enumeration ausgeschlossen?",
+                "answer": "Nein. Gleicher Text beseitigt nur einen möglichen Unterschied. Auch Zeit, Status, Antwortlänge und andere Abläufe können Konten verraten.",
+                "label": "Eigene Antwort vergleichen"
+              }
+            },
+            "Quelle: WebAppSecurityTesting2.pdf, PDF-Seite/Folie 3–4, 8 (inkl. Notizen)"
+          ],
+          "remember": "Nicht nur Fehlermeldungen, sondern das beobachtbare Verhalten kann Informationen preisgeben."
+        },
+        {
+          "type": "slide",
+          "title": "Burp-Ergebnisse lesen statt blind vertrauen",
+          "body": [
+            "Die Vorlesungsdemo kombiniert sechs bekannte Benutzernamen mit hundert Passwortkandidaten. Der Cluster-bomb-Modus bildet alle Kombinationen. Ein frischer Sitzungszustand verhindert, dass ein bereits erfolgreicher Login die weiteren Messungen verfälscht.",
+            {
+              "formula": {
+                "main": "6 × 100 = 600 Versuche",
+                "note": "Kartesisches Produkt: Jeder Name wird mit jedem Kandidaten kombiniert."
+              }
+            },
+            "In der gezeigten Tabelle liefern auch erfolgreiche und erfolglose Anmeldungen denselben Status 302. Der Unterschied liegt im Redirect-Ziel und dadurch in der Antwortlänge. Ein Ausreisser ist ein Prüfhinweis; erst sein Inhalt erklärt die Ursache.",
+            {
+              "reveal": {
+                "question": "Eigene Variante: Vier Namen und fünf Kandidaten. Wie viele Kombinationen? Beweist eine längere Antwort einen erfolgreichen Login?",
+                "answer": "20 Kombinationen. Nein: Auch Fehlermeldungen oder andere Zustände können die Länge ändern. Die Antwort und den resultierenden Zustand prüfen.",
+                "label": "Eigene Antwort vergleichen"
+              }
+            },
+            "Quelle: WebAppSecurityTesting2.pdf, PDF-Seite/Folie 5–7 (inkl. Notizen)"
+          ],
+          "remember": "Kombinationen rechnen; Auffälligkeiten anhand der tatsächlichen Antwort verifizieren."
+        },
+        {
+          "type": "slide",
+          "title": "Login und Passwort-Reset absichern",
+          "body": [
+            {
+              "table": {
+                "head": [
+                  "Risiko",
+                  "Passende Massnahme"
+                ],
+                "rows": [
+                  [
+                    "Viele Loginversuche",
+                    "Rate Limiting und abgestufte Verzögerungen; Missbrauch von Sperren als DoS berücksichtigen"
+                  ],
+                  [
+                    "Leicht erratbare Passwörter",
+                    "Ausreichende Länge und Prüfung gegen verbreitete/kompromittierte Passwörter"
+                  ],
+                  [
+                    "Konten verratende Antworten",
+                    "Einheitliche Meldungen und möglichst einheitliche Abläufe"
+                  ],
+                  [
+                    "Erratbare Reset-Antworten",
+                    "Nicht allein auf Sicherheitsfragen vertrauen; abgesicherter zweiter Kanal mit kurzlebigem Einmal-Token"
+                  ]
+                ]
+              }
+            },
+            {
+              "callout": {
+                "tone": "warn",
+                "title": "Präzisierung zu Folie 8",
+                "text": "Die dort genannten starren Grossbuchstaben-/Ziffern-/Sonderzeichenregeln sind keine heutige OWASP-Empfehlung. Länge und Blocklisten sind tragfähigere Kriterien. Rate Limiting und gegebenenfalls MFA ergänzen den Schutz."
+              }
+            },
+            {
+              "reveal": {
+                "question": "Eigener Fall: Ein Reset-Link bleibt unbegrenzt gültig und kann mehrfach verwendet werden. Was ist daran falsch?",
+                "answer": "Ein bekannt gewordener Link eröffnet wiederholt Zugriff. Er sollte ausreichend zufällig, kurzlebig, an das Konto gebunden und nach Gebrauch ungültig sein. Sicherheitsfragen allein schützen einen Reset nicht zuverlässig.",
+                "label": "Eigene Antwort vergleichen"
+              }
+            },
+            "Quelle: WebAppSecurityTesting2.pdf, PDF-Seite/Folie 8–10 (inkl. Notizen); OWASP Authentication Cheat Sheet; OWASP Forgot Password Cheat Sheet"
+          ],
+          "remember": "Recovery ist ein zweiter Zugang zum Konto und braucht entsprechend starken Schutz."
+        },
+        {
+          "type": "checkpoint",
+          "id": "cp-login",
+          "title": "Checkpoint: Authentication and Recovery",
+          "questions": [
+            {
+              "id": "combinations",
+              "type": "type",
+              "prompt": "A test combines 6 usernames with 100 password candidates each. How many attempts (number only)?",
+              "accept": [
+                "600",
+                "600 attempts",
+                "600 Versuche"
+              ],
+              "explanation": "Das kartesische Produkt enthält 6 × 100 Kombinationen. Quelle: WebAppSecurityTesting2.pdf, PDF-Seite/Folie 3–10 (inkl. Notizen); OWASP Authentication Cheat Sheet; OWASP Forgot Password Cheat Sheet"
+            },
+            {
+              "id": "enumeration",
+              "type": "multi",
+              "prompt": "Which observations can reveal whether an account exists?",
+              "options": [
+                "Different error text",
+                "Different timing",
+                "Different registration responses",
+                "The same generic message necessarily proves no leakage"
+              ],
+              "correct": [
+                0,
+                1,
+                2
+              ],
+              "explanation": "Mehrere beobachtbare Kanäle können Konten verraten. Quelle: WebAppSecurityTesting2.pdf, PDF-Seite/Folie 3–10 (inkl. Notizen); OWASP Authentication Cheat Sheet; OWASP Forgot Password Cheat Sheet"
+            },
+            {
+              "id": "recovery",
+              "type": "single",
+              "prompt": "Which password-reset design is strongest among these options?",
+              "options": [
+                "A favourite-colour question alone",
+                "A permanent reusable link",
+                "A random, expiring, single-use token delivered through the registered channel"
+              ],
+              "correct": 2,
+              "explanation": "Nicht erratbare Einmal-Tokens mit Ablauf begrenzen das Missbrauchsfenster; der Kanal muss abgesichert sein. Quelle: WebAppSecurityTesting2.pdf, PDF-Seite/Folie 3–10 (inkl. Notizen); OWASP Authentication Cheat Sheet; OWASP Forgot Password Cheat Sheet"
+            }
+          ]
+        },
+        {
+          "type": "slide",
+          "title": "Session-ID: ein zeitlich begrenzter Zugangsschlüssel",
+          "body": [
+            "Nach dem Login enthält nicht jede Anfrage erneut das Passwort. Stattdessen ordnet der Server die Session-ID einer Sitzung zu. Wer eine gültige ID besitzt, kann häufig als deren Benutzer auftreten: Ein starkes Passwort repariert eine gestohlene Session-ID nicht.",
+            "Die Folien vergleichen viele frisch erzeugte IDs im Burp Sequencer. Wiederkehrende Muster und kaum wechselnde Stellen sind Warnzeichen. Eine einzelne lange ID beweist keine Unvorhersagbarkeit; statistische Tests allein beweisen umgekehrt noch keinen sicheren Generator.",
+            {
+              "callout": {
+                "tone": "def",
+                "title": "Entropie statt Aussehen",
+                "text": "Entropie beschreibt hier den unvorhersagbaren Anteil. Eine lange Zeichenfolge mit Zeitstempel und Zähler kann wesentlich weniger Zufälligkeit enthalten, als ihre Länge vermuten lässt."
+              }
+            },
+            "Quelle: WebAppSecurityTesting2.pdf, PDF-Seite/Folie 3, 11–15 (inkl. Notizen)"
+          ],
+          "remember": "Eine Session-ID muss geheim und unvorhersagbar sein, nicht nur lang aussehen."
+        },
+        {
+          "type": "slide",
+          "title": "Session Fixation: zwei Varianten verstehen",
+          "body": [
+            {
+              "compare": {
+                "left": {
+                  "title": "Angreifer-Sitzung ist schon angemeldet",
+                  "points": [
+                    "Opfer nutzt die Sitzung des Angreifers.",
+                    "Es könnte dort eigene Daten ablegen.",
+                    "Der Angreifer liest diese im eigenen Konto."
+                  ]
+                },
+                "right": {
+                  "title": "Bekannte anonyme Sitzung vor dem Login",
+                  "points": [
+                    "Opfer übernimmt eine dem Angreifer bekannte ID.",
+                    "Opfer meldet sich an.",
+                    "Bleibt die ID gleich, kennt der Angreifer nun den Zugang zur Opfer-Sitzung."
+                  ]
+                }
+              }
+            },
+            {
+              "flow": {
+                "steps": [
+                  {
+                    "title": "Bekannte ID",
+                    "text": "Angreifer kennt die anonyme ID S."
+                  },
+                  {
+                    "title": "Übernahme",
+                    "text": "Opfer nutzt S und meldet sich an."
+                  },
+                  {
+                    "title": "Fehlende Rotation",
+                    "text": "Server verbindet S mit dem Opferkonto."
+                  },
+                  {
+                    "title": "Folge",
+                    "text": "Auch der Angreifer kann S weiterverwenden."
+                  }
+                ]
+              }
+            },
+            {
+              "reveal": {
+                "question": "Würde ein schwer zu erratender Wert für S allein diese zweite Variante verhindern?",
+                "answer": "Nein. Der Angreifer muss S nicht erraten, weil er die ID bereits kennt. Der Server muss beim Login eine neue ID erzeugen und die alte Bindung ungültig machen.",
+                "label": "Eigene Antwort vergleichen"
+              }
+            },
+            "Quelle: WebAppSecurityTesting2.pdf, PDF-Seite/Folie 16–18 (inkl. Notizen)"
+          ],
+          "remember": "Bei Fixation ist die ID schon bekannt; Rotation beim Login unterbricht die Kette."
+        },
+        {
+          "type": "slide",
+          "title": "Session-Schutz als mehrere unabhängige Aufgaben",
+          "body": [
+            {
+              "table": {
+                "head": [
+                  "Massnahme",
+                  "Wogegen sie hilft"
+                ],
+                "rows": [
+                  [
+                    "Lange kryptografisch zufällige IDs",
+                    "Erraten; die Vorlesung nennt mindestens 128 Bit Entropie als Ziel"
+                  ],
+                  [
+                    "Rotation beim Login, alte ID ungültig",
+                    "Bekannte anonyme ID nicht in die authentifizierte Sitzung übernehmen"
+                  ],
+                  [
+                    "IDs nur in Cookies akzeptieren",
+                    "Lecks und Fixation über URL-Parameter reduzieren"
+                  ],
+                  [
+                    "Serverseitige Timeouts und Invalidierung",
+                    "Nutzbarkeit alter Sitzungen begrenzen"
+                  ],
+                  [
+                    "HTTPS und geeignete Cookie-Attribute",
+                    "Transport und Browserzugriff absichern"
+                  ]
+                ]
+              }
+            },
+            {
+              "callout": {
+                "tone": "warn",
+                "title": "Präzisierung zu Folie 19",
+                "text": "Nur Cookies zu verwenden ist kein vollständiger Beweis gegen jede Fixation. Rotation und sichere Annahme von Session-IDs bleiben nötig. Auch die Rotation schützt nicht vor einem späteren Diebstahl der neuen ID."
+              }
+            },
+            "Die zehn Minuten auf der Folie sind ein Beispiel für Inaktivität, keine für alle Anwendungen richtige Frist. Die Invalidierung muss serverseitig wirken; nur einen Timer im Browser anzuzeigen reicht nicht.",
+            "Quelle: WebAppSecurityTesting2.pdf, PDF-Seite/Folie 19 (inkl. Notizen); OWASP Session Management Cheat Sheet"
+          ],
+          "remember": "Zufall, Transport, Rotation und Lebensdauer adressieren verschiedene Risiken."
+        },
+        {
+          "type": "checkpoint",
+          "id": "cp-sessions",
+          "title": "Checkpoint: Session Management",
+          "questions": [
+            {
+              "id": "fixation",
+              "type": "order",
+              "prompt": "Order the classic fixation failure.",
+              "items": [
+                "Attacker knows an anonymous session ID",
+                "Victim adopts that ID",
+                "Victim authenticates without ID rotation",
+                "Attacker reuses the ID for the authenticated session"
+              ],
+              "explanation": "Die bekannte ID wird fälschlich über den Privilegwechsel hinweg behalten. Quelle: WebAppSecurityTesting2.pdf, PDF-Seite/Folie 11–19 (inkl. Notizen); OWASP Session Management Cheat Sheet"
+            },
+            {
+              "id": "rotate",
+              "type": "single",
+              "prompt": "Which change directly interrupts this fixation chain?",
+              "options": [
+                "Use a longer but unchanged ID",
+                "Issue a new ID at login and invalidate the old one",
+                "Hide the login button"
+              ],
+              "correct": 1,
+              "explanation": "Der Angreifer darf mit der alten ID nicht zur neuen authentifizierten Sitzung gelangen. Quelle: WebAppSecurityTesting2.pdf, PDF-Seite/Folie 11–19 (inkl. Notizen); OWASP Session Management Cheat Sheet"
+            },
+            {
+              "id": "token",
+              "type": "multi",
+              "prompt": "Which statements are correct?",
+              "options": [
+                "A long timestamp is not necessarily unpredictable.",
+                "One token proves cryptographic randomness.",
+                "A stolen session can bypass the need to know the password.",
+                "Timeouts must be enforced on the server."
+              ],
+              "correct": [
+                0,
+                2,
+                3
+              ],
+              "explanation": "Darstellung, Geheimhaltung und serverseitige Lebensdauer sind eigenständige Eigenschaften. Quelle: WebAppSecurityTesting2.pdf, PDF-Seite/Folie 11–19 (inkl. Notizen); OWASP Session Management Cheat Sheet"
+            }
+          ]
+        },
+        {
+          "type": "slide",
+          "title": "XSS: fremder Code im Kontext deiner Anwendung",
+          "body": [
+            "Bei Cross-Site Scripting gelangen kontrollierbare Daten in einen Kontext, in dem der Browser sie als Code interpretiert. Der fremde Code läuft dabei im Kontext der betroffenen Webseite und kann deren Oberfläche verändern oder Anfragen mit der Sitzung des Benutzers auslösen.",
+            {
+              "cards": [
+                {
+                  "title": "Cookie-Diebstahl",
+                  "text": "Möglich, wenn das relevante Cookie für JavaScript lesbar ist."
+                },
+                {
+                  "title": "Täuschende Oberfläche",
+                  "text": "Zum Beispiel ein eingeschobenes Formular."
+                },
+                {
+                  "title": "Aktionen als Benutzer",
+                  "text": "Anfragen aus dem Kontext der bereits geöffneten Sitzung."
+                }
+              ]
+            },
+            {
+              "callout": {
+                "tone": "warn",
+                "title": "Keine Serverübernahme nötig",
+                "text": "Für XSS muss der Angreifer nicht vorher administrativen Zugriff auf den Server haben. Die unsichere Datenverarbeitung der Anwendung kann genügen."
+              }
+            },
+            "Quelle: WebAppSecurityTesting2.pdf, PDF-Seite/Folie 21–23 (inkl. Notizen)"
+          ],
+          "remember": "Entscheidend ist, dass fremde Daten zu Code im Browserkontext der Anwendung werden."
+        },
+        {
+          "type": "slide",
+          "title": "Reflected, Stored, Server und Client sind verschiedene Fragen",
+          "body": [
+            {
+              "table": {
+                "head": [
+                  "Begriff",
+                  "Welche Frage beantwortet er?"
+                ],
+                "rows": [
+                  [
+                    "Reflected",
+                    "Kommt die Eingabe unmittelbar in derselben Antwort zurück?"
+                  ],
+                  [
+                    "Stored",
+                    "Wird die Eingabe gespeichert und später anderen Besuchern präsentiert?"
+                  ],
+                  [
+                    "Server XSS",
+                    "Liegt der unsichere Einbau in den serverseitig erzeugten Seiten?"
+                  ],
+                  [
+                    "Client XSS",
+                    "Verarbeitet Browser-JavaScript die Daten unsicher?"
+                  ]
+                ]
+              }
+            },
+            "Eine gespeicherte Bewertung aus einer JSON-Antwort kann durch eine unsichere DOM-Ausgabe zu Stored Client XSS führen. Dass die Daten als JSON übertragen werden, macht ihre spätere Verwendung nicht automatisch sicher.",
+            {
+              "reveal": {
+                "question": "Eigener Fall: Eine Suche gibt einen Parameter unsicher im HTML zurück; ein Forum speichert ihn und zeigt ihn morgen anderen Nutzern. Welche Haupttypen sind das?",
+                "answer": "Die Suche illustriert Reflected Server XSS, das serverseitig gerenderte Forum Stored Server XSS. Bei Browser-seitigem unsicherem Einbau wäre die jeweilige Client-Variante zu prüfen.",
+                "label": "Eigene Antwort vergleichen"
+              }
+            },
+            "Quelle: WebAppSecurityTesting2.pdf, PDF-Seite/Folie 21–23, 40 (inkl. Notizen)"
+          ],
+          "remember": "Persistenz und Ort der verwundbaren Verarbeitung getrennt bestimmen."
+        },
+        {
+          "type": "slide",
+          "title": "XSS-Tests: Ausführung belegen, Kontext prüfen",
+          "body": [
+            "In einer autorisierten Testumgebung kann eine harmlose sichtbare Markierung belegen, dass Eingabe als Script ausgeführt wird. Danach wird die konkrete Einfügestelle untersucht: HTML-Text, Attribut oder JavaScript sind unterschiedliche Kontexte.",
+            {
+              "callout": {
+                "tone": "warn",
+                "title": "Präzisierung zu Folie 34",
+                "text": "Dass ein Scanner die Eingabe irgendwo in der Antwort wiederfindet, ist allein noch kein XSS-Beweis. Als korrekt kodierter Text darf dieselbe Zeichenfolge sichtbar sein. Entscheidend sind Kontext und mögliche Ausführung."
+              }
+            },
+            {
+              "reveal": {
+                "question": "Eigener Fall: Eine Seite zeigt die Zeichenfolge eines Script-Tags als Text. Ist damit XSS bewiesen?",
+                "answer": "Nein. Wenn sie korrekt als Text ausgegeben wird, ist das gerade das gewünschte Verhalten. Prüfe den tatsächlichen Datenfluss und Kontext, nicht nur die Anwesenheit einer Zeichenfolge.",
+                "label": "Eigene Antwort vergleichen"
+              }
+            },
+            "Quelle: WebAppSecurityTesting2.pdf, PDF-Seite/Folie 24, 34 (inkl. Notizen); OWASP Cross Site Scripting Prevention Cheat Sheet"
+          ],
+          "remember": "Reflexion ist ein Hinweis; unsichere Interpretation ist das Problem."
+        },
+        {
+          "type": "checkpoint",
+          "id": "cp-xss-types",
+          "title": "Checkpoint: XSS Types and Evidence",
+          "questions": [
+            {
+              "id": "stored",
+              "type": "single",
+              "prompt": "A server stores a review and later inserts it unsafely into HTML shown to other users. Which type fits?",
+              "options": [
+                "Stored Server XSS",
+                "Only session fixation",
+                "Reflected Server XSS"
+              ],
+              "correct": 0,
+              "explanation": "Persistenz plus unsicherer Einbau auf dem Server ergibt Stored Server XSS. Quelle: WebAppSecurityTesting2.pdf, PDF-Seite/Folie 21–24, 34, 40 (inkl. Notizen); OWASP Cross Site Scripting Prevention Cheat Sheet"
+            },
+            {
+              "id": "effects",
+              "type": "multi",
+              "prompt": "What can XSS potentially do?",
+              "options": [
+                "Change the displayed page",
+                "Issue requests in the victim session",
+                "Always read HttpOnly cookies",
+                "Read cookies that are accessible to JavaScript"
+              ],
+              "correct": [
+                0,
+                1,
+                3
+              ],
+              "explanation": "HttpOnly beschränkt den Cookie-Zugriff, nicht alle Möglichkeiten fremden Codes. Quelle: WebAppSecurityTesting2.pdf, PDF-Seite/Folie 21–24, 34, 40 (inkl. Notizen); OWASP Cross Site Scripting Prevention Cheat Sheet"
+            },
+            {
+              "id": "reflection",
+              "type": "single",
+              "prompt": "A scanner sees the submitted text in a response. What next?",
+              "options": [
+                "Declare XSS without further inspection",
+                "Check the output context and whether it can execute",
+                "Assume every reflected value is safe"
+              ],
+              "correct": 1,
+              "explanation": "Sicher kodierter Text darf reflektiert werden; die Interpretation entscheidet. Quelle: WebAppSecurityTesting2.pdf, PDF-Seite/Folie 21–24, 34, 40 (inkl. Notizen); OWASP Cross Site Scripting Prevention Cheat Sheet"
+            }
+          ]
+        },
+        {
+          "type": "slide",
+          "title": "Die Session-Hijacking-Demo als Datenfluss",
+          "body": [
+            {
+              "flow": {
+                "steps": [
+                  {
+                    "title": "Eingabe",
+                    "text": "Ein Opfer veranlasst eine Anfrage mit fremder Eingabe."
+                  },
+                  {
+                    "title": "Verwundbare Ausgabe",
+                    "text": "Die Anwendung baut daraus eine ausführbare Seite."
+                  },
+                  {
+                    "title": "Browser",
+                    "text": "Der Code läuft mit den Rechten dieser Seite."
+                  },
+                  {
+                    "title": "Schaden",
+                    "text": "Lesbare Sitzungsdaten können abfliessen oder Aktionen ausgelöst werden."
+                  }
+                ]
+              }
+            },
+            "In den Folien speichert eine Empfangsseite die übermittelten Werte. Das ist ein Demonstrationsdetail. Für die Abwehr musst du erkennen, an welcher Grenze Daten zu Code werden und welche vertraulichen Werte der Code erreichen kann.",
+            {
+              "callout": {
+                "tone": "tip",
+                "title": "Notizen der Folien mitdenken",
+                "text": "Ein Login ist für XSS allgemein nicht zwingend. Für die Übernahme einer wertvollen authentifizierten Sitzung muss eine entsprechende Sitzung vorhanden sein; andere XSS-Wirkungen können auch im öffentlichen Bereich auftreten."
+              }
+            },
+            "Quelle: WebAppSecurityTesting2.pdf, PDF-Seite/Folie 25–31 (inkl. Notizen)"
+          ],
+          "remember": "Die Ursache liegt im unsicheren Einbau; der nachfolgende Cookie-Diebstahl ist eine mögliche Wirkung."
+        },
+        {
+          "type": "slide",
+          "title": "Warum POST allein XSS nicht verhindert",
+          "body": [
+            "Ein normaler Link löst eine Navigation aus und kann nicht direkt einen beliebigen POST-Formularrumpf enthalten. Die Folien zeigen deshalb eine Zwischen-Seite mit Formular: Der Browser lädt sie und sendet anschliessend den POST an die verwundbare Anwendung.",
+            {
+              "flow": {
+                "steps": [
+                  {
+                    "title": "Navigation",
+                    "text": "Link öffnet ein HTML-Dokument."
+                  },
+                  {
+                    "title": "Formular",
+                    "text": "Das Dokument veranlasst einen POST."
+                  },
+                  {
+                    "title": "Ausgabe",
+                    "text": "Die Zielanwendung verarbeitet die Daten unsicher."
+                  }
+                ]
+              }
+            },
+            {
+              "reveal": {
+                "question": "Eigener Review-Kommentar: «Wir haben die Suche von GET auf POST umgestellt; damit ist XSS behoben.» Wie antwortest du?",
+                "answer": "Die Übertragungsmethode beseitigt den unsicheren Ausgabekontext nicht. Auch POST-Daten können in ausführbares HTML gelangen. Ein Transferweg kann durch Browser- und Cookie-Regeln eingeschränkt sein, ohne die XSS-Ursache zu reparieren.",
+                "label": "Eigene Antwort vergleichen"
+              }
+            },
+            "Quelle: WebAppSecurityTesting2.pdf, PDF-Seite/Folie 28–33 (inkl. Notizen)"
+          ],
+          "remember": "GET versus POST ist keine XSS-Abwehr; der sichere Umgang mit den Daten zählt."
+        },
+        {
+          "type": "slide",
+          "title": "HttpOnly und sichere Ausgabe nicht verwechseln",
+          "body": [
+            {
+              "compare": {
+                "left": {
+                  "title": "HttpOnly",
+                  "points": [
+                    "Verhindert, dass JavaScript das so markierte Cookie ausliest.",
+                    "Andere nicht so markierte Cookies können weiterhin lesbar sein.",
+                    "Verringert bestimmte Folgen eines XSS-Angriffs."
+                  ]
+                },
+                "right": {
+                  "title": "XSS-Ursache beheben",
+                  "points": [
+                    "Unvertrauenswürdige Daten nicht als Code interpretieren.",
+                    "Ausgabe passend zum Kontext kodieren.",
+                    "Bei erlaubtem HTML einen geeigneten Sanitizer einsetzen."
+                  ]
+                }
+              }
+            },
+            {
+              "reveal": {
+                "question": "Ein Session-Cookie ist HttpOnly. Warum kann XSS trotzdem gefährlich sein?",
+                "answer": "Fremder Code kann die Seite verändern und im Browser des Opfers Aktionen auslösen. Der Browser kann dabei das Cookie mitsenden, ohne dass der Code dessen Wert auslesen kann.",
+                "label": "Eigene Antwort vergleichen"
+              }
+            },
+            "Quelle: WebAppSecurityTesting2.pdf, PDF-Seite/Folie 25, 35 (inkl. Notizen); OWASP Session Management Cheat Sheet; OWASP Cross Site Scripting Prevention Cheat Sheet"
+          ],
+          "remember": "HttpOnly schützt den Cookie-Wert; es macht eine verwundbare Seite nicht XSS-sicher."
+        },
+        {
+          "type": "checkpoint",
+          "id": "cp-xss-chain",
+          "title": "Checkpoint: XSS Impact and Transport",
+          "questions": [
+            {
+              "id": "httponly",
+              "type": "single",
+              "prompt": "What does HttpOnly directly prevent?",
+              "options": [
+                "All XSS execution",
+                "JavaScript reading that cookie",
+                "Every authenticated browser request"
+              ],
+              "correct": 1,
+              "explanation": "Das Attribut verhindert den direkten JavaScript-Lesezugriff auf das betreffende Cookie. Quelle: WebAppSecurityTesting2.pdf, PDF-Seite/Folie 25–35 (inkl. Notizen); OWASP Session Management Cheat Sheet"
+            },
+            {
+              "id": "post",
+              "type": "multi",
+              "prompt": "Which statements about POST-based XSS are justified?",
+              "options": [
+                "POST is not an output-encoding mechanism.",
+                "An intermediate HTML form can generate a POST.",
+                "Switching GET to POST fixes unsafe rendering.",
+                "The output context still needs protection."
+              ],
+              "correct": [
+                0,
+                1,
+                3
+              ],
+              "explanation": "POST ändert den Transport, nicht die unsichere Interpretation. Quelle: WebAppSecurityTesting2.pdf, PDF-Seite/Folie 25–35 (inkl. Notizen); OWASP Session Management Cheat Sheet"
+            },
+            {
+              "id": "anonymous",
+              "type": "single",
+              "prompt": "Does XSS always require the victim to be logged in?",
+              "options": [
+                "Yes, for every possible XSS effect",
+                "No; public pages can be affected too",
+                "No, because sessions never matter"
+              ],
+              "correct": 1,
+              "explanation": "Die Voraussetzungen hängen vom Ziel und der Wirkung ab; authentifizierte Aktionen benötigen entsprechende Berechtigungen. Quelle: WebAppSecurityTesting2.pdf, PDF-Seite/Folie 25–35 (inkl. Notizen); OWASP Session Management Cheat Sheet"
+            }
+          ]
+        },
+        {
+          "type": "slide",
+          "title": "Ausgabekontext: Encoding oder Sanitizing?",
+          "body": [
+            {
+              "table": {
+                "head": [
+                  "Gewünschte Ausgabe",
+                  "Passende Strategie"
+                ],
+                "rows": [
+                  [
+                    "Normaler Text",
+                    "Als Text ausgeben, zum Beispiel über textContent"
+                  ],
+                  [
+                    "Text im serverseitigen HTML",
+                    "Kontextgerechtes Output Encoding mit Bibliothek/Template-System"
+                  ],
+                  [
+                    "Bewusst erlaubtes formatiertes HTML",
+                    "Geeigneten HTML-Sanitizer mit erlaubten Elementen verwenden"
+                  ],
+                  [
+                    "Zahl in einer Rechnung",
+                    "Als Zahl parsen und validieren; keinen JavaScript-Ausdruck bauen"
+                  ]
+                ]
+              }
+            },
+            {
+              "callout": {
+                "tone": "warn",
+                "title": "Präzisierung zu Folie 35",
+                "text": "Das Ersetzen einiger HTML-Zeichen ist keine universelle Lösung für JavaScript-, URL- und Attributkontexte. «Sanitize» auf der Folie umfasst unterschiedliche Mechanismen; Encoding zeigt Daten als Text, HTML-Sanitizing erlaubt nur ausgewählte Struktur."
+              }
+            },
+            "Input Validation prüft fachliche Regeln. Sie ist sinnvoll, ersetzt aber nicht die sichere Ausgabe: Ein Forum über JavaScript darf Code als Text akzeptieren und anzeigen.",
+            "Quelle: WebAppSecurityTesting2.pdf, PDF-Seite/Folie 35, 47 (inkl. Notizen); OWASP Cross Site Scripting Prevention Cheat Sheet"
+          ],
+          "remember": "Zuerst den Zielkontext bestimmen, dann die passende sichere Ausgabe wählen."
+        },
+        {
+          "type": "slide",
+          "title": "Browserfilter: die Folie ist historisch",
+          "body": [
+            "Die aufgeführten Schutzfunktionen alter Browser und der XSS Auditor sind keine verlässliche heutige Abwehrstrategie. MDN kennzeichnet X-XSS-Protection als veraltet und nicht standardisiert.",
+            {
+              "callout": {
+                "tone": "warn",
+                "title": "Nicht als aktuelle Browser-Matrix lernen",
+                "text": "Lerne nicht «Browser X verhindert diesen Angriff immer». Prüfe die Anwendung selbst und verwende sichere Ausgabe sowie eine passende CSP. Die historischen Kommandozeilen- und Browserdetails sind Einordnung, keine empfohlene Konfiguration."
+              }
+            },
+            "Quelle: WebAppSecurityTesting2.pdf, PDF-Seite/Folie 36, 44 (inkl. Notizen); MDN: X-XSS-Protection"
+          ],
+          "remember": "Veraltete Browserfilter ersetzen keine sichere Anwendung."
+        },
+        {
+          "type": "slide",
+          "title": "CSP lesen und ihre Grenzen verstehen",
+          "body": [
+            "Eine Content Security Policy gibt dem Browser Regeln für Ressourcen und Codeausführung. Beispiel aus dem Thema: `default-src 'self'; img-src *; script-src 'self'` erlaubt Skriptdateien derselben Origin, während Bilder breiter erlaubt sind.",
+            {
+              "callout": {
+                "tone": "warn",
+                "title": "Präzisierung zu den Folien",
+                "text": "Nicht schon irgendein CSP-Header verbietet sämtlichen Inline-Code. Die konkreten Direktiven und Ausnahmen entscheiden. Nonces oder Hashes können ausgewählten Inline-Code zulassen; unsafe-inline und unsafe-eval schwächen die entsprechenden Grenzen."
+              }
+            },
+            "Anders als die Notiz zu Folie 44 behauptet, bekommt ein erlaubtes externes Skript keinen Freibrief für jede spätere Codeausführung. Eine passende CSP kann auch eval und eingespritzte Inline-Skripte blockieren. Das ergänzt sichere Programmierung, ersetzt sie aber nicht.",
+            {
+              "reveal": {
+                "question": "Eigener Fall: Eine CSP enthält nur img-src. Ist daraus ein allgemeines Script-Verbot ableitbar?",
+                "answer": "Nein. Die Bildregel legt keine allgemeine Script-Policy fest. Dafür die tatsächlich wirksamen Script-Direktiven und deren Fallbacks prüfen.",
+                "label": "Eigene Antwort vergleichen"
+              }
+            },
+            "Quelle: WebAppSecurityTesting2.pdf, PDF-Seite/Folie 37–38, 44 (inkl. Notizen); MDN: Content Security Policy (CSP)"
+          ],
+          "remember": "CSP wirkt nach ihren Regeln; weder der Headername noch eine erlaubte Datei garantiert Sicherheit."
+        },
+        {
+          "type": "checkpoint",
+          "id": "cp-defenses",
+          "title": "Checkpoint: XSS Defenses",
+          "questions": [
+            {
+              "id": "text",
+              "type": "single",
+              "prompt": "A UI must display an untrusted nickname as plain text. Which DOM sink fits?",
+              "options": [
+                "eval",
+                "textContent",
+                "Unvalidated innerHTML"
+              ],
+              "correct": 1,
+              "explanation": "textContent behandelt den Namen als Text. Quelle: WebAppSecurityTesting2.pdf, PDF-Seite/Folie 35–38, 44, 47 (inkl. Notizen); OWASP Cross Site Scripting Prevention Cheat Sheet; MDN: Content Security Policy (CSP); MDN: X-XSS-Protection"
+            },
+            {
+              "id": "csp",
+              "type": "multi",
+              "prompt": "Which CSP statements are correct?",
+              "options": [
+                "Its directives determine the restrictions.",
+                "A nonce or hash can authorize selected inline scripts.",
+                "Any CSP header makes all XSS harmless.",
+                "An allowed external script is automatically exempt from all execution restrictions."
+              ],
+              "correct": [
+                0,
+                1
+              ],
+              "explanation": "CSP wirkt nach konkreten Regeln und ergänzt sichere Ausgabe. Quelle: WebAppSecurityTesting2.pdf, PDF-Seite/Folie 35–38, 44, 47 (inkl. Notizen); OWASP Cross Site Scripting Prevention Cheat Sheet; MDN: Content Security Policy (CSP); MDN: X-XSS-Protection"
+            },
+            {
+              "id": "filter",
+              "type": "single",
+              "prompt": "How should the old browser XSS-filter table be treated?",
+              "options": [
+                "As a universal current guarantee",
+                "As historical context, not a replacement for application defenses",
+                "As proof stored XSS is impossible"
+              ],
+              "correct": 1,
+              "explanation": "Die dort beschriebenen Filter sind keine verlässliche aktuelle Absicherung. Quelle: WebAppSecurityTesting2.pdf, PDF-Seite/Folie 35–38, 44, 47 (inkl. Notizen); OWASP Cross Site Scripting Prevention Cheat Sheet; MDN: Content Security Policy (CSP); MDN: X-XSS-Protection"
+            }
+          ]
+        },
+        {
+          "type": "slide",
+          "title": "DOM-XSS: Source und Sink verfolgen",
+          "body": [
+            "Der DOM ist das vom Browser bereitgestellte Modell der Seite. Browser-JavaScript kann beispielsweise die aktuelle URL lesen und Inhalte verändern. Problematisch wird ein Datenfluss von einer beeinflussbaren Quelle (Source) in eine gefährliche Verwendung (Sink).",
+            {
+              "flow": {
+                "steps": [
+                  {
+                    "title": "Source",
+                    "text": "Zum Beispiel ein URL-Parameter oder Fragment"
+                  },
+                  {
+                    "title": "Verarbeitung",
+                    "text": "Dekodieren, Ausschneiden oder Zusammensetzen"
+                  },
+                  {
+                    "title": "Sink",
+                    "text": "Zum Beispiel document.write oder eval"
+                  },
+                  {
+                    "title": "Wirkung",
+                    "text": "Die Eingabe wird als Markup oder Code interpretiert."
+                  }
+                ]
+              }
+            },
+            "Das Fragment nach # wird beim normalen HTTP-Abruf nicht zum Server übertragen. Browser-JavaScript kann es trotzdem lesen. Ein serverseitiger Filter sieht diese Quelle daher nicht automatisch. DOM-XSS ist aber nicht auf Fragmente beschränkt.",
+            {
+              "reveal": {
+                "question": "Eigener Fall: Der Server liefert unverändertes HTML. JavaScript kopiert einen URL-Wert unsicher in die Seite. Kann trotzdem XSS entstehen?",
+                "answer": "Ja. Der gefährliche Einbau kann vollständig im Browser stattfinden. Serverseitige Reflexion ist keine Voraussetzung.",
+                "label": "Eigene Antwort vergleichen"
+              }
+            },
+            "Quelle: WebAppSecurityTesting2.pdf, PDF-Seite/Folie 39–44 (inkl. Notizen)"
+          ],
+          "remember": "Source, Transformation und Sink erklären die Schwachstelle besser als «steht irgendwo JavaScript?»."
+        },
+        {
+          "type": "slide",
+          "title": "Die eval-Rechnung aus der Vorlesung nachvollziehen",
+          "body": [
+            "Die Demo baut zunächst einen String aus `13 * ` und einem aus der URL gelesenen Wert. Bei 19 ergibt die beabsichtigte Rechnung 247. eval behandelt den zusammengesetzten String jedoch als JavaScript-Programm, nicht bloss als Zahl.",
+            "Die Folie liest ab dem letzten Vorkommen von data= in der vollständigen URL. Dadurch kann ein Wert im Fragment die sichtbare Query übersteuern. Zusätzliche Anweisungen wären dann Teil des ausgewerteten Programms.",
+            {
+              "reveal": {
+                "question": "Wie lässt sich dieselbe Multiplikation sicherer formulieren?",
+                "answer": "Den vorgesehenen Parameter strukturiert auslesen, in eine Zahl umwandeln und auf einen erlaubten, endlichen Wert prüfen. Dann direkt mit 13 multiplizieren und das Ergebnis als Text ausgeben. eval und HTML-Interpretation werden dafür nicht benötigt.",
+                "label": "Eigene Antwort vergleichen"
+              }
+            },
+            {
+              "callout": {
+                "tone": "tip",
+                "title": "Eigene Kontrollrechnung",
+                "text": "13 × 19 = 247. Ein korrektes Ergebnis bei normaler Eingabe beweist nicht, dass unerwartete Eingaben sicher verarbeitet werden."
+              }
+            },
+            "Quelle: WebAppSecurityTesting2.pdf, PDF-Seite/Folie 45–47 (inkl. Notizen)"
+          ],
+          "remember": "Daten als Daten verarbeiten; für einfache Rechnungen keinen Programmtext erzeugen."
+        },
+        {
+          "type": "checkpoint",
+          "id": "cp-dom",
+          "title": "Checkpoint: DOM-based XSS",
+          "questions": [
+            {
+              "id": "fragment",
+              "type": "single",
+              "prompt": "Which URL component is normally not sent in the HTTP request?",
+              "options": [
+                "The path",
+                "The fragment after #",
+                "The query before #"
+              ],
+              "correct": 1,
+              "explanation": "Das Fragment bleibt beim normalen Abruf im Browser und ist dort dennoch lesbar. Quelle: WebAppSecurityTesting2.pdf, PDF-Seite/Folie 39–47 (inkl. Notizen); OWASP Cross Site Scripting Prevention Cheat Sheet"
+            },
+            {
+              "id": "repair",
+              "type": "multi",
+              "prompt": "Which changes address the multiplication demo at its root?",
+              "options": [
+                "Read the intended parameter with a structured parser.",
+                "Validate a finite numeric value.",
+                "Evaluate a concatenated expression with eval.",
+                "Calculate directly and render the result as text."
+              ],
+              "correct": [
+                0,
+                1,
+                3
+              ],
+              "explanation": "Strukturiertes Lesen, Typprüfung und direkte Rechnung vermeiden die Codeinterpretation. Quelle: WebAppSecurityTesting2.pdf, PDF-Seite/Folie 39–47 (inkl. Notizen); OWASP Cross Site Scripting Prevention Cheat Sheet"
+            },
+            {
+              "id": "product",
+              "type": "type",
+              "prompt": "In the benign lecture example, calculate 13 × 19 (number only).",
+              "accept": [
+                "247",
+                "247.0",
+                "247,0"
+              ],
+              "explanation": "13 × 19 = 247. Die korrekte Normalrechnung allein ist kein Sicherheitsbeweis. Quelle: WebAppSecurityTesting2.pdf, PDF-Seite/Folie 39–47 (inkl. Notizen); OWASP Cross Site Scripting Prevention Cheat Sheet"
+            }
+          ]
+        },
+        {
+          "type": "slide",
+          "title": "Transfer: den fehlenden Schutz finden",
+          "body": [
+            {
+              "reveal": {
+                "question": "Eigener Fall: Ein Portal rotiert die Session-ID beim Login, rendert danach aber Bewertungen über unsicheres innerHTML. Ist die Sitzung damit vollständig geschützt?",
+                "answer": "Nein. Rotation verhindert die beschriebene Fixation über die alte ID. Späteres XSS bleibt möglich und kann Aktionen in der neuen Sitzung auslösen. Die Ausgabe muss zusätzlich sicher werden.",
+                "label": "Eigene Antwort vergleichen"
+              }
+            },
+            {
+              "reveal": {
+                "question": "Eigener Fall: Eine App prüft Eingaben serverseitig, liest im Browser aber ein Fragment und übergibt es an eval. Welche Grenze wurde übersehen?",
+                "answer": "Das Fragment wurde beim Abruf nicht an den Server gesendet. Die verwundbare Verarbeitung liegt im Browser. Die Lösung adressiert den clientseitigen Datenfluss und vermeidet eval.",
+                "label": "Eigene Antwort vergleichen"
+              }
+            },
+            {
+              "checklist": {
+                "title": "Kann ich das erklären und anwenden?",
+                "items": [
+                  "Ich kann Enumeration von Passwortversuchen unterscheiden.",
+                  "Ich kann erklären, weshalb ein Reset ebenfalls Authentifizierung absichern muss.",
+                  "Ich kann Fixation und Session-Diebstahl samt Gegenmassnahmen unterscheiden.",
+                  "Ich kann Reflected/Stored und Server/Client getrennt einordnen.",
+                  "Ich kann HttpOnly, Encoding, Sanitizing und CSP mit ihren Grenzen erklären.",
+                  "Ich kann einen DOM-Datenfluss vom Eingang bis zur gefährlichen Verwendung verfolgen."
+                ]
+              }
+            },
+            "Quelle: WebAppSecurityTesting2.pdf, PDF-Seite/Folie 3–47 (inkl. Notizen)"
+          ],
+          "remember": "Eine richtige Massnahme ersetzt nicht die anderen erforderlichen Schutzgrenzen."
+        },
+        {
+          "type": "slide",
+          "title": "Was du nachschlägst statt auswendig lernst",
+          "body": [
+            "Die alten WebGoat- und Burp-Screenshots erklären einen Ablauf; heutige Versionsnummern, Menüpunkte und historische Browserfilter sind kein unveränderlicher Prüfstein. Im Vordergrund stehen Datenfluss, Ursache und begründete Abwehr.",
+            "Die Empfangsskripte und Formular-Demos illustrieren Transport und Folgen. Du sollst verstehen, warum die Kette möglich wird; ein bestimmter Demo-Hostname oder die genaue Länge einer Beispielantwort ist Zusatzwissen.",
+            {
+              "callout": {
+                "tone": "tip",
+                "title": "Quellenkorrekturen sichtbar halten",
+                "text": "Die Präzisierungen dieser Lektion betreffen Passwortregeln, Session-Schutz, kontextgerechte Ausgabe, alte Browserfilter und CSP. Bei abweichendem Folienwortlaut unterscheide die historische Demo von der heutigen technischen Aussage."
+              }
+            },
+            "Quelle: WebAppSecurityTesting2.pdf, PDF-Seite/Folie 5–7, 12–15, 25–38, 44 (inkl. Notizen)"
+          ],
+          "remember": "Lerne die Mechanismen; schlage versionsabhängige Werkzeugdetails gezielt nach."
         }
       ]
     }
