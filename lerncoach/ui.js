@@ -462,8 +462,16 @@
     return `<div class="lc-block lc-reveal" data-reveal="${esc(key)}">
       <p class="lc-reveal-q">${fi(reveal.question)}</p>
       <button type="button" class="button lc-btn-ghost lc-reveal-btn" data-action="reveal">${esc(reveal.label || "Antwort aufdecken")}</button>
-      <div class="lc-reveal-a" hidden>${paras(reveal.answer)}</div>
+      <div class="lc-reveal-a" hidden>${paras(reveal.answer)}${reveal.code ? `<pre class="lc-code-pre"><code>${esc(reveal.code)}</code></pre>` : ""}</div>
     </div>`;
+  }
+
+  function renderCode(code) {
+    return `<figure class="lc-block lc-code">
+      ${code.caption ? `<figcaption>${fi(code.caption)}</figcaption>` : ""}
+      <pre class="lc-code-pre"><code>${esc(code.text)}</code></pre>
+      ${code.note ? `<p class="lc-block-note">${fi(code.note)}</p>` : ""}
+    </figure>`;
   }
 
   function renderChecklist(checklist) {
@@ -667,6 +675,7 @@
     if (block.cards) return renderCards(block.cards);
     if (block.formula) return renderFormula(block.formula);
     if (block.reveal) return renderReveal(block.reveal, `r${index}`);
+    if (block.code) return renderCode(block.code);
     if (block.checklist) return renderChecklist(block.checklist);
     if (block.sim) return renderSim(block.sim);
     if (block.chart) return renderChart(block.chart);

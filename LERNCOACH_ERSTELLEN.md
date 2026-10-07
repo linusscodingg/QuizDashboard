@@ -87,7 +87,8 @@ Setze einen Block nur, wenn er das Verständnis besser macht als ein Absatz. Fü
 | `compare` | zwei Konzepte gegenüberstellen | `left` und `right`, je mit `title` und `points` |
 | `cards` | mehrere gleichrangige Punkte nebeneinander | mindestens 2 Karten mit `title` |
 | `formula` | Formel mit erklärten Bestandteilen | `main` |
-| `reveal` | aktive Frage, Antwort erst nach Klick | `question`, `answer` |
+| `reveal` | aktive Frage, Antwort erst nach Klick, optional mit `code` (mehrzeiliger Code unter der Antwort) | `question`, `answer` |
+| `code` | mehrzeiliger Programmcode, zum Beispiel Java-Lösungen | `text` |
 | `checklist` | Selbstcheck „Kann ich das jetzt?" mit Zähler | `items` |
 | `sim` | Mini-Simulation, aktuell `kind: "minmax"` | `kind`, `label`, `min`, `max`, `start` |
 | `chart` | Diagramm als SVG | `kind` (`histogram`, `box`, `scatter`, `heatmap`, `sampling`) |
@@ -119,6 +120,10 @@ Beispiele:
              parts: [{ label: "Zähler", text: "Abstand zum Minimum" }], note: "Resultat 0 bis 1" } }
 
 { reveal: { question: "Was passiert als Nächstes?", answer: ["Erster Absatz.", "Zweiter Absatz."], label: "Auflösung" } }
+
+{ reveal: { question: "Wie sieht Schritt 1 in Java aus?", answer: "So:", code: "BigInteger a1 = this.myModPow(exponent, p);" } }
+
+{ code: { caption: "Lösung", text: "public int f() {\n  return 1;\n}", note: "Optionaler Hinweis" } }
 
 { checklist: { title: "Kann ich das jetzt?", items: ["Ich kann X erklären."] } }
 

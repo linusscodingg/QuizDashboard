@@ -202,7 +202,14 @@
       const reveal = block.reveal;
       if (!isObject(reveal) || !isText(reveal.question)) return "reveal.question fehlt";
       if (reveal.label !== undefined && !isText(reveal.label)) return "reveal.label muss Text sein";
+      if (reveal.code !== undefined && !isText(reveal.code)) return "reveal.code muss Text sein";
       return textOrList(reveal.answer) ? null : "reveal.answer braucht Text oder eine Liste von Texten";
+    }
+    if (block.code !== undefined) {
+      const code = block.code;
+      if (!isObject(code) || !isText(code.text)) return "code.text fehlt";
+      if (code.caption !== undefined && !isText(code.caption)) return "code.caption muss Text sein";
+      return code.note === undefined || isText(code.note) ? null : "code.note muss Text sein";
     }
     if (block.checklist !== undefined) {
       const checklist = block.checklist;

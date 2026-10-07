@@ -6,7 +6,8 @@ window.QUIZ_CATALOG = {
     { id: "DHEAL", name: "Digital Health", description: "Healthcare data, systems and clinical AI", accent: "#237274" },
     { id: "SWS1", name: "SWS1", description: "Software and System Security 1", accent: "#9a4f24" },
     { id: "ITRECHT", name: "IT-Recht", description: "Rechtliche Grundlagen der Informatik", accent: "#6d4bc3" },
-    { id: "RESE", name: "RESE", description: "Resilienz-Engineering", accent: "#28736b" }
+    { id: "RESE", name: "RESE", description: "Resilienz-Engineering", accent: "#28736b" },
+    { id: "KRY", name: "Kryptologie", description: "Wahlfach Kryptologie: Serien mit PARI/GP und KryptoTrainer", accent: "#8a3b8f" }
   ],
   quizzes: [
     {
@@ -214,6 +215,15 @@ window.QUIZ_CATALOG = {
       title: "Vulnerabilität, Risiko, Zuverlässigkeit und Robustheit",
       source: "03 (01) RESE Resilience and the___ of Vulnerability Risk etc.pdf; 03 (02) RESE Group Exercise.pdf; Resilience Curve.pdf",
       path: "quizzes/RESE/W4_Risiko_Zuverlaessigkeit_Robustheit.html",
+      maximumScore: 100
+    },
+    {
+      id: "kry-w4-serie4-chinesischer-restsatz",
+      subject: "KRY",
+      week: 4,
+      title: "Serie 4: Chinesischer Restsatz",
+      source: "Serie_04_KRY.pdf; W4_TippsSerie4.pdf; W2_ChinesischerRestsatz_Handout.pdf",
+      path: "quizzes/KRY/W4_Serie4_Chinesischer_Restsatz.html",
       maximumScore: 100
     }
   ]

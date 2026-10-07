@@ -401,6 +401,10 @@
 .lc-reveal-a { margin-top: 12px; padding-top: 12px; border-top: 1px solid var(--line); }
 .lc-reveal-a p { margin: 0 0 8px; }
 .lc-reveal-a p:last-child { margin-bottom: 0; }
+.lc-code { min-width: 0; margin: 0; }
+.lc-code figcaption { margin: 0 0 6px; font-weight: 800; }
+.lc-code-pre { max-width: 100%; margin: 10px 0 0; padding: 12px 14px; overflow-x: auto; border: 1px solid var(--line); border-radius: 12px; background: var(--wash); font-size: .86rem; line-height: 1.5; white-space: pre; }
+.lc-code-pre code { padding: 0; background: none; font-size: inherit; }
 .lc-reveal.is-open { border-style: solid; background: var(--wash); }
 
 /* Selbstcheck */
