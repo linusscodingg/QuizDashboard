@@ -1,6 +1,7 @@
 window.QUIZ_CATALOG = {
   version: 1,
   subjects: [
+    { id: "ASE1", name: "ASE1 · CPRE", description: "English Requirements Engineering exam preparation", accent: "#4b5bb5" },
     { id: "CNS1", name: "CNS1", description: "Computer Networks and Security", accent: "#0b77a5" },
     { id: "DHEAL", name: "Digital Health", description: "Healthcare data, systems and clinical AI", accent: "#237274" },
     { id: "SWS1", name: "SWS1", description: "Software and System Security 1", accent: "#9a4f24" },
@@ -8,6 +9,42 @@ window.QUIZ_CATALOG = {
     { id: "RESE", name: "RESE", description: "Resilienz-Engineering", accent: "#28736b" }
   ],
   quizzes: [
+    {
+      "id": "ase1-w1-foundations-principles",
+      "subject": "ASE1",
+      "week": 1,
+      "title": "RE Foundations and Principles",
+      "source": "Activities - Week 01.pdf; CPRE FL Handbuch v1.2.0, chapters 1–2",
+      "path": "quizzes/ASE1/W1_Foundations_Principles.html",
+      "maximumScore": 100
+    },
+    {
+      "id": "ase1-w2-context-interviews",
+      "subject": "ASE1",
+      "week": 2,
+      "title": "Context, Scope and Interviews",
+      "source": "Activities - Week 02.pdf; CPRE FL Handbuch v1.2.0, sections 2.2.4, 3.1 and 3.4.2",
+      "path": "quizzes/ASE1/W2_Context_Interviews.html",
+      "maximumScore": 100
+    },
+    {
+      "id": "ase1-w3-documentation-models",
+      "subject": "ASE1",
+      "week": 3,
+      "title": "Documentation and Model Literacy",
+      "source": "Activities - Week 03.pdf; CPRE FL Handbuch v1.2.0, chapter 3; Activities week 3 Tasks.pdf",
+      "path": "quizzes/ASE1/W3_Documentation_Models.html",
+      "maximumScore": 100
+    },
+    {
+      "id": "ase1-w4-elaboration-validation",
+      "subject": "ASE1",
+      "week": 4,
+      "title": "Elicitation, Conflicts and Validation",
+      "source": "Activities - Week 04.pdf; CPRE FL Handbuch v1.2.0, chapter 4; HS26_ASE_UX und UCD.pdf",
+      "path": "quizzes/ASE1/W4_Elaboration_Validation.html",
+      "maximumScore": 100
+    },
     {
       id: "cns1-w4-routing-rip-eigrp",
       subject: "CNS1",

@@ -1,0 +1,945 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Interactive ASE1 review on Elicitation, Conflicts and Validation.">
+  <title>ASE1 - Elicitation, Conflicts and Validation - Lecture Review</title>
+  <style>
+    :root {
+      --ink: #2f241f;
+      --muted: #74655c;
+      --teal: #4b5bb5;
+      --teal-dark: #334187;
+      --mint: #f8e7d8;
+      --blue: #367fba;
+      --paper: #fff;
+      --wash: #faf2eb;
+      --line: #ead3c2;
+      --green: #198754;
+      --amber: #a96c00;
+      --red: #b9343b;
+      --shadow: 0 18px 50px rgba(25, 84, 84, .13);
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      min-height: 100vh;
+      color: var(--ink);
+      font: 16px/1.5 Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      background:
+        radial-gradient(circle at 8% 0%, rgba(64, 166, 164, .16), transparent 29rem),
+        linear-gradient(145deg, #fbfdfd 0%, var(--wash) 70%, #e5f1ef 100%);
+    }
+    button, input, textarea { font: inherit; }
+    button { cursor: pointer; }
+    button:focus-visible, input:focus-visible, textarea:focus-visible { outline: 3px solid rgba(54,127,186,.3); outline-offset: 2px; }
+    .shell { width: min(1140px, calc(100% - 32px)); margin: 0 auto; padding: 28px 0 46px; }
+    .topbar {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) auto;
+      gap: 20px;
+      align-items: start;
+      padding: 25px;
+      color: #fff;
+      border-radius: 24px;
+      background: linear-gradient(120deg, #334187, #4b5bb5 62%, #7785db);
+      box-shadow: var(--shadow);
+    }
+    .eyebrow { margin: 0 0 6px; color: #c8f4ed; font-size: .78rem; font-weight: 850; letter-spacing: .14em; text-transform: uppercase; }
+    h1 { margin: 0; font-size: clamp(1.55rem, 3vw, 2.4rem); line-height: 1.1; }
+    .subtitle { margin: 9px 0 0; color: #dcf6f1; }
+    .scorebox { min-width: 215px; padding: 14px 16px; border: 1px solid rgba(255,255,255,.28); border-radius: 16px; background: rgba(255,255,255,.1); }
+    .scorebox strong, .scorebox span { display: block; }
+    .scorebox strong { font-size: 1.35rem; }
+    .scorebox span { margin-top: 4px; color: #dcf6f1; font-size: .9rem; }
+    .progress-wrap { grid-column: 1 / -1; margin-top: 17px; }
+    .progress-track { height: 10px; overflow: hidden; border-radius: 999px; background: rgba(255,255,255,.2); }
+    .progress-fill { width: 0; height: 100%; border-radius: inherit; background: linear-gradient(90deg, #8ce5d7, #d9fff8); transition: width .25s ease; }
+    .progress-labels { display: flex; justify-content: space-between; gap: 12px; margin-top: 8px; color: #dcf6f1; font-size: .86rem; }
+    .layout { display: grid; grid-template-columns: minmax(0, 1fr) 270px; gap: 22px; margin-top: 22px; }
+    .card, .side-card { border: 1px solid rgba(164,195,189,.72); border-radius: 22px; background: rgba(255,255,255,.95); box-shadow: var(--shadow); }
+    .card { min-height: 570px; padding: clamp(22px, 4vw, 38px); }
+    .side-card { position: sticky; top: 18px; padding: 18px; }
+    .side-card h2 { margin: 0 0 12px; font-size: 1rem; }
+    .mini-stat { display: flex; justify-content: space-between; gap: 10px; padding: 10px 0; color: var(--muted); border-bottom: 1px solid var(--line); font-size: .9rem; }
+    .mini-stat strong { color: var(--ink); }
+    .source-note { margin: 16px 0 0; color: var(--muted); font-size: .78rem; line-height: 1.45; }
+    .save-note { min-height: 1.25em; margin: 9px 0 0; color: var(--green); font-size: .8rem; font-weight: 750; }
+    .task-head { display: flex; justify-content: space-between; gap: 16px; align-items: flex-start; }
+    .task-no { color: var(--teal); font-size: .82rem; font-weight: 850; letter-spacing: .08em; text-transform: uppercase; }
+    .topic { margin-top: 6px; color: var(--muted); font-size: .94rem; }
+    .points { flex: none; padding: 7px 11px; color: var(--teal-dark); border-radius: 999px; background: var(--mint); font-weight: 800; }
+    .question { margin: 24px 0 18px; font-size: clamp(1.15rem, 2vw, 1.4rem); line-height: 1.42; }
+    .hint { margin: -7px 0 18px; color: var(--muted); font-size: .92rem; }
+    .options, .order-list { display: grid; gap: 10px; }
+    .option { display: grid; grid-template-columns: auto 1fr; gap: 12px; align-items: start; padding: 13px 15px; border: 1px solid var(--line); border-radius: 14px; background: #fbfdfd; transition: border-color .15s, transform .15s; }
+    .option:hover { border-color: #62aaa4; transform: translateY(-1px); }
+    .option input { margin-top: 4px; accent-color: var(--teal); }
+    .option.answer-correct { border-color: #49a96b; background: #e8f8ee; }
+    .option.answer-wrong { border-color: #dc7070; background: #fff0f0; }
+    .answer-label { display: block; margin-top: 5px; font-size: .78rem; font-weight: 850; }
+    .answer-correct .answer-label { color: #14642f; }
+    .answer-wrong .answer-label { color: #922020; }
+    textarea { width: 100%; min-height: 155px; padding: 14px; resize: vertical; color: var(--ink); border: 1px solid var(--line); border-radius: 14px; background: #fbfdfd; line-height: 1.5; }
+    .order-row { display: grid; grid-template-columns: 36px 1fr auto auto; gap: 8px; align-items: center; padding: 10px; border: 1px solid var(--line); border-radius: 13px; background: #fbfdfd; }
+    .order-row.answer-correct { border-color: #49a96b; background: #e8f8ee; }
+    .order-row.answer-wrong { border-color: #dc7070; background: #fff0f0; }
+    .category-list { display: grid; gap: 12px; }
+    .category-row { padding: 14px; border: 1px solid var(--line); border-radius: 14px; background: #fbfdfd; }
+    .category-row.answer-correct { border-color: #49a96b; background: #e8f8ee; }
+    .category-row.answer-wrong { border-color: #dc7070; background: #fff0f0; }
+    .category-row label { display: block; margin-bottom: 9px; font-weight: 700; }
+    .category-row select { width: 100%; padding: 10px 12px; color: var(--ink); border: 1px solid var(--line); border-radius: 10px; background: #fff; }
+    .category-row small { display: block; margin-top: 8px; line-height: 1.4; }
+    .rank { display: grid; place-items: center; width: 30px; height: 30px; color: #fff; border-radius: 50%; background: var(--teal); font-weight: 800; }
+    .move { width: 34px; height: 34px; padding: 0; color: var(--teal); border: 1px solid var(--line); border-radius: 9px; background: #fff; font-weight: 900; }
+    .actions { display: flex; flex-wrap: wrap; gap: 9px; margin-top: 22px; }
+    .btn { min-height: 42px; padding: 10px 15px; border: 1px solid transparent; border-radius: 12px; font-weight: 780; }
+    .btn.primary { color: #fff; background: var(--teal); }
+    .btn.secondary { color: #fff; background: var(--blue); }
+    .btn.ghost { color: var(--ink); border-color: var(--line); background: #fff; }
+    .btn:disabled { cursor: not-allowed; opacity: .42; }
+    .feedback, .solution { margin-top: 18px; padding: 16px; border-radius: 14px; }
+    .feedback.correct { color: #0c6638; background: #e5f7eb; }
+    .feedback.partial { color: #7c5600; background: #fff4d0; }
+    .feedback.wrong, .feedback.skipped { color: #8c272d; background: #fdebed; }
+    .solution { border: 1px solid #bdd9d3; background: #eef9f6; }
+    .solution h3 { margin: 0 0 8px; font-size: 1rem; }
+    .solution p { margin: 7px 0; }
+    .answer-analysis { display: grid; gap: 8px; margin: 12px 0; }
+    .analysis-item { padding: 10px 12px; border-radius: 10px; }
+    .analysis-item.correct { border-left: 4px solid var(--green); background: #e8f8ee; }
+    .analysis-item.wrong { border-left: 4px solid var(--red); background: #fff0f0; }
+    .analysis-item strong { display: block; margin-bottom: 3px; }
+    .reference { color: var(--muted); font-size: .85rem; }
+    .self-rate { display: flex; flex-wrap: wrap; gap: 9px; margin-top: 12px; }
+    .overview { display: grid; grid-template-columns: repeat(4, 1fr); gap: 7px; }
+    .dot { display: grid; place-items: center; aspect-ratio: 1; padding: 0; color: var(--muted); border: 1px solid var(--line); border-radius: 10px; background: #f4f7f7; font-weight: 800; }
+    .dot.current { outline: 3px solid rgba(54,127,186,.24); }
+    .dot.correct { color: #fff; border-color: var(--green); background: var(--green); }
+    .dot.partial { color: #fff; border-color: var(--amber); background: var(--amber); }
+    .dot.wrong, .dot.skipped { color: #fff; border-color: var(--red); background: var(--red); }
+    .result { display: none; }
+    .result.show { display: block; }
+    .result-hero { padding: 24px; color: #fff; border-radius: 18px; background: linear-gradient(120deg, #334187, #4b5bb5); }
+    .result-hero h2 { margin: 0 0 8px; font-size: 2rem; }
+    .result-big { font-size: clamp(2.5rem, 7vw, 4.8rem); font-weight: 900; line-height: 1; }
+    .result-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin: 18px 0; }
+    .result-tile { padding: 16px; border: 1px solid var(--line); border-radius: 15px; background: #fbfdfd; }
+    .result-tile strong, .result-tile span { display: block; }
+    .result-tile strong { font-size: 1.35rem; }
+    .concepts { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; }
+    .concept-box { padding: 16px; border: 1px solid var(--line); border-radius: 15px; }
+    .concept-box h3 { margin: 0 0 8px; font-size: 1rem; }
+    .concept-box ul { margin: 0; padding-left: 18px; }
+    .hidden { display: none !important; }
+    @media (max-width: 830px) {
+      .topbar { grid-template-columns: 1fr; }
+      .scorebox { min-width: 0; }
+      .layout { grid-template-columns: 1fr; }
+      .side-card { position: static; }
+    }
+    @media (max-width: 600px) {
+      .shell { width: min(100% - 20px, 1140px); padding-top: 10px; }
+      .topbar, .card, .side-card { border-radius: 17px; }
+      .result-grid, .concepts { grid-template-columns: 1fr; }
+      .order-row { grid-template-columns: 32px 1fr auto auto; }
+    }
+  </style>
+</head>
+<body>
+  <main class="shell">
+    <header class="topbar">
+      <div>
+        <p class="eyebrow">ASE1 · Week 4</p>
+        <h1>Elicitation, Conflicts and Validation</h1>
+        <p class="subtitle">Original English practice · CPRE concepts and ASE1 applications</p>
+      </div>
+      <div class="scorebox" aria-live="polite"><strong id="scoreText">0 / 100 points</strong><span id="percentText">0 % · no final grade yet</span></div>
+      <div class="progress-wrap">
+        <div class="progress-track"><div class="progress-fill" id="progressFill"></div></div>
+        <div class="progress-labels"><span id="progressText">0 / 12 questions</span><span id="streakText">Streak: 0</span></div>
+      </div>
+    </header>
+
+    <div class="layout">
+      <section class="card">
+        <div id="quizView"></div>
+        <div id="resultView" class="result"></div>
+      </section>
+      <aside class="side-card">
+        <h2>Question overview</h2>
+        <div class="overview" id="overview"></div>
+        <div class="mini-stat"><span>Completed</span><strong id="doneSide">0 / 12</strong></div>
+        <div class="mini-stat"><span>Current score</span><strong id="pointsSide">0 / 100</strong></div>
+        <div class="mini-stat"><span>Self-assessment grade</span><strong id="gradeSide">shown at the end</strong></div>
+        <div class="actions">
+          <button class="btn secondary" id="saveBtn" type="button">Save progress</button>
+          <button class="btn primary" id="finishBtn" type="button" disabled>Finish review</button>
+          <button class="btn ghost" id="newQuizBtn" type="button">Start new quiz</button>
+        </div>
+        <p class="save-note" id="saveNotice" aria-live="polite">Changes are also saved locally and automatically.</p>
+        <p class="source-note">Sources: Activities - Week 04.pdf; CPRE FL Handbuch v1.2.0, chapter 4; HS26_ASE_UX und UCD.pdf. Original learning questions, not an official CPRE paper. Review score and grade are for learning; they do not predict certification. <a href="CPRE_Exam_Guide.html" target="_blank" rel="noopener">Exam guide and official practice exams</a></p><p class="source-note">Single choice: one answer. Multiple choice: select the stated number; selecting too many earns zero, otherwise each correct selection earns its share. K-style statements are marked separately. Ordering and written answers are learning activities, not CPRE exam formats.</p>
+      </aside>
+    </div>
+  </main>
+
+  <script>
+    const questions = [
+  {
+    "id": "source",
+    "topic": "Requirements sources",
+    "prompt": "Which item is a requirements source rather than an elicitation technique?",
+    "type": "single",
+    "options": [
+      "Brainstorming",
+      "Apprenticing",
+      "An operating manual",
+      "An interview"
+    ],
+    "correct": 2,
+    "optionExplanations": [
+      "Brainstorming is a technique.",
+      "Apprenticing is a technique.",
+      "A document can supply requirements evidence.",
+      "An interview is a technique applied to sources."
+    ],
+    "reference": "CPRE FL Handbuch v1.2.0, section 4.1–4.2 (Glinz et al., © IREB)",
+    "concepts": [
+      "Requirements sources"
+    ],
+    "solution": "A document can supply requirements evidence.",
+    "points": 6
+  },
+  {
+    "id": "kano",
+    "topic": "Kano model",
+    "prompt": "A service feature surprises and delights users, but its absence previously caused no complaint. Which Kano factor best fits this evidence?",
+    "type": "single",
+    "options": [
+      "Basic factor",
+      "Excitement factor",
+      "A permanently irrelevant feature",
+      "A constraint by definition"
+    ],
+    "correct": 1,
+    "optionExplanations": [
+      "A missing basic factor tends to cause dissatisfaction.",
+      "Unexpected positive value without prior dissatisfaction fits an excitement factor.",
+      "The positive reaction indicates potential value.",
+      "Kano satisfaction categories do not determine requirement kind."
+    ],
+    "reference": "CPRE FL Handbuch v1.2.0, section 4.2.1 (Glinz et al., © IREB)",
+    "concepts": [
+      "Kano model"
+    ],
+    "solution": "Unexpected positive value without prior dissatisfaction fits an excitement factor.",
+    "points": 6
+  },
+  {
+    "id": "elaboration-k",
+    "type": "categorize",
+    "topic": "Elicitation and validation",
+    "prompt": "K-style practice: judge each statement.",
+    "options": [
+      "True",
+      "False"
+    ],
+    "statements": [
+      "A relevant source may be discovered during validation.",
+      "Kano categories are immutable properties of features.",
+      "Deriving sample test cases can expose missing requirements.",
+      "The best elicitation technique is independent of stakeholder access."
+    ],
+    "correct": [
+      0,
+      1,
+      0,
+      1
+    ],
+    "explanations": [
+      "Elaboration is iterative and discoveries can reopen earlier activities.",
+      "Expectations differ between groups and evolve.",
+      "Sample development can expose ambiguity before execution.",
+      "Access and context affect technique suitability."
+    ],
+    "reference": "CPRE FL Handbuch v1.2.0, section 4, 4.2.1, 4.2.2, 4.4.2 (Glinz et al., © IREB)",
+    "concepts": [
+      "Elicitation and validation"
+    ],
+    "solution": "Elaboration is iterative and discoveries can reopen earlier activities. Expectations differ between groups and evolve. Sample development can expose ambiguity before execution. Access and context affect technique suitability.",
+    "points": 8
+  },
+  {
+    "id": "methods",
+    "topic": "Elicitation techniques",
+    "prompt": "Select TWO suitable ways to explore tacit workarounds in an existing service.",
+    "type": "multi",
+    "options": [
+      "Observe users performing their work",
+      "Learn the task by working under an experienced user’s guidance",
+      "Only ask whether users like a proposed colour palette",
+      "Assume no written complaint means no need"
+    ],
+    "correct": [
+      0,
+      1
+    ],
+    "optionExplanations": [
+      "Field observation can expose unstated routines.",
+      "Apprenticing reveals domain knowledge through participation.",
+      "This narrow question does not investigate workarounds.",
+      "Basic needs may not be spontaneously expressed."
+    ],
+    "reference": "CPRE FL Handbuch v1.2.0, section 4.2.1–4.2.2 (Glinz et al., © IREB)",
+    "concepts": [
+      "Elicitation techniques"
+    ],
+    "solution": "Field observation can expose unstated routines. Apprenticing reveals domain knowledge through participation.",
+    "points": 8
+  },
+  {
+    "id": "conflict-type",
+    "topic": "Conflict analysis",
+    "prompt": "Two service teams repeatedly reject each other’s requirements because of a history of mistrust, even after agreeing on the facts. Which cause should be investigated?",
+    "type": "single",
+    "options": [
+      "Only a syntax error",
+      "Relationship conflict",
+      "Necessarily no conflict",
+      "A guaranteed data conflict"
+    ],
+    "correct": 1,
+    "optionExplanations": [
+      "Changing wording may not address the cause.",
+      "Past mistrust and personal tension fit a relationship conflict.",
+      "The rejection still obstructs agreement.",
+      "The case says they agree on the facts; data is not the main stated cause."
+    ],
+    "reference": "CPRE FL Handbuch v1.2.0, section 4.3.2 (Glinz et al., © IREB)",
+    "concepts": [
+      "Conflict analysis"
+    ],
+    "solution": "Past mistrust and personal tension fit a relationship conflict.",
+    "points": 8
+  },
+  {
+    "id": "resolution",
+    "topic": "Conflict resolution",
+    "prompt": "Select TWO valid cautions about choosing variants to resolve different needs.",
+    "type": "multi",
+    "options": [
+      "Variants can support differing contexts",
+      "Variants add configuration and validation complexity",
+      "Variants always remove every conflict at zero cost",
+      "Variants mean no agreed rules are needed"
+    ],
+    "correct": [
+      0,
+      1
+    ],
+    "optionExplanations": [
+      "Different configurations may satisfy different needs.",
+      "More options create additional requirements and testing responsibilities.",
+      "There are costs and possible remaining conflicts.",
+      "Rules are still needed for each supported variant."
+    ],
+    "reference": "CPRE FL Handbuch v1.2.0, section 4.3.3 (Glinz et al., © IREB)",
+    "concepts": [
+      "Conflict resolution"
+    ],
+    "solution": "Different configurations may satisfy different needs. More options create additional requirements and testing responsibilities.",
+    "points": 8
+  },
+  {
+    "id": "validation-technique",
+    "topic": "Validation techniques",
+    "prompt": "A reviewer attempts to design a test and finds the requirement does not define success. Which technique family is illustrated?",
+    "type": "single",
+    "options": [
+      "Sample development",
+      "Beta testing of a deployed release",
+      "A/B testing",
+      "Voting on stakeholder priorities"
+    ],
+    "correct": 0,
+    "optionExplanations": [
+      "The defect is exposed by deriving a downstream work product.",
+      "No deployed software or real-user trial is described.",
+      "No comparison of live variants is described.",
+      "The problem is specification quality, not a vote."
+    ],
+    "reference": "CPRE FL Handbuch v1.2.0, section 4.4.2 (Glinz et al., © IREB)",
+    "concepts": [
+      "Validation techniques"
+    ],
+    "solution": "The defect is exposed by deriving a downstream work product.",
+    "points": 8
+  },
+  {
+    "id": "risk",
+    "topic": "Validation practices",
+    "prompt": "Select TWO measures suited to reducing blind spots when validating high-risk requirements.",
+    "type": "multi",
+    "options": [
+      "Involve appropriate independent expertise",
+      "Review the complete coherent set from different perspectives",
+      "Require the author to check only spelling",
+      "Validate only after deployment because early checks are impossible"
+    ],
+    "correct": [
+      0,
+      1
+    ],
+    "optionExplanations": [
+      "Independence can reveal assumptions shared by the original team.",
+      "Whole-set and multidisciplinary review help find different defects.",
+      "Spelling review is insufficient.",
+      "Requirements can be validated before the system exists."
+    ],
+    "reference": "CPRE FL Handbuch v1.2.0, section 4.4.1 (Glinz et al., © IREB)",
+    "concepts": [
+      "Validation practices"
+    ],
+    "solution": "Independence can reveal assumptions shared by the original team. Whole-set and multidisciplinary review help find different defects.",
+    "points": 8
+  },
+  {
+    "id": "ucd",
+    "topic": "UX and UCD",
+    "prompt": "Select TWO valid statements about usability evaluation.",
+    "type": "multi",
+    "options": [
+      "Task success can supply evidence of effectiveness",
+      "Time and effort relative to task success can supply evidence of efficiency",
+      "A beautiful mock-up proves production throughput",
+      "An expert review and a representative-user test supply identical evidence"
+    ],
+    "correct": [
+      0,
+      1
+    ],
+    "optionExplanations": [
+      "Effectiveness concerns accuracy and completeness of reaching goals.",
+      "Efficiency relates achieved results to expended resources.",
+      "A UI mock-up cannot demonstrate backend capacity.",
+      "The evaluator and method differ, so the evidence differs."
+    ],
+    "reference": "HS26_ASE_UX und UCD.pdf, slides 7–9, 32–42",
+    "concepts": [
+      "UX and UCD"
+    ],
+    "solution": "Effectiveness concerns accuracy and completeness of reaching goals. Efficiency relates achieved results to expended resources.",
+    "points": 8
+  },
+  {
+    "id": "conflict-process",
+    "type": "order",
+    "topic": "Conflict resolution",
+    "prompt": "Order the conflict-resolution activities.",
+    "items": [
+      "Identify the conflict",
+      "Analyse causes, positions and affected requirements",
+      "Agree and apply a suitable resolution technique",
+      "Document and communicate the decision and rationale"
+    ],
+    "correct": [
+      0,
+      1,
+      2,
+      3
+    ],
+    "initial": [
+      2,
+      0,
+      3,
+      1
+    ],
+    "solution": "Analysis should inform the choice of technique. Recording the result preserves assumptions, alternatives and reasoning for later work.",
+    "reference": "CPRE FL Handbuch v1.2.0, section 4.3.1 (Glinz et al., © IREB)",
+    "concepts": [
+      "Conflict resolution"
+    ],
+    "points": 10
+  },
+  {
+    "id": "case-combination",
+    "type": "text",
+    "topic": "Technique selection",
+    "prompt": "Own case: operators know an old service well but struggle to explain exceptions. New users need a simpler workflow. Propose three complementary elicitation techniques and state what uncertainty each addresses.",
+    "solution": "Full-credit rubric: (1) observation or apprenticing for tacit operator routines; (2) system archaeology or feedback analysis for existing exceptions and behaviour; (3) a prototype/scenario/creative workshop with new users to explore alternatives; (4) explain that discovered rules and new ideas still need validation for relevance. Equivalent justified combinations count. Half credit: names useful techniques but weakly connects them to uncertainty.",
+    "reference": "CPRE FL Handbuch v1.2.0, section 4.2.2–4.2.3 (Glinz et al., © IREB)",
+    "concepts": [
+      "Technique selection"
+    ],
+    "hint": "Answer in English. After checking, use the rubric: full credit for all required elements; half credit for a sound but incomplete answer; zero for an incorrect or unsupported answer.",
+    "points": 10
+  },
+  {
+    "id": "case-validation",
+    "type": "text",
+    "topic": "Validation and UCD",
+    "prompt": "Own case: users complete a booking but repeatedly overlook the final price. The prototype gets high satisfaction ratings, and the team wants to approve all requirements. Explain why that conclusion is too strong and propose a next cycle.",
+    "solution": "Full-credit rubric: (1) distinguish positive attitudes from successful informed task performance; (2) identify an unclear or unmet information need; (3) clarify requirements with representative users and stakeholders and revise the design candidate; (4) evaluate realistic tasks again and check related requirements and assumptions. Half credit: notices a usability issue but omits requirements validation or iteration. Do not claim the study proves every user will fail.",
+    "reference": "HS26_ASE_UX und UCD.pdf, slides 7–15, 40–44; CPRE FL Handbuch v1.2.0, section 4.4 (Glinz et al., © IREB)",
+    "concepts": [
+      "Validation and UCD"
+    ],
+    "hint": "Answer in English. After checking, use the rubric: full credit for all required elements; half credit for a sound but incomplete answer; zero for an incorrect or unsupported answer.",
+    "points": 12
+  }
+];
+
+    const STORAGE_KEY = "ase1-w4-elaboration-validation-review-v1";
+    const DASHBOARD_QUIZ_ID = "ase1-w4-elaboration-validation";
+    const maxPoints = questions.reduce((sum, question) => sum + question.points, 0);
+    const defaultState = () => ({
+      current: 0, answers: {}, order: {}, results: {}, revealed: {}, completed: false,
+      attemptId: createAttemptId(), startedAt: new Date().toISOString(), completedAt: null, updatedAt: null
+    });
+    let state = loadState();
+    let dashboardReady = window.parent === window && !window.opener;
+    let pendingManualSave = false;
+
+    function createAttemptId() {
+      if (globalThis.crypto?.randomUUID) return globalThis.crypto.randomUUID();
+      return `attempt-${Date.now()}-${Math.random().toString(16).slice(2)}`;
+    }
+    function loadState() {
+      try {
+        const saved = JSON.parse(localStorage.getItem(STORAGE_KEY));
+        return saved && typeof saved === "object" ? { ...defaultState(), ...saved } : defaultState();
+      } catch (_) { return defaultState(); }
+    }
+    function saveState() {
+      state.updatedAt = new Date().toISOString();
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+      if (dashboardReady && !state.completed && !state.completedAt) reportProgressToDashboard(false);
+    }
+    function escapeHtml(value) { return String(value ?? "").replace(/[&<>"']/g, char => ({"&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;","'":"&#39;"}[char])); }
+    function resultFor(id) { return state.results[id]; }
+    function isDone(question) { return Boolean(resultFor(question.id)); }
+    function isSubmitted(question) { return isDone(question) || (question.type === "text" && state.revealed[question.id] && Boolean(state.answers[question.id])); }
+    function earned() { return questions.reduce((sum, question) => sum + (resultFor(question.id)?.points || 0), 0); }
+    function completedCount() { return questions.filter(isDone).length; }
+    function formatPoints(value) { return Number.isInteger(value) ? value : value.toFixed(1); }
+    function grade(score) { return (1 + 5 * score / maxPoints).toFixed(1); }
+    function statusLabel(status) { return status === "correct" ? "Correct" : status === "partial" ? "Partially correct" : status === "wrong" ? "Incorrect" : "Skipped"; }
+
+    function streak() {
+      let best = 0, current = 0;
+      questions.forEach(question => {
+        const result = resultFor(question.id);
+        if (result?.status === "correct") { current += 1; best = Math.max(best, current); }
+        else if (result) current = 0;
+      });
+      return best;
+    }
+
+    function updateHeader() {
+      const score = earned();
+      const done = completedCount();
+      const percentage = Math.round(score / maxPoints * 100);
+      document.getElementById("scoreText").textContent = `${formatPoints(score)} / ${maxPoints} points`;
+      document.getElementById("percentText").textContent = state.completed ? `${percentage} % · Grade ${grade(score)}` : `${percentage} % · no final grade yet`;
+      document.getElementById("progressText").textContent = `${done} / ${questions.length} questions`;
+      document.getElementById("progressFill").style.width = `${done / questions.length * 100}%`;
+      document.getElementById("streakText").textContent = `Streak: ${streak()}`;
+      document.getElementById("doneSide").textContent = `${done} / ${questions.length}`;
+      document.getElementById("pointsSide").textContent = `${formatPoints(score)} / ${maxPoints}`;
+      document.getElementById("gradeSide").textContent = state.completed ? grade(score) : "shown at the end";
+      document.getElementById("saveBtn").disabled = state.completed;
+      document.getElementById("finishBtn").disabled = done !== questions.length;
+      renderOverview();
+    }
+
+    function renderOverview() {
+      const overview = document.getElementById("overview");
+      overview.innerHTML = questions.map((question, index) => {
+        const status = resultFor(question.id)?.status || "";
+        return `<button class="dot ${status} ${!state.completed && state.current === index ? "current" : ""}" data-jump="${index}" aria-label="Question ${index + 1}: ${status || "unanswered"}">${index + 1}</button>`;
+      }).join("");
+      overview.querySelectorAll("[data-jump]").forEach(button => button.addEventListener("click", () => {
+        state.completed = false;
+        state.current = Number(button.dataset.jump);
+        saveState(); render();
+      }));
+    }
+
+    function answerArea(question) {
+      const disabled = isSubmitted(question) ? "disabled" : "";
+      if (question.type === "single" || question.type === "multi") {
+        const selected = state.answers[question.id] || [];
+        const inputType = question.type === "single" ? "radio" : "checkbox";
+        return `<div class="options">${question.options.map((option, index) => {
+          const correct = Array.isArray(question.correct) ? question.correct.includes(index) : question.correct === index;
+          const chosen = selected.includes(index);
+          const reviewClass = isDone(question) ? (correct ? "answer-correct" : "answer-wrong") : "";
+          const label = !isDone(question) ? "" : correct ? (chosen ? "✓ Correctly selected" : "✓ Correct answer – not selected") : (chosen ? "✕ Incorrectly selected" : "✕ Not correct");
+          return `<label class="option ${reviewClass}"><input ${disabled} type="${inputType}" name="answer" value="${index}" ${chosen ? "checked" : ""}><span>${escapeHtml(option)}${label ? `<small class="answer-label">${label}</small>` : ""}</span></label>`;
+        }).join("")}</div>`;
+      }
+      if (question.type === "order") {
+        const order = state.order[question.id] || question.initial || question.items.map((_, index) => index);
+        return `<div class="order-list">${order.map((itemIndex, position) => {
+          const correctPosition = question.correct.indexOf(itemIndex);
+          const correct = correctPosition === position;
+          const reviewClass = isDone(question) ? (correct ? "answer-correct" : "answer-wrong") : "";
+          const label = !isDone(question) ? "" : correct ? "✓ Correct position" : `✕ Expected at position ${correctPosition + 1}`;
+          return `<div class="order-row ${reviewClass}"><span class="rank">${position + 1}</span><span>${escapeHtml(question.items[itemIndex])}${label ? `<small class="answer-label">${label}</small>` : ""}</span><button class="move" data-move="${position},-1" ${disabled || position === 0 ? "disabled" : ""} aria-label="Move up">↑</button><button class="move" data-move="${position},1" ${disabled || position === order.length - 1 ? "disabled" : ""} aria-label="Move down">↓</button></div>`;
+        }).join("")}</div>`;
+      }
+      if (question.type === "categorize") {
+        const selected = state.answers[question.id] || Array(question.statements.length).fill("");
+        return `<div class="category-list">${question.statements.map((statement, index) => {
+          const chosen = selected[index];
+          const correct = chosen !== "" && Number(chosen) === question.correct[index];
+          const reviewClass = isDone(question) ? (correct ? "answer-correct" : "answer-wrong") : "";
+          const resultLabel = !isDone(question) ? "" : correct
+            ? `✓ Correctly assigned: ${escapeHtml(question.options[question.correct[index]])}`
+            : `✕ Your answer: ${escapeHtml(chosen === "" ? "Not selected" : question.options[Number(chosen)])} · Correct: ${escapeHtml(question.options[question.correct[index]])}`;
+          const explanation = isDone(question) ? `<small>${escapeHtml(question.explanations[index])}</small>` : "";
+          return `<div class="category-row ${reviewClass}"><label for="category-${index}">${index + 1}. ${escapeHtml(statement)}</label><select id="category-${index}" data-category-index="${index}" ${disabled}><option value="">Select your answer</option>${question.options.map((option, optionIndex) => `<option value="${optionIndex}" ${String(chosen) === String(optionIndex) ? "selected" : ""}>${escapeHtml(option)}</option>`).join("")}</select>${resultLabel ? `<small class="answer-label">${resultLabel}</small>` : ""}${explanation}</div>`;
+        }).join("")}</div>`;
+      }
+      return `<textarea id="textAnswer" ${disabled} placeholder="Write your answer in your own words …">${escapeHtml(state.answers[question.id] || "")}</textarea>`;
+    }
+
+    function feedback(question) {
+      const result = resultFor(question.id);
+      if (!result) return "";
+      const detail = result.status === "skipped" ? "This question was skipped and receives 0 points." : `${statusLabel(result.status)} · ${formatPoints(result.points)} of ${question.points} points.`;
+      return `<div class="feedback ${result.status}"><strong>${escapeHtml(detail)}</strong>${result.note ? `<div>${escapeHtml(result.note)}</div>` : ""}</div>`;
+    }
+
+    function solution(question) {
+      if (!state.revealed[question.id]) return "";
+      const rating = question.type === "text" && !isDone(question) ? `<div class="self-rate"><button class="btn primary" data-rate="correct">Fully correct</button><button class="btn secondary" data-rate="partial">Partially correct</button><button class="btn ghost" data-rate="wrong">Incorrect / I did not know</button></div>` : "";
+      const analysis = question.optionExplanations ? `<div class="answer-analysis">${question.optionExplanations.map((reason, index) => {
+        const correct = Array.isArray(question.correct) ? question.correct.includes(index) : question.correct === index;
+        return `<div class="analysis-item ${correct ? "correct" : "wrong"}"><strong>${correct ? "✓ Statement is correct" : "✕ Statement is incorrect"}</strong>${escapeHtml(reason)}</div>`;
+      }).join("")}</div>` : "";
+      return `<div class="solution"><h3>Answer review and reasoning</h3>${analysis}<p>${escapeHtml(question.solution)}</p><p class="reference"><strong>Source:</strong> ${escapeHtml(question.reference)}</p>${rating}</div>`;
+    }
+
+    function renderQuestion() {
+      const question = questions[state.current];
+      document.getElementById("resultView").classList.remove("show");
+      const quiz = document.getElementById("quizView");
+      quiz.classList.remove("hidden");
+      quiz.innerHTML = `
+        <div class="task-head"><div><div class="task-no">Question ${state.current + 1} of ${questions.length}</div><div class="topic">${escapeHtml(question.topic)}</div></div><div class="points">${question.points} points</div></div>
+        <div class="question">${escapeHtml(question.prompt)}</div>
+        ${question.hint ? `<p class="hint">${escapeHtml(question.hint)}</p>` : ""}
+        ${answerArea(question)}
+        ${feedback(question)}
+        ${solution(question)}
+        <div class="actions">
+          ${question.type === "text" && !isSubmitted(question) ? `<button class="btn primary" id="saveTextBtn">Check answer</button>` : ""}
+          ${question.type !== "text" && !isDone(question) ? `<button class="btn primary" id="checkBtn">Check answer</button>` : ""}
+          ${!isSubmitted(question) ? `<button class="btn ghost" id="skipBtn">Skip</button>` : ""}
+          <button class="btn ghost" id="prevBtn" ${state.current === 0 ? "disabled" : ""}>← Back</button>
+          <button class="btn ghost" id="nextBtn" ${state.current === questions.length - 1 ? "disabled" : ""}>Next →</button>
+        </div>`;
+      bindEvents(question);
+    }
+
+    function bindEvents(question) {
+      document.querySelectorAll('input[name="answer"]').forEach(input => input.addEventListener("change", () => {
+        if (question.type === "single") state.answers[question.id] = [Number(input.value)];
+        else state.answers[question.id] = [...document.querySelectorAll('input[name="answer"]:checked')].map(element => Number(element.value));
+        saveState();
+      }));
+      document.querySelectorAll("[data-move]").forEach(button => button.addEventListener("click", () => {
+        const [position, delta] = button.dataset.move.split(",").map(Number);
+        const order = [...(state.order[question.id] || question.initial || question.items.map((_, index) => index))];
+        [order[position], order[position + delta]] = [order[position + delta], order[position]];
+        state.order[question.id] = order; saveState(); render();
+      }));
+      document.querySelectorAll("[data-category-index]").forEach(select => select.addEventListener("change", () => {
+        const answers = [...(state.answers[question.id] || Array(question.statements.length).fill(""))];
+        answers[Number(select.dataset.categoryIndex)] = select.value;
+        state.answers[question.id] = answers; saveState();
+      }));
+      document.getElementById("textAnswer")?.addEventListener("input", event => {
+        if (isSubmitted(question)) return;
+        state.answers[question.id] = event.target.value;
+        saveState();
+      });
+      document.getElementById("checkBtn")?.addEventListener("click", () => gradeAuto(question));
+      document.getElementById("saveTextBtn")?.addEventListener("click", () => {
+        const text = document.getElementById("textAnswer").value.trim();
+        if (!text) return alert("Write your own answer first.");
+        state.answers[question.id] = text; state.revealed[question.id] = true; saveState(); render();
+      });
+      document.querySelectorAll("[data-rate]").forEach(button => button.addEventListener("click", () => {
+        const status = button.dataset.rate;
+        const factor = status === "correct" ? 1 : status === "partial" ? .5 : 0;
+        state.results[question.id] = { status, points: question.points * factor };
+        saveState(); render();
+      }));
+      document.getElementById("skipBtn")?.addEventListener("click", () => {
+        state.results[question.id] = { status: "skipped", points: 0 }; saveState(); render();
+      });
+      document.getElementById("prevBtn").addEventListener("click", () => navigate(-1));
+      document.getElementById("nextBtn").addEventListener("click", () => navigate(1));
+    }
+
+    function gradeAuto(question) {
+      if (isDone(question)) return;
+      let points = 0, note = "";
+      if (question.type === "single") {
+        const answer = state.answers[question.id]?.[0];
+        if (answer === undefined) return alert("Select an answer first.");
+        points = answer === question.correct ? question.points : 0;
+      } else if (question.type === "multi") {
+        const selected = state.answers[question.id] || [];
+        if (!selected.length) return alert("Select at least one answer first.");
+        const correctHits = selected.filter(value => question.correct.includes(value)).length;
+        const fraction = selected.length > question.correct.length ? 0 : correctHits / question.correct.length;
+        points = Math.round(question.points * fraction * 2) / 2;
+        if (points > 0 && points < question.points) note = "Partial credit: each correct selection earns its share; selecting more than requested earns zero.";
+      } else if (question.type === "order") {
+        const order = state.order[question.id] || question.initial || question.items.map((_, index) => index);
+        const hits = order.filter((value, index) => value === question.correct[index]).length;
+        points = Math.round(question.points * hits / question.correct.length * 2) / 2;
+        state.order[question.id] = order;
+        if (points > 0 && points < question.points) note = `${hits} of ${question.correct.length} positions are correct.`;
+      } else if (question.type === "categorize") {
+        const selected = state.answers[question.id] || Array(question.statements.length).fill("");
+        if (selected.some(value => value === "" || value === undefined)) return alert("Assign an answer to every statement first.");
+        const hits = selected.filter((value, index) => Number(value) === question.correct[index]).length;
+        points = Math.round(question.points * hits / question.correct.length * 2) / 2;
+        if (points > 0 && points < question.points) note = `${hits} of ${question.correct.length} assignments are correct.`;
+      }
+      const status = points === question.points ? "correct" : points > 0 ? "partial" : "wrong";
+      state.results[question.id] = { status, points, note };
+      state.revealed[question.id] = true;
+      saveState(); render();
+    }
+
+    function navigate(delta) {
+      state.current = Math.min(questions.length - 1, Math.max(0, state.current + delta));
+      saveState(); render(); window.scrollTo({ top: 0, behavior: "smooth" });
+    }
+
+    function conceptAnalysis() {
+      const map = {};
+      questions.forEach(question => {
+        const result = resultFor(question.id);
+        question.concepts.forEach(concept => {
+          map[concept] ||= { earned: 0, maximum: 0 };
+          map[concept].earned += result?.points || 0;
+          map[concept].maximum += question.points;
+        });
+      });
+      const groups = { strong: [], mixed: [], weak: [] };
+      Object.entries(map).forEach(([name, value]) => {
+        const percentage = value.maximum ? value.earned / value.maximum * 100 : 0;
+        const item = `${name} (${Math.round(percentage)} %)`;
+        if (percentage >= 80) groups.strong.push(item);
+        else if (percentage >= 55) groups.mixed.push(item);
+        else groups.weak.push(item);
+      });
+      return groups;
+    }
+
+    function classification(percentage) {
+      if (percentage >= 85) return { status: "Very well understood" };
+      if (percentage >= 70) return { status: "Generally understood, but with gaps" };
+      if (percentage >= 50) return { status: "Not yet understood with confidence" };
+      return { status: "Significant knowledge gaps" };
+    }
+    function list(items, emptyText) { return items.length ? `<ul>${items.map(item => `<li>${escapeHtml(item)}</li>`).join("")}</ul>` : `<p>${escapeHtml(emptyText)}</p>`; }
+
+    function exportResult() {
+      const data = { quizId: DASHBOARD_QUIZ_ID, score: earned(), maximumScore: maxPoints,
+        grade: grade(earned()), quizState: state, reviewItems: buildReviewItems() };
+      const url = URL.createObjectURL(new Blob([JSON.stringify(data, null, 2)], { type: "application/json" }));
+      const link = document.createElement("a");
+      link.href = url;
+      link.download = DASHBOARD_QUIZ_ID + "-result.json";
+      link.click();
+      setTimeout(() => URL.revokeObjectURL(url), 1000);
+    }
+
+    function renderResult() {
+      if (completedCount() !== questions.length) return alert("Complete or skip all questions first.");
+      state.completed = true;
+      state.completedAt ||= new Date().toISOString();
+      saveState();
+      const score = earned();
+      const percentage = Math.round(score / maxPoints * 100);
+      const resultClass = classification(percentage);
+      const concepts = conceptAnalysis();
+      const counts = { correct: 0, partial: 0, wrong: 0 };
+      questions.forEach(question => {
+        const status = resultFor(question.id)?.status;
+        if (status === "correct") counts.correct += 1;
+        else if (status === "partial") counts.partial += 1;
+        else counts.wrong += 1;
+      });
+      document.getElementById("quizView").classList.add("hidden");
+      const view = document.getElementById("resultView");
+      view.classList.add("show");
+      view.innerHTML = `
+        <div class="result-hero"><p class="eyebrow">Result</p><h2>${escapeHtml(resultClass.status)}</h2><div class="result-big">${percentage} %</div><p>${formatPoints(score)} / ${maxPoints} points · Self-assessment grade ${grade(score)}</p></div>
+        <div class="result-grid"><div class="result-tile"><strong>${counts.correct}</strong><span>fully correct</span></div><div class="result-tile"><strong>${counts.partial}</strong><span>partially correct</span></div><div class="result-tile"><strong>${counts.wrong}</strong><span>incorrect / skipped</span></div></div>
+        <div class="concepts"><div class="concept-box"><h3>Strengths</h3>${list(concepts.strong, "No area above 80% yet.")}</div><div class="concept-box"><h3>Uncertain</h3>${list(concepts.mixed, "No mixed areas.")}</div><div class="concept-box"><h3>Review</h3>${list(concepts.weak, "No clearly weak areas.")}</div></div>
+        <div class="actions"><button class="btn ghost" id="backToQuiz">Review answers</button><button class="btn ghost" id="exportResultBtn">Export result JSON</button><button class="btn ghost" id="retakeBtn">Start new quiz</button></div>`;
+      document.getElementById("backToQuiz").addEventListener("click", () => { state.completed = false; saveState(); render(); });
+      document.getElementById("retakeBtn").addEventListener("click", startNewQuiz);
+      document.getElementById("exportResultBtn").addEventListener("click", exportResult);
+      reportResultToDashboard(score, percentage, concepts, resultClass);
+      updateHeader();
+    }
+
+    function buildReviewItems() {
+      const label = value => value === undefined || value === null || value === "" ? "No answer" : String(value);
+      const answerText = (question, correct) => {
+        if (question.type === "text") return correct ? label(question.solution) : label(state.answers[question.id]);
+        if (question.type === "order") {
+          const order = correct ? question.correct : (state.order[question.id] || question.initial || []);
+          return order.length ? order.map(index => question.items[index]).join(" → ") : "No answer";
+        }
+        if (question.type === "categorize") {
+          const values = correct ? question.correct : (state.answers[question.id] || []);
+          return question.statements.map((statement, index) => `${statement} → ${question.options[Number(values[index])] || "No answer"}`).join("\n");
+        }
+        const values = correct ? (Array.isArray(question.correct) ? question.correct : [question.correct]) : (state.answers[question.id] || []);
+        return values.length ? values.map(index => question.options[index]).join(" · ") : "No answer";
+      };
+      return questions.map(question => {
+        const result = resultFor(question.id) || { status: "skipped", points: 0 };
+        if (result.status === "correct") return null;
+        return {
+          status: result.status,
+          prompt: question.prompt,
+          yourAnswer: answerText(question, false),
+          correctAnswer: answerText(question, true),
+          explanation: question.type === "text" ? "" : question.solution,
+          points: result.points || 0,
+          maximum: question.points
+        };
+      }).filter(Boolean);
+    }
+
+    function resultPayload(score, percentage, concepts, resultClass) {
+      return {
+        subject: "ASE1", lecture: "Week 1 – Elicitation, Conflicts and Validation",
+        source: "Activities - Week 04.pdf; CPRE FL Handbuch v1.2.0", date: state.completedAt || new Date().toISOString(), attemptId: state.attemptId,
+        totalScore: score, maximumScore: maxPoints, percentage, grade: Number(grade(score)), understanding: resultClass.status,
+        questionResults: questions.map(question => ({ id: question.id, topic: question.topic, points: resultFor(question.id)?.points || 0, maximum: question.points, status: resultFor(question.id)?.status || "unanswered" })),
+        weakConcepts: concepts.weak, partiallyUnderstoodConcepts: concepts.mixed, strongConcepts: concepts.strong
+      };
+    }
+
+    function reportResultToDashboard(score, percentage, concepts, resultClass) {
+      const payload = resultPayload(score, percentage, concepts, resultClass);
+      const message = { source: "quiz-dashboard", version: 1, type: "quiz-completed", quizId: DASHBOARD_QUIZ_ID, attempt: {
+        attemptId: payload.attemptId, completedAt: payload.date, score: payload.totalScore, maximumScore: payload.maximumScore,
+        percentage: payload.percentage, grade: payload.grade, understanding: payload.understanding,
+        strongConcepts: payload.strongConcepts, uncertainConcepts: payload.partiallyUnderstoodConcepts, weakConcepts: payload.weakConcepts,
+        reviewItems: buildReviewItems()
+      }};
+      if (window.parent && window.parent !== window) window.parent.postMessage(message, "*");
+      if (window.opener && !window.opener.closed) window.opener.postMessage(message, "*");
+    }
+
+    function snapshotQuizState() {
+      return JSON.parse(JSON.stringify({
+        current: state.current, answers: state.answers, order: state.order,
+        results: state.results, revealed: state.revealed, completed: false,
+        attemptId: state.attemptId, startedAt: state.startedAt,
+        completedAt: null, updatedAt: state.updatedAt
+      }));
+    }
+
+    function restoreProgressFromDashboard(progress) {
+      const remote = progress?.quizState;
+      if (!remote || typeof remote !== "object" || remote.completed) return;
+      const remoteTime = Date.parse(progress.updatedAt || remote.updatedAt) || 0;
+      const localTime = Date.parse(state.updatedAt) || 0;
+      if (remoteTime <= localTime) return;
+      const record = value => value && typeof value === "object" && !Array.isArray(value) ? value : {};
+      state = {
+        ...defaultState(), ...remote,
+        current: Math.min(questions.length - 1, Math.max(0, Number(remote.current) || 0)),
+        answers: record(remote.answers), order: record(remote.order),
+        results: record(remote.results), revealed: record(remote.revealed),
+        completed: false, completedAt: null,
+        updatedAt: new Date(remoteTime).toISOString()
+      };
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+      render();
+      document.getElementById("saveNotice").textContent = "Cloud progress loaded.";
+    }
+
+    function reportProgressToDashboard(manual = false) {
+      if (state.completed || state.completedAt) return;
+      const message = {
+        source: "quiz-dashboard", version: 1, type: "quiz-progress", quizId: DASHBOARD_QUIZ_ID, manual,
+        progress: {
+          attemptId: state.attemptId,
+          currentTask: state.current + 1,
+          completedCount: completedCount(),
+          totalQuestions: questions.length,
+          score: earned(),
+          maximumScore: maxPoints,
+          updatedAt: state.updatedAt || new Date().toISOString(),
+          quizState: snapshotQuizState()
+        }
+      };
+      if (window.parent && window.parent !== window) window.parent.postMessage(message, "*");
+      if (window.opener && !window.opener.closed) window.opener.postMessage(message, "*");
+    }
+
+    function saveProgressManually() {
+      const question = questions[state.current];
+      const text = document.getElementById("textAnswer");
+      if (question?.type === "text" && text) state.answers[question.id] = text.value;
+      saveState();
+      if (dashboardReady) reportProgressToDashboard(true);
+      else pendingManualSave = true;
+      document.getElementById("saveNotice").textContent = `Progress saved · ${new Date().toLocaleTimeString("en-GB", { hour: "2-digit", minute: "2-digit" })}`;
+    }
+
+    function clearDashboardProgress() {
+      const message = { source: "quiz-dashboard", version: 1, type: "quiz-progress-reset", quizId: DASHBOARD_QUIZ_ID };
+      if (window.parent && window.parent !== window) window.parent.postMessage(message, "*");
+      if (window.opener && !window.opener.closed) window.opener.postMessage(message, "*");
+    }
+
+    function render() {
+      if (state.completed) renderResult(); else renderQuestion();
+      updateHeader();
+    }
+
+    document.getElementById("saveBtn").addEventListener("click", saveProgressManually);
+    document.getElementById("finishBtn").addEventListener("click", renderResult);
+    function startNewQuiz() {
+      if (!confirm("Start a new quiz? An unfinished saved state will be discarded. Earlier completed attempts remain in the dashboard.")) return;
+      localStorage.removeItem(STORAGE_KEY); clearDashboardProgress(); state = defaultState(); saveState(); render();
+    }
+
+    document.getElementById("newQuizBtn").addEventListener("click", startNewQuiz);
+
+    window.addEventListener("message", event => {
+      const message = event.data;
+      const allowedSource = event.source === window.parent || event.source === window.opener;
+      if (!allowedSource || !message || message.source !== "quiz-dashboard" || message.version !== 1) return;
+      if (message.type !== "quiz-resume" || message.quizId !== DASHBOARD_QUIZ_ID) return;
+      restoreProgressFromDashboard(message.progress);
+      dashboardReady = true;
+      if (state.updatedAt && !state.completed && !state.completedAt) reportProgressToDashboard(pendingManualSave);
+      pendingManualSave = false;
+    });
+
+    const readyMessage = { source: "quiz-dashboard", version: 1, type: "quiz-ready", quizId: DASHBOARD_QUIZ_ID };
+    if (window.parent && window.parent !== window) window.parent.postMessage(readyMessage, "*");
+    if (window.opener && !window.opener.closed) window.opener.postMessage(readyMessage, "*");
+    render();
+  </script>
+</body>
+</html>
