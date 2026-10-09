@@ -8,6 +8,7 @@ window.LERNCOACH_MANIFEST = {
   version: 1,
   files: [
     "lerncoach/content/ASE1.js",
+    "lerncoach/content/ASE1DE.js",
     "lerncoach/content/CNS1.js",
     "lerncoach/content/DHEAL.js",
     "lerncoach/content/SWS1.js",

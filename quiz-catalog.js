@@ -2,6 +2,7 @@ window.QUIZ_CATALOG = {
   version: 1,
   subjects: [
     { id: "ASE1", name: "ASE1 · CPRE", description: "English Requirements Engineering exam preparation", accent: "#4b5bb5" },
+    { id: "ASE1DE", name: "ASE1 · CPRE (Deutsch)", description: "Requirements-Engineering-Prüfungsvorbereitung auf Deutsch", accent: "#3f7a5a" },
     { id: "CNS1", name: "CNS1", description: "Computer Networks and Security", accent: "#0b77a5" },
     { id: "DHEAL", name: "Digital Health", description: "Healthcare data, systems and clinical AI", accent: "#237274" },
     { id: "SWS1", name: "SWS1", description: "Software and System Security 1", accent: "#9a4f24" },
@@ -44,6 +45,42 @@ window.QUIZ_CATALOG = {
       "title": "Elicitation, Conflicts and Validation",
       "source": "Activities - Week 04.pdf; CPRE FL Handbuch v1.2.0, chapter 4; HS26_ASE_UX und UCD.pdf",
       "path": "quizzes/ASE1/W4_Elaboration_Validation.html",
+      "maximumScore": 100
+    },
+    {
+      "id": "ase1de-w1-grundlagen-prinzipien",
+      "subject": "ASE1DE",
+      "week": 1,
+      "title": "RE-Grundlagen und Prinzipien",
+      "source": "Activities - Week 01.pdf; CPRE FL Handbuch v1.2.0, Kapitel 1–2",
+      "path": "quizzes/ASE1DE/W1_Grundlagen_Prinzipien.html",
+      "maximumScore": 100
+    },
+    {
+      "id": "ase1de-w2-kontext-interviews",
+      "subject": "ASE1DE",
+      "week": 2,
+      "title": "Kontext, Scope und Interviews",
+      "source": "Activities - Week 02.pdf; CPRE FL Handbuch v1.2.0, Abschnitte 2.2.4, 3.1 und 3.4.2",
+      "path": "quizzes/ASE1DE/W2_Kontext_Interviews.html",
+      "maximumScore": 100
+    },
+    {
+      "id": "ase1de-w3-dokumentation-modelle",
+      "subject": "ASE1DE",
+      "week": 3,
+      "title": "Dokumentation und Modellverständnis",
+      "source": "Activities - Week 03.pdf; CPRE FL Handbuch v1.2.0, Kapitel 3; Activities week 3 Tasks.pdf",
+      "path": "quizzes/ASE1DE/W3_Dokumentation_Modelle.html",
+      "maximumScore": 100
+    },
+    {
+      "id": "ase1de-w4-ermittlung-validierung",
+      "subject": "ASE1DE",
+      "week": 4,
+      "title": "Ermittlung, Konflikte und Validierung",
+      "source": "Activities - Week 04.pdf; CPRE FL Handbuch v1.2.0, Kapitel 4; HS26_ASE_UX und UCD.pdf",
+      "path": "quizzes/ASE1DE/W4_Ermittlung_Validierung.html",
       "maximumScore": 100
     },
     {
