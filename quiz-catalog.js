@@ -183,6 +183,15 @@ window.QUIZ_CATALOG = {
       maximumScore: 100
     },
     {
+      id: "sws1-w5-web-application-security-testing-3",
+      subject: "SWS1",
+      week: 5,
+      title: "Web Application Security Testing 3: Access Control, CSRF and Testing Tools",
+      source: "WebAppSecurityTesting3.pdf",
+      path: "quizzes/SWS1/W5_Web_Application_Security_Testing_3.html",
+      maximumScore: 100
+    },
+    {
       id: "sws1-w2-secure-development-lifecycle",
       subject: "SWS1",
       week: 2,

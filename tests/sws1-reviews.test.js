@@ -4,6 +4,7 @@ const path = require("node:path");
 const vm = require("node:vm");
 
 const cases = [
+  {"file":"W5_Web_Application_Security_Testing_3.html","quizId":"sws1-w5-web-application-security-testing-3","source":"WebAppSecurityTesting3.pdf","title":"Web Application Security Testing 3: Access Control, CSRF and Testing Tools","questionCount":12,"maximumScore":100},
   {"file":"W1_Introduction_Software_Security.html","quizId":"sws1-w1-introduction-software-security","source":"IntroSoftwareSecurity.pdf","title":"Introduction to Software Security","questionCount":12,"maximumScore":100},
   {"file":"W3_Web_Application_Security_Testing_1.html","quizId":"sws1-w3-web-application-security-testing-1","source":"WebAppSecurityTesting1.pdf","title":"Web Application Security Testing 1: Injection","questionCount":12,"maximumScore":100},
   {"file":"W4_Web_Application_Security_Testing_2.html","quizId":"sws1-w4-web-application-security-testing-2","source":"WebAppSecurityTesting2.pdf","title":"Web Application Security Testing 2: Authentication, Sessions and XSS","questionCount":12,"maximumScore":100},

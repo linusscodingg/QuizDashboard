@@ -38,7 +38,7 @@ function harness(script, storage = new Map()) {
   return { run, element, rates, messages, storage, resume };
 }
 
-for (const filename of ["W1_Introduction_Software_Security.html","W3_Web_Application_Security_Testing_1.html","W4_Web_Application_Security_Testing_2.html"]) {
+for (const filename of ["W1_Introduction_Software_Security.html","W3_Web_Application_Security_Testing_1.html","W4_Web_Application_Security_Testing_2.html","W5_Web_Application_Security_Testing_3.html"]) {
   const html = fs.readFileSync(path.join(root, "quizzes/SWS1", filename), "utf8");
   const script = [...html.matchAll(/<script(?:\s[^>]*)?>([\s\S]*?)<\/script>/gi)].map(match => match[1]).find(value => value.trim());
   const h = harness(script);
@@ -126,4 +126,4 @@ for (const filename of ["W1_Introduction_Software_Security.html","W3_Web_Applica
   assert.notEqual(h.run("state.attemptId"), previous);
   assert.equal(harness(script, h.storage).run("state.attemptId"), h.run("state.attemptId"), "Reset attempt survives reload");
 }
-console.log("SWS1: three new quiz grading and resume contracts passed (cloud messages simulated)");
+console.log("SWS1: four quiz grading and resume contracts passed (cloud messages simulated)");
