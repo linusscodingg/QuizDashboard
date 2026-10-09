@@ -8,6 +8,7 @@
   <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' https://www.gstatic.com https://apis.google.com; script-src-elem 'self' 'unsafe-inline' https://www.gstatic.com https://apis.google.com; style-src 'self' 'unsafe-inline'; img-src 'self' data:; connect-src 'self' https://www.gstatic.com https://apis.google.com https://*.googleapis.com https://*.firebaseio.com https://*.firebaseapp.com; frame-src 'self' https://*.firebaseapp.com; object-src 'none'; base-uri 'self'; form-action 'self'; upgrade-insecure-requests">
   <title>Quiz-Dashboard</title>
   <link rel="stylesheet" href="lerncoach/lerncoach.css">
+  <link rel="stylesheet" href="linus-easter-egg.css">
   <style>
     :root {
       color-scheme: light;
@@ -319,6 +320,7 @@
     <section class="cloud-bar" aria-label="Cloud-Synchronisation">
       <div class="cloud-state"><strong id="cloudTitle">Lokal gespeichert</strong><span id="cloudStatus">Firebase wird vorbereitet …</span></div>
       <button class="button small danger" id="cloudLogoutBtn" type="button" hidden>Abmelden</button>
+      <button class="button small" id="linusEggBtn" type="button" hidden aria-label="Scam-Detektor öffnen" title="Scam-Detektor">🕵️</button>
       <button class="button small danger" id="cloudDeleteToggle" type="button" hidden>Konto löschen</button>
       <div class="cloud-panel delete-panel" id="cloudDeletePanel" hidden>
         <button class="button small danger" id="cloudDeleteConfirm" type="button">Cloud-Daten und Konto endgültig löschen</button>
@@ -1084,6 +1086,17 @@
   <script src="lerncoach/engine.js"></script>
   <script src="lerncoach/manifest.js"></script>
   <script src="lerncoach/ui.js"></script>
+  <dialog class="linus-egg" id="linusEggDialog" aria-labelledby="linusEggTitle" aria-describedby="linusEggMessage">
+    <button class="linus-egg-close" id="linusEggClose" type="button" aria-label="Schliessen" autofocus>✕</button>
+    <div class="linus-egg-icon" aria-hidden="true">🕵️</div>
+    <p class="linus-egg-label">GOAT Security Department</p>
+    <h2 id="linusEggTitle">Linus-Account wird überprüft …</h2>
+    <div class="linus-egg-scan" id="linusEggScan" aria-hidden="true"></div>
+    <p id="linusEggMessage" aria-live="polite">Einen Moment, Linus. Der Scam-Detektor schaut genauer hin.</p>
+    <button class="button linus-egg-action" id="linusEggLawyer" type="button" hidden>Ich möchte meinen Anwalt sprechen</button>
+    <p class="linus-egg-footnote">Ein kleines Easter Egg. Viel Erfolg beim Lernen 😄</p>
+  </dialog>
+  <script src="linus-easter-egg.js"></script>
   <script src="firebase-config.js"></script>
   <script src="firebase-sync.js"></script>
 </body>
