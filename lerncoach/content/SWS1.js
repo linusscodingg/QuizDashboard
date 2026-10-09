@@ -1,4 +1,21 @@
 /*
+ * W5 ergänzt 09.10.2026: lokaler Schedule and Videos.html, SW5 = Kapitel 4 Part 3/3.
+ * WebAppSecurityTesting3.pdf: alle 46 PDF-Seiten inkl. Notizen gelesen und visuell geprüft.
+ * PDF-Seite = gedruckte Foliennummer. Originale bleiben ausserhalb des Repos.
+ * A: Autorisierung (3–15) -> cp-access-control; CSRF (17–29) -> cp-csrf-mechanism/defenses;
+ * Testwahl/Befundbewertung (31–46) -> cp-dynamic-testing/static-llm/transfer.
+ * B: Datenfluss, Browserkontext und Frameworkgrenzen. C: alte Demo-URLs, Toolzahlen.
+ * Eigene Transferfälle und Abläufe gekennzeichnet. Keine Videos/LCQs transkribiert.
+ * Präzisierungen geprüft 09.10.2026: Cookie-Kontext, Lax-Top-Level-Bedingung,
+ * Request senden vs. Response lesen, keine Token in URLs, keine vollständige Codeabdeckungsgarantie.
+ * https://developer.mozilla.org/en-US/docs/Web/HTTP/Reference/Headers/Set-Cookie
+ * https://developer.mozilla.org/en-US/docs/Web/HTTP/Guides/CORS
+ * https://cheatsheetseries.owasp.org/cheatsheets/Cross-Site_Request_Forgery_Prevention_Cheat_Sheet.html
+ * https://cheatsheetseries.owasp.org/cheatsheets/Authorization_Cheat_Sheet.html
+ * https://cheatsheetseries.owasp.org/cheatsheets/Secrets_Management_Cheat_Sheet.html
+ * Strittige Demo-Secret-Bewertung nur eingeordnet, nicht als eindeutige Quizfrage benutzt.
+ */
+/*
  * Ergänzung 06.10.2026 nach Moodle Schedule and Videos (SW 1–4):
  * https://moodle.zhaw.ch/mod/page/view.php?id=1989373
  * Neue Wochen: W1 IntroSoftwareSecurity.pdf, 29/29 Seiten inkl. Notizen;
@@ -3086,6 +3103,1176 @@ Lerncoach.registerSubject({
             "Quelle: WebAppSecurityTesting2.pdf, PDF-Seite/Folie 5–7, 12–15, 25–38, 44 (inkl. Notizen)"
           ],
           "remember": "Lerne die Mechanismen; schlage versionsabhängige Werkzeugdetails gezielt nach."
+        }
+      ]
+    },
+    {
+      "id": "w5",
+      "number": 5,
+      "title": "Web Application Security Testing 3: Access Control, CSRF und Testing Tools",
+      "status": "ready",
+      "items": [
+        {
+          "type": "slide",
+          "title": "Woche 5: Wer darf was – und wer hat es ausgelöst?",
+          "body": [
+            "Ein gültiger Login beantwortet nur, wer eine Anfrage stellt. Diese Woche ergänzt zwei andere Fragen: Darf diese Person die Funktion und das konkrete Objekt benutzen? Und stammt eine zustandsändernde Anfrage tatsächlich aus einer beabsichtigten Benutzeraktion?",
+            {
+              "cards": [
+                {
+                  "title": "Zugriffskontrolle",
+                  "text": "Funktionsrechte und Objektrechte unterscheiden, testen und serverseitig durchsetzen."
+                },
+                {
+                  "title": "CSRF",
+                  "text": "Die fremd ausgelöste Anfrage verstehen und Token, SameSite sowie Browserregeln korrekt einordnen."
+                },
+                {
+                  "title": "Testwerkzeuge",
+                  "text": "Dynamische, statische und LLM-gestützte Befunde prüfen statt Trefferzahlen mit Sicherheit gleichzusetzen."
+                }
+              ]
+            },
+            {
+              "callout": {
+                "tone": "tip",
+                "text": "Erklärungen sind auf Deutsch, Checkpoints auf Englisch. Eigene Fälle dienen dem Transfer. Schwerpunkt sind Mechanismen und begründete Testentscheidungen; die Gewichtung ist keine Prüfungszusage."
+              }
+            },
+            "Quelle: WebAppSecurityTesting3.pdf, PDF-Seite/Folie 3, 8, 17–18, 31, 45–46 (inkl. Notizen)."
+          ],
+          "remember": "Authentifiziert, autorisiert und absichtlich ausgelöst sind drei verschiedene Eigenschaften."
+        },
+        {
+          "type": "slide",
+          "title": "Zwei Ebenen der Zugriffskontrolle",
+          "body": [
+            {
+              "compare": {
+                "left": {
+                  "title": "Function level",
+                  "points": [
+                    "Darf die Person diese Funktion überhaupt benutzen?",
+                    "Beispiel der Vorlesung: Ein Kunde ruft eine Admin-Funktion auf."
+                  ]
+                },
+                "right": {
+                  "title": "Object level",
+                  "points": [
+                    "Darf die Person diese Funktion für genau dieses Objekt benutzen?",
+                    "Beispiel der Vorlesung: Ein Verkäufer verändert das Produkt eines anderen Verkäufers."
+                  ]
+                },
+                "verdict": "Eine erlaubte Funktion kann für ein fremdes Objekt trotzdem verboten sein."
+              }
+            },
+            "Authentifizierung ist keine vollständige Autorisierung. Auch hinter einer Login-Schranke können fremde Profile oder Rechnungen erreichbar bleiben. Versteckte Menüpunkte und schwer erratbare URLs ersetzen keine Berechtigungsprüfung.",
+            {
+              "reveal": {
+                "question": "Eigener Kurzfall: Kundin A darf Rechnungen herunterladen. Sie ändert die Rechnungs-ID und erhält die Rechnung von B. Welche Ebene fehlt?",
+                "answer": "Die Objektberechtigung: Der Download als Funktion ist erlaubt, der Zugriff auf die Rechnung von B nicht.",
+                "label": "Überlegen, dann aufdecken"
+              }
+            },
+            "Quelle: WebAppSecurityTesting3.pdf, PDF-Seite/Folie 3–8, 14–15 (inkl. Notizen)."
+          ],
+          "remember": "Prüfe Funktion UND Objekt."
+        },
+        {
+          "type": "slide",
+          "title": "Zugriffsrechte mit kontrollierten Vergleichen testen",
+          "body": [
+            "Im autorisierten Test helfen Konten mit unterschiedlichen Rollen und zwei bekannte, getrennt zugeordnete Testobjekte. So weisst du, welche Anfragen erlaubt sein sollen. Nur zufällige IDs zu probieren liefert bei einem Fehlschlag wenig Aussagekraft.",
+            {
+              "flow": {
+                "steps": [
+                  {
+                    "title": "Referenz erfassen",
+                    "text": "Mit dem berechtigten Testkonto Funktion und Objekt aufrufen."
+                  },
+                  {
+                    "title": "Eine Grenze ändern",
+                    "text": "Mit einer anderen Rolle dieselbe Funktion oder als zweiter Eigentümer dasselbe Objekt anfragen."
+                  },
+                  {
+                    "title": "Wirkung prüfen",
+                    "text": "Antwortinhalt und tatsächliche Datenänderung mit den erwarteten Rechten vergleichen."
+                  }
+                ]
+              }
+            },
+            {
+              "table": {
+                "head": [
+                  "Beobachtung",
+                  "Was sie belegt"
+                ],
+                "rows": [
+                  [
+                    "Fremde Daten werden geliefert",
+                    "Unberechtigter Zugriff für diesen geprüften Fall."
+                  ],
+                  [
+                    "Zugriff abgelehnt, keine Wirkung",
+                    "Die konkrete Grenze wurde eingehalten; kein Beweis für alle Endpunkte."
+                  ],
+                  [
+                    "Object not found bei unbekannter ID",
+                    "Unklar: Objekt könnte fehlen oder absichtlich verborgen werden."
+                  ]
+                ]
+              }
+            },
+            "IDs können im Pfad, in Query-Parametern oder im Request-Body/JSON stehen. Prüfe auch schreibende Methoden; ein erfolgreicher GET-Test deckt POST, PUT oder DELETE nicht automatisch ab.",
+            "Quelle: WebAppSecurityTesting3.pdf, PDF-Seite/Folie 5–10, 12–14 (inkl. Notizen)."
+          ],
+          "remember": "Ein aussagekräftiger Negativtest braucht ein bekanntes Objekt und eine bekannte Berechtigungsgrenze."
+        },
+        {
+          "type": "slide",
+          "title": "Die Abwehr gehört auf den Server",
+          "body": [
+            "Das Profilbeispiel der Vorlesung ist auf Funktionsebene geschützt, vertraut aber einer vom Browser gelieferten pid. Für das eigene Profil kann der Server das Konto aus der authentifizierten Session bestimmen. Für frei wählbare Objekte bleibt eine explizite Prüfung gegen die geltenden Zugriffsregeln nötig.",
+            {
+              "flow": {
+                "steps": [
+                  {
+                    "title": "Identität bestimmen",
+                    "text": "Vertrauenswürdige Session auswerten."
+                  },
+                  {
+                    "title": "Funktion prüfen",
+                    "text": "Ist diese Aktion für die Rolle erlaubt?"
+                  },
+                  {
+                    "title": "Objekt prüfen",
+                    "text": "Darf diese Identität auf das ausgewählte Objekt zugreifen?"
+                  },
+                  {
+                    "title": "Erst dann ausführen",
+                    "text": "Daten liefern oder ändern."
+                  }
+                ]
+              }
+            },
+            {
+              "reveal": {
+                "question": "Eigener Fall: Der Server ersetzt fortlaufende Rechnungsnummern durch zufällige IDs. Ist die fehlende Objektprüfung damit behoben?",
+                "answer": "Nein. Schwer erratbare IDs erschweren das Finden fremder Objekte, erlauben aber keinen Zugriff darauf. Auch eine anderweitig bekannt gewordene ID muss die Objektprüfung durchlaufen.",
+                "label": "Überlegen, dann aufdecken"
+              }
+            },
+            "Quelle: WebAppSecurityTesting3.pdf, PDF-Seite/Folie 11–15 (inkl. Notizen)."
+          ],
+          "remember": "Clientseitige Sichtbarkeit ist keine serverseitige Erlaubnis."
+        },
+        {
+          "type": "checkpoint",
+          "id": "cp-access-control",
+          "title": "Checkpoint: Function and object permissions",
+          "questions": [
+            {
+              "id": "function-case",
+              "type": "single",
+              "prompt": "A customer can directly call an administrator-only export endpoint. Which check is primarily missing?",
+              "options": [
+                "Function-level authorization",
+                "CSRF token validation",
+                "Object ownership within an otherwise permitted customer function",
+                "HTML output encoding"
+              ],
+              "correct": 0,
+              "explanation": "The customer must not use this function at all. Hiding the menu does not enforce that rule. Quelle: WebAppSecurityTesting3.pdf, PDF-Seite/Folie 3–7 (inkl. Notizen)."
+            },
+            {
+              "id": "object-fix",
+              "type": "multi",
+              "prompt": "A logged-in user changes invoiceId and reads another customer’s invoice. Which measures address authorization?",
+              "options": [
+                "Check the user’s permission for the selected invoice on the server",
+                "Hide invoiceId in a hidden form field",
+                "Derive the account from the session when only the user’s own account is needed",
+                "Replace the ID with an unpredictable value and remove permission checks"
+              ],
+              "correct": [
+                0,
+                2
+              ],
+              "explanation": "The server needs a trusted identity and a permission decision. Hidden or random identifiers do not replace authorization. Quelle: WebAppSecurityTesting3.pdf, PDF-Seite/Folie 8, 14–15 (inkl. Notizen)."
+            },
+            {
+              "id": "not-found",
+              "type": "single",
+              "prompt": "An unknown invoice ID returns “not found”. What is the best next test within an authorized test environment?",
+              "options": [
+                "Conclude that object authorization is correct",
+                "Use a known existing invoice owned by a second test account and verify the result",
+                "Switch to HTTPS to bypass the authorization check",
+                "Remove the session so ownership is irrelevant"
+              ],
+              "correct": 1,
+              "explanation": "The unknown ID may simply not exist. A known foreign test object isolates the permission question. Quelle: WebAppSecurityTesting3.pdf, PDF-Seite/Folie 10 (inkl. Notizen)."
+            },
+            {
+              "id": "access-sequence",
+              "type": "order",
+              "prompt": "Order this server-side handling of a protected object operation.",
+              "items": [
+                "Resolve the authenticated identity",
+                "Verify permission to use the function",
+                "Verify permission for the selected object",
+                "Perform the requested operation"
+              ],
+              "explanation": "Both authorization decisions precede the protected operation; the identity is their input. Quelle: WebAppSecurityTesting3.pdf, PDF-Seite/Folie 15 (inkl. Notizen)."
+            }
+          ]
+        },
+        {
+          "type": "slide",
+          "title": "CSRF: Eine echte Session, aber ein fremder Auftrag",
+          "body": [
+            "Bei Cross-Site Request Forgery bringt eine fremde Seite den Browser dazu, eine unerwünschte Aktion an einer Zielanwendung anzufragen. Wird dabei die vorhandene Session mitgesendet, handelt der Server unter der Identität des Opfers. Das Passwort oder den Cookie-Wert muss der Angreifer dafür nicht kennen.",
+            {
+              "flow": {
+                "steps": [
+                  {
+                    "title": "Angemeldet",
+                    "text": "Das Opfer hat eine aktive Session bei der Zielanwendung."
+                  },
+                  {
+                    "title": "Fremder Auslöser",
+                    "text": "Eine andere Seite löst einen passend aufgebauten Request aus."
+                  },
+                  {
+                    "title": "Browser sendet",
+                    "text": "Passende Cookies werden gesendet, soweit Cookie- und Browserregeln das erlauben."
+                  },
+                  {
+                    "title": "Server verwechselt Absicht",
+                    "text": "Ohne wirksamen CSRF-Schutz wird die Aktion als legitimer Benutzerauftrag behandelt."
+                  }
+                ]
+              }
+            },
+            {
+              "callout": {
+                "tone": "warn",
+                "text": "Die Folie sagt vereinfacht, Cookies würden immer mitgeschickt. Tatsächlich gelten unter anderem SameSite, Secure, Domain/Path und Browserrichtlinien. Die folgenden Beispiele setzen voraus, dass die benötigte Session mitgesendet wird."
+              }
+            },
+            "Quelle: WebAppSecurityTesting3.pdf, PDF-Seite/Folie 17–18, 29 (inkl. Notizen)."
+          ],
+          "remember": "CSRF missbraucht die Session des Opfers, ohne sie zwingend zu stehlen."
+        },
+        {
+          "type": "slide",
+          "title": "GET, POST und versteckte Anfragen",
+          "body": [
+            {
+              "table": {
+                "head": [
+                  "Mechanismus aus den Folien",
+                  "Ausgelöste Anfrage",
+                  "Lernpunkt"
+                ],
+                "rows": [
+                  [
+                    "Eingebettetes Bild",
+                    "GET an die Bildadresse",
+                    "Auch ein scheinbares Bild kann einen Endpunkt ansprechen."
+                  ],
+                  [
+                    "Automatisch abgesendetes Formular",
+                    "POST mit Formularfeldern",
+                    "POST allein beweist keine bewusste Benutzeraktion."
+                  ],
+                  [
+                    "Formular in einem unsichtbaren Frame",
+                    "Formularanfrage im Hintergrund",
+                    "Die fehlende sichtbare Wirkung bedeutet nicht, dass nichts passiert."
+                  ],
+                  [
+                    "fetch / XMLHttpRequest",
+                    "Programmatisch erzeugte Anfrage",
+                    "Sende- und Leserechte sowie Cookies getrennt prüfen."
+                  ]
+                ]
+              }
+            },
+            "Im Message-Board-Beispiel kennt die fremde Seite den Aufbau des Beitrags-Requests. Den Absender bestimmt die Zielanwendung anhand der Session des Opfers. Mehrstufige Abläufe können ebenfalls betroffen sein, wenn sich alle benötigten Schritte ohne unbekannte Schutzwerte erzeugen lassen.",
+            {
+              "callout": {
+                "tone": "tip",
+                "text": "GET soll keine fachlichen Zustandsänderungen auslösen. Der Wechsel auf POST ist sinnvoll, ersetzt jedoch keinen CSRF-Schutz."
+              }
+            },
+            "Quelle: WebAppSecurityTesting3.pdf, PDF-Seite/Folie 19–27 (inkl. Notizen)."
+          ],
+          "remember": "Die HTTP-Methode allein belegt keine Absicht."
+        },
+        {
+          "type": "slide",
+          "title": "CORS: Request senden ist nicht Response lesen",
+          "body": [
+            "Die Same-Origin-Policy verhindert nicht pauschal jede Anfrage an einen anderen Ursprung. Gewöhnliche Formulare und bestimmte einfache Cross-Origin-Requests können gesendet werden, ohne dass die Zielseite vorher CORS freigibt. Der Zugriff des fremden Scripts auf die Antwort ist eine andere Frage.",
+            {
+              "compare": {
+                "left": {
+                  "title": "Einfache Anfrage",
+                  "points": [
+                    "Zum Beispiel ein Formular-POST mit application/x-www-form-urlencoded.",
+                    "Kann die Zielanwendung erreichen, auch wenn das Script die Antwort nicht lesen darf."
+                  ]
+                },
+                "right": {
+                  "title": "Anfrage mit Preflight",
+                  "points": [
+                    "Zum Beispiel ein Cross-Origin-PUT oder ein Request mit nicht freigegebenen eigenen Headern.",
+                    "Der Browser fragt zuerst mit OPTIONS nach der CORS-Erlaubnis."
+                  ]
+                }
+              }
+            },
+            "Bei fetch fordert credentials: include das Mitsenden passender Credentials an; es hebt SameSite und Browserbeschränkungen nicht auf. Ein CORS-Fehler im Script beweist daher weder allgemein, dass nichts gesendet wurde, noch dass eine Zustandsänderung stattgefunden hat. Prüfe die tatsächliche Serverwirkung.",
+            "Präzisierung der Foliennotizen: https://developer.mozilla.org/en-US/docs/Web/HTTP/Guides/CORS",
+            "Quelle: WebAppSecurityTesting3.pdf, PDF-Seite/Folie 26–27 (inkl. Notizen)."
+          ],
+          "remember": "Antwort nicht lesbar bedeutet nicht automatisch Aktion verhindert."
+        },
+        {
+          "type": "slide",
+          "title": "CSRF erkennen statt Schutz erraten",
+          "body": [
+            "Beginne bei einer sensiblen Aktion und ihrem normalen Request: Welche Session wird gebraucht? Sind alle handlungsrelevanten Werte vorhersehbar? Prüft der Server einen unbekannten, an die Session gebundenen Token oder eine andere wirksame Herkunftsabsicherung?",
+            {
+              "reveal": {
+                "question": "Eigener Fall: Ein Testformular löst bei einer angemeldeten Testperson eine Adressänderung aus. Das Script meldet anschliessend einen CORS-Fehler. Was ist der entscheidende Befund?",
+                "answer": "Prüfe das gespeicherte Profil. Wurde es ohne beabsichtigte Freigabe geändert, ist die Aktion erfolgt – auch ohne lesbare Antwort. Dokumentiere zugleich Cookie-Einstellungen und Request-Typ.",
+                "label": "Überlegen, dann aufdecken"
+              }
+            },
+            {
+              "compare": {
+                "left": {
+                  "title": "Broken access control",
+                  "points": [
+                    "Der Anfragende überschreitet seine eigenen Rechte.",
+                    "Abwehr: Funktion und Objekt autorisieren."
+                  ]
+                },
+                "right": {
+                  "title": "CSRF",
+                  "points": [
+                    "Die Rechte einer anderen, angemeldeten Person werden für einen fremd ausgelösten Auftrag benutzt.",
+                    "Abwehr: Die Anfrage gegen CSRF absichern."
+                  ]
+                }
+              }
+            },
+            "Quelle: WebAppSecurityTesting3.pdf, PDF-Seite/Folie 3, 8, 17–19, 27–29 (inkl. Notizen)."
+          ],
+          "remember": "Autorisierung und CSRF-Schutz lösen unterschiedliche Probleme."
+        },
+        {
+          "type": "checkpoint",
+          "id": "cp-csrf-mechanism",
+          "title": "Checkpoint: CSRF and browser behaviour",
+          "questions": [
+            {
+              "id": "csrf-prerequisites",
+              "type": "multi",
+              "prompt": "In the cookie-based CSRF scenario from the lecture, which conditions enable the unwanted action?",
+              "options": [
+                "The victim’s authenticated session accompanies the request",
+                "The attacker must know the victim’s password",
+                "The attacker can construct the action request without an unknown validated protection value",
+                "The server accepts that request without effective CSRF protection"
+              ],
+              "correct": [
+                0,
+                2,
+                3
+              ],
+              "explanation": "The browser supplies the victim’s session subject to cookie policy. The attacker need not know the password or read the cookie. Quelle: WebAppSecurityTesting3.pdf, PDF-Seite/Folie 17–19, 28–29 (inkl. Notizen)."
+            },
+            {
+              "id": "cors-result",
+              "type": "single",
+              "prompt": "A simple cross-origin form POST changes a test account’s address, but the response is unavailable to the attacking page. What follows?",
+              "options": [
+                "The unavailable response proves CSRF was prevented",
+                "The action succeeded; response access and request effects are separate",
+                "The request must have used a stolen password",
+                "All cross-origin POST requests require a successful preflight"
+              ],
+              "correct": 1,
+              "explanation": "A simple request can cause a state change without granting the other origin access to its response. Präzisierung: https://developer.mozilla.org/en-US/docs/Web/HTTP/Guides/CORS Quelle: WebAppSecurityTesting3.pdf, PDF-Seite/Folie 27 (inkl. Notizen)."
+            },
+            {
+              "id": "csrf-name",
+              "type": "type",
+              "prompt": "Name the attack that causes a logged-in victim’s browser to submit an unwanted authenticated request. Use its English name or abbreviation.",
+              "accept": [
+                "CSRF",
+                "Cross-Site Request Forgery",
+                "Cross Site Request Forgery"
+              ],
+              "placeholder": "English term or abbreviation",
+              "explanation": "CSRF abuses the victim’s authenticated context. Quelle: WebAppSecurityTesting3.pdf, PDF-Seite/Folie 17–18 (inkl. Notizen)."
+            },
+            {
+              "id": "post-only",
+              "type": "single",
+              "prompt": "A developer replaces a state-changing GET with POST and adds no further protection. Which assessment is correct?",
+              "options": [
+                "POST alone prevents forged requests",
+                "The method is improved, but cross-site forms can still submit POST requests under suitable cookie conditions",
+                "The change fixes object-level access control",
+                "Only a readable response can make this exploitable"
+              ],
+              "correct": 1,
+              "explanation": "POST is not a proof of user intent. The lecture demonstrates automatically submitted forms. Quelle: WebAppSecurityTesting3.pdf, PDF-Seite/Folie 20–27 (inkl. Notizen)."
+            }
+          ]
+        },
+        {
+          "type": "slide",
+          "title": "CSRF-Token: Ein Wert, den die fremde Seite nicht kennt",
+          "body": [
+            "Beim Synchronizer-Token-Verfahren erzeugt der Server einen ausreichend zufälligen Token, verknüpft ihn mit der Session und gibt ihn an seine eigenen Seiten weiter. Geschützte Anfragen müssen ihn zusätzlich zur Session übermitteln. Der Server prüft ihn vor der Aktion; fehlende oder falsche Werte führen zur Ablehnung.",
+            {
+              "flow": {
+                "steps": [
+                  {
+                    "title": "Erzeugen und binden",
+                    "text": "Unvorhersehbaren Token für die Session bereitstellen."
+                  },
+                  {
+                    "title": "In Anfrage aufnehmen",
+                    "text": "Zum Beispiel als Formularfeld im POST-Body."
+                  },
+                  {
+                    "title": "Serverseitig vergleichen",
+                    "text": "Token gegen den erwarteten Session-Wert prüfen."
+                  },
+                  {
+                    "title": "Bei Fehler abbrechen",
+                    "text": "Keine geschützte Aktion ausführen."
+                  }
+                ]
+              }
+            },
+            {
+              "callout": {
+                "tone": "warn",
+                "text": "Ein Feld namens csrf reicht nicht: Ein konstanter Wert oder eine fehlende Serverprüfung schützt nicht. Den Token nicht in URLs transportieren, wo er in Verlauf oder Logs geraten kann. Die Folie nennt noch GET-Parameter; diese Variante übernehmen wir nicht."
+              }
+            },
+            "Präzisierung: https://cheatsheetseries.owasp.org/cheatsheets/Cross-Site_Request_Forgery_Prevention_Cheat_Sheet.html",
+            "Quelle: WebAppSecurityTesting3.pdf, PDF-Seite/Folie 28 (inkl. Notizen)."
+          ],
+          "remember": "Session-Cookie identifiziert; ein korrekt geprüftes CSRF-Token erschwert fremd erzeugte Aufträge."
+        },
+        {
+          "type": "slide",
+          "title": "SameSite genau genug verstehen",
+          "body": [
+            "Die folgenden expliziten Einstellungen gelten zusätzlich zu den übrigen Cookie- und Browserregeln:",
+            {
+              "cards": [
+                {
+                  "title": "Strict",
+                  "text": "Cookie nur im Same-Site-Kontext."
+                },
+                {
+                  "title": "Lax",
+                  "text": "Zusätzlich bei Navigation der obersten Seite mit sicherer Methode, etwa GET. Nicht bei eingebetteten Bildern, Frames oder fetch allein wegen GET."
+                },
+                {
+                  "title": "None; Secure",
+                  "text": "SameSite erlaubt Cross-Site-Verwendung; Secure und weitere Browserregeln gelten weiterhin."
+                }
+              ]
+            },
+            "Die Aussage „Lax erlaubt cross-site GET“ auf Folie 29 ist zu weit: Auch der Navigationskontext zählt. Für unsere Aufgaben gilt ein explizites SameSite=Lax, damit browserspezifische Sonderregeln für einen fehlenden Wert keine Mehrdeutigkeit erzeugen.",
+            {
+              "reveal": {
+                "question": "Eigener Fall: Eine Anwendung löscht per GET. Eine fremde Seite lässt die Testperson einen normalen Link dorthin öffnen. Reicht Lax?",
+                "answer": "Nein. Bei einer Top-Level-GET-Navigation kann das Cookie mitgehen. Zustandsändernde GET-Endpunkte und fehlenden CSRF-Schutz beheben.",
+                "label": "Überlegen, dann aufdecken"
+              }
+            },
+            "Präzisierung: https://developer.mozilla.org/en-US/docs/Web/HTTP/Reference/Headers/Set-Cookie",
+            "Quelle: WebAppSecurityTesting3.pdf, PDF-Seite/Folie 29 (inkl. Notizen)."
+          ],
+          "remember": "Bei Lax zählen Methode UND Navigationskontext."
+        },
+        {
+          "type": "slide",
+          "title": "Schutzmassnahmen nicht verwechseln",
+          "body": [
+            {
+              "table": {
+                "head": [
+                  "Kontrolle",
+                  "Was du damit begründest"
+                ],
+                "rows": [
+                  [
+                    "Autorisierung",
+                    "Diese Identität darf diese Aktion an diesem Objekt ausführen."
+                  ],
+                  [
+                    "CSRF-Schutz",
+                    "Eine fremde Seite kann keinen akzeptierten Auftrag allein aus vorhersehbaren Werten erzeugen."
+                  ],
+                  [
+                    "HttpOnly",
+                    "JavaScript kann den Cookie-Wert nicht direkt lesen; der Browser kann ihn dennoch mitsenden."
+                  ],
+                  [
+                    "XSS-Abwehr",
+                    "Nicht vertrauenswürdige Daten werden im passenden Ausgabekontext nicht als aktiver Code interpretiert."
+                  ]
+                ]
+              }
+            },
+            "SameSite ist eine zusätzliche Schutzschicht, kein pauschaler Ersatz für die Prüfung sensibler Requests. Same-site ist zudem nicht gleich same-origin: Zwei HTTPS-Subdomains derselben registrierbaren Domain können same-site sein. CSRF-Token ersetzen ihrerseits keine XSS-Abwehr.",
+            {
+              "reveal": {
+                "question": "Eigener Fall: Ein Shop prüft CSRF-Token, erlaubt eingeloggten Verkäufern aber jede Produkt-ID. Was bleibt offen?",
+                "answer": "Objektautorisierung: Ein Verkäufer kann mit seinem eigenen gültigen Token ein fremdes Produkt ändern, falls die Berechtigungsprüfung fehlt.",
+                "label": "Überlegen, dann aufdecken"
+              }
+            },
+            "Ergänzende Präzisierung zu SameSite und XSS: https://cheatsheetseries.owasp.org/cheatsheets/Cross-Site_Request_Forgery_Prevention_Cheat_Sheet.html",
+            "Quelle: WebAppSecurityTesting3.pdf, PDF-Seite/Folie 15, 28–29 (sowie W4: WebAppSecurityTesting2.pdf, 25, 35–38) (inkl. Notizen)."
+          ],
+          "remember": "Eine korrekte Schutzmassnahme deckt nicht automatisch andere Fehlerklassen ab."
+        },
+        {
+          "type": "checkpoint",
+          "id": "cp-csrf-defenses",
+          "title": "Checkpoint: Tokens and SameSite",
+          "questions": [
+            {
+              "id": "token-sequence",
+              "type": "order",
+              "prompt": "Order the synchronizer-token flow.",
+              "items": [
+                "Generate an unpredictable token and associate it with the session",
+                "Include the token in a legitimate protected request",
+                "Validate the received token against the session’s expected value",
+                "Execute the action only after successful validation"
+              ],
+              "explanation": "A token is effective only if checked before the protected operation. Quelle: WebAppSecurityTesting3.pdf, PDF-Seite/Folie 28 (inkl. Notizen)."
+            },
+            {
+              "id": "lax-context",
+              "type": "multi",
+              "prompt": "Assume an explicit SameSite=Lax session cookie and otherwise matching cookie attributes. In which cross-site cases does Lax permit the cookie?",
+              "options": [
+                "A top-level navigation through an ordinary GET link",
+                "A GET issued by an embedded image",
+                "A cross-site fetch GET",
+                "A top-level GET navigation to a badly designed state-changing endpoint"
+              ],
+              "correct": [
+                0,
+                3
+              ],
+              "explanation": "Lax allows safe-method top-level navigation, even if a server wrongly assigns a state change to GET. Image and fetch requests do not satisfy that context. Präzisierung: https://developer.mozilla.org/en-US/docs/Web/HTTP/Reference/Headers/Set-Cookie Quelle: WebAppSecurityTesting3.pdf, PDF-Seite/Folie 29 (inkl. Notizen)."
+            },
+            {
+              "id": "token-validation",
+              "type": "single",
+              "prompt": "Every form contains csrf=12345 and the server only checks whether the field exists. What is the problem?",
+              "options": [
+                "The value is predictable and is not validated as a session-bound secret",
+                "CSRF tokens must be placed in URLs",
+                "The use of POST prevents any remaining attack",
+                "A longer parameter name would provide sufficient entropy"
+              ],
+              "correct": 0,
+              "explanation": "An attacker can reproduce a constant field. The server must reject missing or invalid protection values. Quelle: WebAppSecurityTesting3.pdf, PDF-Seite/Folie 28 (inkl. Notizen)."
+            },
+            {
+              "id": "httponly",
+              "type": "single",
+              "prompt": "A valid session cookie is HttpOnly. Does this alone prevent cookie-based CSRF?",
+              "options": [
+                "Yes, because no script can send a request with it",
+                "No, because HttpOnly prevents script access to the cookie value, not its automatic inclusion in matching requests",
+                "Yes, provided the target uses POST",
+                "No, because HttpOnly makes the cookie public"
+              ],
+              "correct": 1,
+              "explanation": "CSRF does not require the attacker to read the session cookie. Quelle: WebAppSecurityTesting3.pdf, PDF-Seite/Folie 17–18 (sowie W4: WebAppSecurityTesting2.pdf, 25) (inkl. Notizen)."
+            }
+          ]
+        },
+        {
+          "type": "slide",
+          "title": "Dynamisch und statisch: zwei Blickrichtungen",
+          "body": [
+            {
+              "compare": {
+                "left": {
+                  "title": "Dynamisch: laufende Anwendung",
+                  "points": [
+                    "Ein Scanner wie ZAP beobachtet HTTP-Verhalten.",
+                    "Er braucht erreichbare Funktionen und gegebenenfalls eine gültige Session.",
+                    "Er kann reale Header, Antworten und Auswirkungen sehen."
+                  ]
+                },
+                "right": {
+                  "title": "Statisch: Code oder Bytecode",
+                  "points": [
+                    "Die Anwendung muss für diese Analyse nicht laufen.",
+                    "Fortify untersucht im Kurs Quellcode, SpotBugs Java-Bytecode.",
+                    "Frameworkwissen und Datenflussmodelle bestimmen mit, welche Fehler sichtbar werden."
+                  ]
+                }
+              }
+            },
+            "Auch die hier gezeigte LLM-Codeprüfung ist eine statische Betrachtung, solange die Anwendung nicht ausgeführt wird. Tools ergänzen sich: Ein Codebefund kann eine problematische Stelle zeigen, ein dynamischer Test deren Wirkung in der Testumgebung.",
+            {
+              "callout": {
+                "tone": "tip",
+                "text": "Die folgenden Tool-Ergebnisse stammen aus der konkreten Marketplace-Demo. Sie sind kein aktueller Produktvergleich und keine Rangliste."
+              }
+            },
+            "Quelle: WebAppSecurityTesting3.pdf, PDF-Seite/Folie 31–33, 38, 41, 43–45 (inkl. Notizen)."
+          ],
+          "remember": "Wähle das Werkzeug nach der Beweisfrage."
+        },
+        {
+          "type": "slide",
+          "title": "ZAP: Abdeckung kommt vor Aussagekraft",
+          "body": [
+            {
+              "flow": {
+                "steps": [
+                  {
+                    "title": "Anwendung erkunden",
+                    "text": "Crawling findet Seiten, Formulare und weitere Requests."
+                  },
+                  {
+                    "title": "Testfälle erzeugen",
+                    "text": "Gefundene Requests werden mit passenden Testeingaben variiert."
+                  },
+                  {
+                    "title": "Beobachtungen auswerten",
+                    "text": "Antwort, Laufzeit oder Header liefern Hinweise auf Schwachstellen."
+                  }
+                ]
+              }
+            },
+            "Der Scanner kann nur erkundete Bereiche prüfen. Ungültige Formulardaten können ihn vor einem mehrstufigen Ablauf stoppen. Eine abgelaufene Session oder ein versehentlich ausgelöstes Logout versteckt geschützte Funktionen. Im Test helfen passende Eingabedaten und ergänzendes manuelles Browsen durch den Proxy.",
+            {
+              "reveal": {
+                "question": "Eigener Fall: Ein Shop-Scan meldet keine Checkout-Probleme. Im Verlauf steht bei jedem Formular „ungültige Postleitzahl“. Wie belastbar ist das Ergebnis?",
+                "answer": "Für den Checkout ist es nicht belastbar: Der Scanner hat den Ablauf vermutlich nicht erreicht. Gültige Testdaten einrichten und den erreichten Bereich nachweisen.",
+                "label": "Überlegen, dann aufdecken"
+              }
+            },
+            {
+              "callout": {
+                "tone": "warn",
+                "text": "Crawling und aktive Tests können Daten verändern. Eine geeignete Testumgebung und wiederherstellbare Testdaten verhindern, dass gelöschte Objekte späteren Tests die Grundlage entziehen."
+              }
+            },
+            "Quelle: WebAppSecurityTesting3.pdf, PDF-Seite/Folie 33, 37 (inkl. Notizen)."
+          ],
+          "remember": "Nicht erreicht ist nicht geprüft."
+        },
+        {
+          "type": "slide",
+          "title": "Ein Alert ist zunächst ein Befund",
+          "body": [
+            {
+              "table": {
+                "head": [
+                  "Begriff",
+                  "Bedeutung"
+                ],
+                "rows": [
+                  [
+                    "True positive",
+                    "Gemeldete Schwachstelle bestätigt sich."
+                  ],
+                  [
+                    "False positive",
+                    "Gemeldete Schwachstelle liegt in diesem Kontext nicht vor."
+                  ],
+                  [
+                    "False negative",
+                    "Eine vorhandene Schwachstelle wird übersehen."
+                  ]
+                ]
+              }
+            },
+            "In der ZAP-Demo werden acht unterschiedliche Befunde gezählt: sechs als echt eingeordnet, zwei als falsch. Eine SQL-Injection wird von zwei Plugins gemeldet. Mehr Meldungen können also denselben Fehler betreffen; eine Trefferzahl ist kein Vollständigkeitsbeweis.",
+            "Aktive Tests ändern Eingaben, etwa um einen reproduzierbaren Laufzeiteffekt zu prüfen. Passive Checks lesen vorhandene Antworten, zum Beispiel Set-Cookie. Ein fehlendes Token-Feld ist zunächst ein Hinweis: Ob eine ausnutzbare CSRF-Lücke besteht, hängt auch von anderen wirksamen Schutzmassnahmen ab.",
+            {
+              "reveal": {
+                "question": "Eigene Beweisfrage: Eine einzelne Antwort dauert ungewöhnlich lange. Reicht das als SQL-Injection-Nachweis?",
+                "answer": "Nein. Kontrollanfragen und wiederholbare Unterschiede sind nötig, um normale Last oder Netzwerkverzögerungen als Erklärung zu prüfen. Die Kursdemo zeigt einen gezielt ausgelösten Effekt.",
+                "label": "Überlegen, dann aufdecken"
+              }
+            },
+            "Quelle: WebAppSecurityTesting3.pdf, PDF-Seite/Folie 34–37, 42 (inkl. Notizen)."
+          ],
+          "remember": "Befund, Reproduktion und Reichweite getrennt dokumentieren."
+        },
+        {
+          "type": "checkpoint",
+          "id": "cp-dynamic-testing",
+          "title": "Checkpoint: Dynamic testing and evidence",
+          "questions": [
+            {
+              "id": "coverage",
+              "type": "single",
+              "prompt": "A scanner never passes a form because its generated data is invalid. A clean scan then means:",
+              "options": [
+                "The workflow after that form was not adequately tested",
+                "The workflow is free of injection vulnerabilities",
+                "Static analysis would need the same valid HTTP form data",
+                "Authentication no longer matters"
+              ],
+              "correct": 0,
+              "explanation": "Coverage is limited by discovery. Reach the workflow using valid data or manual proxy-assisted exploration. Quelle: WebAppSecurityTesting3.pdf, PDF-Seite/Folie 37 (inkl. Notizen)."
+            },
+            {
+              "id": "scan-quality",
+              "type": "multi",
+              "prompt": "Which actions improve the quality of an authorized dynamic test?",
+              "options": [
+                "Verify that the scanner remains authenticated",
+                "Check that required multi-step workflows were reached",
+                "Treat every missing token field as conclusive proof of CSRF",
+                "Preserve or restore test data needed by later requests"
+              ],
+              "correct": [
+                0,
+                1,
+                3
+              ],
+              "explanation": "Authentication, reachability and stable test state affect coverage. A passive warning needs contextual validation. Quelle: WebAppSecurityTesting3.pdf, PDF-Seite/Folie 36–37 (inkl. Notizen)."
+            },
+            {
+              "id": "false-positive",
+              "type": "type",
+              "prompt": "A tool reports a vulnerability, but investigation shows it is not present. Give the English classification or abbreviation.",
+              "accept": [
+                "false positive",
+                "false-positive",
+                "FP"
+              ],
+              "placeholder": "English term or abbreviation",
+              "explanation": "A false positive is an incorrect positive finding; a false negative is a missed real flaw. Quelle: WebAppSecurityTesting3.pdf, PDF-Seite/Folie 34, 39–42 (inkl. Notizen)."
+            },
+            {
+              "id": "passive-check",
+              "type": "single",
+              "prompt": "Which activity is passive analysis of existing traffic?",
+              "options": [
+                "Submitting a modified parameter to trigger a time delay",
+                "Reading the received Set-Cookie header for attributes",
+                "Sending requests with many alternative object IDs",
+                "Submitting an unexpected value to a purchase endpoint"
+              ],
+              "correct": 1,
+              "explanation": "Reading observed traffic is passive; generating changed test requests is active. Quelle: WebAppSecurityTesting3.pdf, PDF-Seite/Folie 35–36 (inkl. Notizen)."
+            }
+          ]
+        },
+        {
+          "type": "slide",
+          "title": "Statische Analyse braucht mehr als Syntax",
+          "body": [
+            "Fortify sucht im Kurs unter anderem nach unsicheren Funktionen, auffälligen Konfigurationen und Datenflüssen von Benutzereingaben zu SQL oder HTML. SpotBugs mit Find Security Bugs arbeitet auf Java-Bytecode. Beide können Fundstellen im Programm zeigen.",
+            {
+              "flow": {
+                "steps": [
+                  {
+                    "title": "Quelle einer Eingabe",
+                    "text": "Woher kommt ein nicht vertrauenswürdiger Wert?"
+                  },
+                  {
+                    "title": "Verarbeitung",
+                    "text": "Welche Prüfungen oder Umwandlungen erfolgen?"
+                  },
+                  {
+                    "title": "Sensible Verwendung",
+                    "text": "Geht der Wert in eine SQL-Abfrage, HTML-Ausgabe oder andere kritische Operation?"
+                  }
+                ]
+              }
+            },
+            "Sprache zu unterstützen heisst noch nicht, Framework und Template-System ausreichend zu verstehen. In der Marketplace-Demo übersehen beide Tools das reflektierte XSS; Fortify übersieht auch SQL-Injection. Die Folien nennen fehlendes Frameworkverständnis als vermutete Erklärung, nicht als bewiesene Ursache.",
+            {
+              "reveal": {
+                "question": "Eigene Verständnisfrage: Alle Dateien wurden eingelesen. Sind damit alle Schwachstellen geprüft?",
+                "answer": "Nein. Dateiabdeckung ist keine vollständige semantische Analyse. Datenflüsse, Frameworkverhalten und Geschäftsregeln können unzureichend modelliert sein.",
+                "label": "Überlegen, dann aufdecken"
+              }
+            },
+            "Quelle: WebAppSecurityTesting3.pdf, PDF-Seite/Folie 38, 40–42, 45 (inkl. Notizen)."
+          ],
+          "remember": "Code gesehen bedeutet nicht Verhalten vollständig verstanden."
+        },
+        {
+          "type": "slide",
+          "title": "Die Marketplace-Ergebnisse richtig einordnen",
+          "body": [
+            {
+              "table": {
+                "head": [
+                  "Analyse in der Kursdemo",
+                  "Beobachtung",
+                  "Was du daraus lernst"
+                ],
+                "rows": [
+                  [
+                    "ZAP",
+                    "Bestätigte und falsche Befunde; doppelte SQLi-Meldung",
+                    "Alerts nachprüfen und zusammengehörige Befunde zusammenführen."
+                  ],
+                  [
+                    "Fortify SCA",
+                    "Echte Befunde, Fehlalarm und kontextabhängige Geheimnis-Funde",
+                    "Deployment und Datenzugriff gehören zur Bewertung."
+                  ],
+                  [
+                    "SpotBugs + Find Security Bugs",
+                    "Vier echte Befunde; XSS trotzdem übersehen",
+                    "Keine Fehlalarme bedeutet nicht vollständige Erkennung."
+                  ],
+                  [
+                    "LLM-Codeanalyse",
+                    "Mehrere echte Befunde plus strittiger Konfigurationsbefund",
+                    "Ergebnisse belegen und nicht auf andere Projekte verallgemeinern."
+                  ]
+                ]
+              }
+            },
+            {
+              "callout": {
+                "tone": "warn",
+                "text": "Die Demo ordnet das Datenbankpasswort in der Konfiguration als Fehlalarm ein. Daraus folgt keine allgemeine Freigabe, produktive Passwörter oder private Schlüssel in auslieferbare Artefakte einzubauen. Entscheidend sind Verteilung, Zugriffsschutz und Einsatzkontext; diesen Grenzfall verwenden wir nicht als eindeutige Bewertungsfrage."
+              }
+            },
+            "Ergänzende Einordnung: https://cheatsheetseries.owasp.org/cheatsheets/Secrets_Management_Cheat_Sheet.html",
+          "Eine einzelne Demo kann weder aktuelle Erkennungsraten noch einen allgemeinen Sieger bestimmen. Die Befunde überschneiden sich zudem: Man darf die Treffer verschiedener Tools nicht einfach zu einer Anzahl unterschiedlicher Sicherheitslücken addieren.",
+            "Quelle: WebAppSecurityTesting3.pdf, PDF-Seite/Folie 34, 39–44 (inkl. Notizen)."
+          ],
+          "remember": "Kontext prüfen, Doppelmeldungen erkennen, fehlende Befunde suchen."
+        },
+        {
+          "type": "slide",
+          "title": "LLMs als zusätzliche Codeprüfung",
+          "body": [
+            "Ein LLM kann bei einer Codeprüfung auf fehlende Geschäftsregeln hinweisen. In den Notizen steht etwa ein Rechnungs-Endpunkt mit parametrisierter SQL-Abfrage, aber ohne Prüfung, ob die Rechnung zur angemeldeten Person gehört. Schutz vor SQL-Injection löst diese Objektberechtigung nicht.",
+            {
+              "compare": {
+                "left": {
+                  "title": "Potenzial",
+                  "points": [
+                    "Zusammenhänge und vermutete Geschäftsregeln erläutern.",
+                    "Verdächtige Codepfade und mögliche Korrekturen vorschlagen."
+                  ]
+                },
+                "right": {
+                  "title": "Grenzen",
+                  "points": [
+                    "Ausgaben können zwischen Durchläufen variieren.",
+                    "Kontext kann bei grossen Projekten fehlen.",
+                    "Plausible Begründungen können falsch sein und müssen geprüft werden."
+                  ]
+                }
+              }
+            },
+            {
+              "reveal": {
+                "question": "Eigener Fall: Ein LLM behauptet „fehlende Autorisierung“ in einem Handler. Eine zentrale Middleware prüft aber die Rechte. Wie gehst du vor?",
+                "answer": "Die Middleware und ihren tatsächlichen Geltungsbereich lesen und den Zugriff mit passenden Testkonten prüfen. Weder den isolierten Handler noch die LLM-Aussage als vollständigen Nachweis behandeln.",
+                "label": "Überlegen, dann aufdecken"
+              }
+            },
+            "Quelle: WebAppSecurityTesting3.pdf, PDF-Seite/Folie 43–45 (inkl. Notizen)."
+          ],
+          "remember": "Ein LLM liefert prüfbare Hypothesen, keine Sicherheitsgarantie."
+        },
+        {
+          "type": "checkpoint",
+          "id": "cp-static-llm",
+          "title": "Checkpoint: Static analysis and LLM review",
+          "questions": [
+            {
+              "id": "static-limits",
+              "type": "multi",
+              "prompt": "Which statements match the lecture’s static-analysis discussion?",
+              "options": [
+                "SpotBugs analyses Java bytecode",
+                "Supporting Java guarantees understanding every Spring/Thymeleaf data flow",
+                "A tool can inspect every file and still miss a vulnerability",
+                "Source analysis can help locate the responsible code"
+              ],
+              "correct": [
+                0,
+                2,
+                3
+              ],
+              "explanation": "Language support and semantic/framework coverage differ. The demo contains missed SQLi or XSS despite analysed code. Quelle: WebAppSecurityTesting3.pdf, PDF-Seite/Folie 38–42, 45 (inkl. Notizen)."
+            },
+            {
+              "id": "parameterized-owner",
+              "type": "single",
+              "prompt": "An invoice endpoint uses parameterized SQL but never checks access to the requested invoice. Which issue remains?",
+              "options": [
+                "The query necessarily contains SQL injection",
+                "Object-level authorization may be missing",
+                "A CSRF token would grant access to every invoice",
+                "Parameterized queries authenticate users"
+              ],
+              "correct": 1,
+              "explanation": "Parameterization protects query structure, not permission to read an object. Quelle: WebAppSecurityTesting3.pdf, PDF-Seite/Folie 44 (Notizen), 8, 15 (inkl. Notizen)."
+            },
+            {
+              "id": "llm-proof",
+              "type": "single",
+              "prompt": "An LLM claims that a handler lacks authorization. What is the best next step?",
+              "options": [
+                "Accept the claim because the response explains it confidently",
+                "Check surrounding controls and reproduce access with appropriate test identities",
+                "Dismiss it because static tools did not flag it",
+                "Count it as a confirmed flaw after a second identical LLM response"
+              ],
+              "correct": 1,
+              "explanation": "The apparent gap may be enforced elsewhere, or may be real. Evidence and the effective code path decide. Quelle: WebAppSecurityTesting3.pdf, PDF-Seite/Folie 43–45 (inkl. Notizen)."
+            },
+            {
+              "id": "tool-ranking",
+              "type": "single",
+              "prompt": "SpotBugs reports four true positives in the demo. Which conclusion is justified?",
+              "options": [
+                "The reported four findings were valid in that demo, but other flaws may still be missed",
+                "SpotBugs has perfect recall on all Java applications",
+                "A tool with more alerts is always more accurate",
+                "Manual testing can now be omitted"
+              ],
+              "correct": 0,
+              "explanation": "The same demo records missed XSS. True positives do not establish completeness or general product rankings. Quelle: WebAppSecurityTesting3.pdf, PDF-Seite/Folie 41–45 (inkl. Notizen)."
+            }
+          ]
+        },
+        {
+          "type": "slide",
+          "title": "Transfer 1: Sicheres SQL, fremde Rechnung",
+          "body": [
+            "Eigener Fall: Ein Kundenportal prüft den Login und lädt per parametrisierter Abfrage die Rechnung aus der URL. Im Menü erscheinen nur eigene Rechnungen. Kundin A erhält durch Ändern der URL trotzdem die Rechnung von B.",
+            {
+              "reveal": {
+                "question": "Bevor du aufdeckst: Nenne die Fehlerklasse, die fehlende Entscheidung und einen aussagekräftigen Regressionstest.",
+                "answer": "Broken object level access control. Der Server muss prüfen, ob A die konkrete Rechnung lesen darf. Im Test zwei Konten mit bekannten getrennten Rechnungen verwenden: eigener Zugriff erlaubt, fremder Zugriff abgelehnt und keine fremden Inhalte geliefert. Das versteckte Menü und SQL-Parameterisierung ersetzen diese Prüfung nicht.",
+                "label": "Überlegen, dann aufdecken"
+              }
+            },
+            {
+              "callout": {
+                "tone": "tip",
+                "text": "Antwortgerüst: „Die Funktion ist erlaubt, aber … . Der Server muss … . Ich prüfe das mit … .“"
+              }
+            },
+            "Quelle: WebAppSecurityTesting3.pdf, PDF-Seite/Folie 8–15, 44 (Notizen) (inkl. Notizen)."
+          ],
+          "remember": "Die Schutzmassnahme muss zum verletzten Recht passen."
+        },
+        {
+          "type": "slide",
+          "title": "Transfer 2: Kein sichtbarer Erfolg – trotzdem geändert?",
+          "body": [
+            "Eigener Fall: Ein Testportal nutzt eine gültige Cookie-Session mit SameSite=None; Secure. Die übrigen Browserregeln erlauben in diesem Test das Cookie. Ein fremdes Formular sendet einen POST, der die Kontaktadresse ändert. Der Server kontrolliert keinen CSRF-Token und keine Herkunft. Die fremde Seite kann die Antwort nicht lesen.",
+            {
+              "reveal": {
+                "question": "Welche Voraussetzungen sind erfüllt? Welche Korrektur und welchen Negativtest würdest du wählen?",
+                "answer": "Das Opfer ist authentifiziert, der Browser sendet die Session, und die fremde Seite kann den Request erzeugen. Die unlesbare Antwort verhindert die Änderung nicht. Ein bewährter CSRF-Schutz muss vor der Aktion validiert werden. Danach testen: gültiger legitimer Request funktioniert; Request ohne oder mit falschem Token verändert nichts. SameSite zusätzlich passend konfigurieren.",
+                "label": "Überlegen, dann aufdecken"
+              }
+            },
+            "Vergleiche dies mit dem eigenen Rechnungs-Fall: Dort überschreitet A die eigenen Rechte. Hier führt der Browser von A unter deren erlaubten Rechten einen unerwünschten Auftrag aus.",
+            "Quelle: WebAppSecurityTesting3.pdf, PDF-Seite/Folie 17–29 (inkl. Notizen)."
+          ],
+          "remember": "Prüfe die tatsächliche Wirkung und die passende Grenze."
+        },
+        {
+          "type": "slide",
+          "title": "Transfer 3: Ein Scan ohne Befunde",
+          "body": [
+            "Eigener Fall: ZAP bleibt vor dem Checkout hängen, die Codeanalyse versteht das Template-System nicht, und ein LLM sieht nur den Controller. Alle drei melden für die Bestellung keinen Fehler.",
+            {
+              "reveal": {
+                "question": "Ist das ein guter Freigabenachweis? Formuliere einen besseren Prüfplan.",
+                "answer": "Nein. Zuerst die Lücken benennen: Checkout erreichen und die Session nachweisen, relevante Templates und Datenflüsse analysieren, vollständige Autorisierungsregeln einbeziehen. Dann gezielt Rollen, fremde Objekte und zustandsändernde Requests manuell prüfen. Findings reproduzieren, beheben und erneut testen; die verbleibende Reichweite dokumentieren.",
+                "label": "Überlegen, dann aufdecken"
+              }
+            },
+            {
+              "flow": {
+                "steps": [
+                  {
+                    "title": "Abdeckung erklären",
+                    "text": "Welche Funktionen, Rollen und Daten wurden geprüft?"
+                  },
+                  {
+                    "title": "Befunde bestätigen",
+                    "text": "Wirkung und verantwortliche Stelle belegen."
+                  },
+                  {
+                    "title": "Korrektur verifizieren",
+                    "text": "Den ursprünglichen Fehler und erlaubte Nutzung erneut prüfen."
+                  }
+                ]
+              }
+            },
+            "Quelle: WebAppSecurityTesting3.pdf, PDF-Seite/Folie 37–46 (inkl. Notizen)."
+          ],
+          "remember": "Mehr Werkzeuge helfen nur, wenn ihre Lücken verstanden werden."
+        },
+        {
+          "type": "checkpoint",
+          "id": "cp-transfer",
+          "title": "Checkpoint: Choose and justify the control",
+          "questions": [
+            {
+              "id": "combined-case",
+              "type": "multi",
+              "prompt": "A seller sends their own valid CSRF token while changing another seller’s product. Which conclusions are correct?",
+              "options": [
+                "A valid CSRF token does not grant permission for the other product",
+                "The server must check object-level authorization",
+                "Replacing POST with GET fixes the problem",
+                "The seller must have stolen the other seller’s session"
+              ],
+              "correct": [
+                0,
+                1
+              ],
+              "explanation": "The seller uses their own session. The missing boundary is access to the foreign product. Quelle: WebAppSecurityTesting3.pdf, PDF-Seite/Folie 8, 15, 28 (inkl. Notizen)."
+            },
+            {
+              "id": "lax-delete",
+              "type": "single",
+              "prompt": "A GET endpoint deletes an item. Its session cookie explicitly uses SameSite=Lax. A victim follows a cross-site link in the top-level window. What matters?",
+              "options": [
+                "Lax excludes all cross-site GET requests",
+                "The cookie may be sent; the state-changing GET and missing request protection remain a problem",
+                "Only image requests are allowed to send Lax cookies",
+                "HttpOnly converts the deletion into a read-only request"
+              ],
+              "correct": 1,
+              "explanation": "Explicit Lax permits safe-method top-level navigation. A server must not implement destructive semantics on GET. Präzisierung: https://developer.mozilla.org/en-US/docs/Web/HTTP/Reference/Headers/Set-Cookie Quelle: WebAppSecurityTesting3.pdf, PDF-Seite/Folie 20, 29 (inkl. Notizen)."
+            },
+            {
+              "id": "release-evidence",
+              "type": "multi",
+              "prompt": "Which statements belong in an honest test report?",
+              "options": [
+                "The checkout was not reached because form validation failed",
+                "All source files were read, therefore all vulnerabilities were excluded",
+                "A foreign-object test reproduced access using two known test accounts",
+                "The reported code finding was checked against middleware and runtime behaviour"
+              ],
+              "correct": [
+                0,
+                2,
+                3
+              ],
+              "explanation": "Report both verified evidence and limits. Reading files alone cannot exclude all vulnerabilities. Quelle: WebAppSecurityTesting3.pdf, PDF-Seite/Folie 10, 37, 42–46 (inkl. Notizen)."
+            },
+            {
+              "id": "regression",
+              "type": "order",
+              "prompt": "Order this workflow after finding a suspected permission flaw.",
+              "items": [
+                "Establish expected permissions and a reproducible test case",
+                "Confirm the missing effective server-side check",
+                "Implement the appropriate permission check",
+                "Repeat forbidden and legitimate access tests"
+              ],
+              "explanation": "A reproducible expectation guides the fix, and regression tests check denial without breaking allowed access. Eigene Synthese. Quelle: WebAppSecurityTesting3.pdf, PDF-Seite/Folie 10, 15, 45–46 (inkl. Notizen)."
+            }
+          ]
+        },
+        {
+          "type": "slide",
+          "title": "Dein Selbstcheck für Woche 5",
+          "body": [
+            {
+              "checklist": {
+                "title": "Kann ich das ohne die Lösung erklären?",
+                "items": [
+                  "Ich unterscheide Funktions- und Objektberechtigungen an einem Fall.",
+                  "Ich plane einen Zugriffstest mit bekannten Rollen und Objekten.",
+                  "Ich erkläre CSRF, ohne Cookie-Diebstahl vorauszusetzen.",
+                  "Ich trenne das Senden einer Anfrage vom Lesen ihrer Antwort.",
+                  "Ich begründe Token-Prüfung und das Verhalten von explizitem SameSite=Lax.",
+                  "Ich unterscheide dynamische Tests, statische Analyse und LLM-Codeprüfung.",
+                  "Ich erkenne False Positives, übersehene Fehler und fehlende Testabdeckung.",
+                  "Ich schlage zu einem Befund eine passende Korrektur und einen Nachtest vor."
+                ]
+              }
+            },
+            "Wenn eine Erklärung stockt, gehe zum betreffenden Abschnitt zurück und formuliere zunächst drei Stichpunkte: verletzte Grenze, Mechanismus, passende Prüfung. Die Transferfälle helfen dir, daraus eine kurze Begründung zu machen.",
+            "Quelle: WebAppSecurityTesting3.pdf, PDF-Seite/Folie 3–46 (inkl. Notizen)."
+          ],
+          "remember": "Erst erklären, dann Lösung vergleichen."
+        },
+        {
+          "type": "slide",
+          "title": "Was du einordnen und nachschlagen kannst",
+          "body": [
+            "Die konkreten alten Demo-URLs, Bildschirmbilder und Tool-Trefferzahlen illustrieren Mechanismen. Du musst daraus keine allgemeine Rangliste oder feste Erkennungsquote lernen. Video- und LCQ-Inhalte wurden für diese Lektion nicht transkribiert.",
+            "Wichtige Präzisierungen: Nicht jeder abgelehnte Request beweist vollständige Autorisierung. Cookies gehen nicht bedingungslos mit. SameSite=Lax gilt nicht für beliebige GETs. CSRF-Token gehören nicht in URLs. Ein Code-Scan erfasst nicht automatisch jede Geschäftsregel.",
+            {
+              "table": {
+                "head": [
+                  "Zum Wiederholen",
+                  "Folien"
+                ],
+                "rows": [
+                  [
+                    "Function / object access control",
+                    "3–15"
+                  ],
+                  [
+                    "CSRF-Ablauf und Request-Mechanismen",
+                    "17–27"
+                  ],
+                  [
+                    "Token und SameSite",
+                    "28–29, ergänzend OWASP/MDN"
+                  ],
+                  [
+                    "Dynamische Tests und Abdeckung",
+                    "31–37"
+                  ],
+                  [
+                    "Statische Analyse und LLMs",
+                    "38–45"
+                  ],
+                  [
+                    "Gemeinsame Schlussfolgerung",
+                    "45–46"
+                  ]
+                ]
+              }
+            },
+            "Die Folienbehauptung „all code is tested“ ist als Vorteil gegenüber Crawling-Lücken zu lesen, nicht als Garantie semantischer Vollständigkeit. Die Grenzen auf Folien 42 und 44 bleiben bestehen.",
+            "Quelle: WebAppSecurityTesting3.pdf, PDF-Seite/Folie 29, 34–46 (inkl. Notizen)."
+          ],
+          "remember": "Kursbeispiel, technische Regel und überprüften Befund auseinanderhalten."
         }
       ]
     }
