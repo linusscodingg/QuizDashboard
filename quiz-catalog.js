@@ -61,7 +61,7 @@ window.QUIZ_CATALOG = {
       "subject": "ASE1DE",
       "week": 2,
       "title": "Kontext, Scope und Interviews",
-      "source": "Activities - Week 02.pdf; CPRE FL Handbuch v1.2.0, Abschnitte 2.2.4, 3.1 und 3.4.2",
+      "source": "Activities - Week 02.pdf; CPRE FL Handbuch v1.2.0, Abschnitte 2.2.4, 3.1 und 3.4.2; ASE1-Fallstudie Online-Auktionsplattform (Musterlösungen LE03–LE07)",
       "path": "quizzes/ASE1DE/W2_Kontext_Interviews.html",
       "maximumScore": 100
     },
@@ -70,7 +70,7 @@ window.QUIZ_CATALOG = {
       "subject": "ASE1DE",
       "week": 3,
       "title": "Dokumentation und Modellverständnis",
-      "source": "Activities - Week 03.pdf; CPRE FL Handbuch v1.2.0, Kapitel 3; Activities week 3 Tasks.pdf",
+      "source": "Activities - Week 03.pdf; CPRE FL Handbuch v1.2.0, Kapitel 3; Activities week 3 Tasks.pdf; ASE1-Fallstudie Online-Auktionsplattform (Musterlösungen LE03–LE07)",
       "path": "quizzes/ASE1DE/W3_Dokumentation_Modelle.html",
       "maximumScore": 100
     },
@@ -79,7 +79,7 @@ window.QUIZ_CATALOG = {
       "subject": "ASE1DE",
       "week": 4,
       "title": "Ermittlung, Konflikte und Validierung",
-      "source": "Activities - Week 04.pdf; CPRE FL Handbuch v1.2.0, Kapitel 4; HS26_ASE_UX und UCD.pdf",
+      "source": "Activities - Week 04.pdf; CPRE FL Handbuch v1.2.0, Kapitel 4; HS26_ASE_UX und UCD.pdf; ASE1-Fallstudie Online-Auktionsplattform (Musterlösungen LE03–LE07)",
       "path": "quizzes/ASE1DE/W4_Ermittlung_Validierung.html",
       "maximumScore": 100
     },

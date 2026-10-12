@@ -16,22 +16,33 @@ vm.runInNewContext(fs.readFileSync(path.join(root, 'lerncoach/content/ASE1.js'),
   Lerncoach: { registerSubject: value => { english = value; } }
 });
 assert.equal(english.id, 'ASE1', 'English subject stays separate');
-for (const [wi, week] of subject.weeks.entries()) {
-  const en = english.weeks[wi];
-  assert.equal(week.id, en.id);
-  assert.equal(week.items.length, en.items.length, `${week.id}: same structure as English`);
-  week.items.forEach((item, ii) => {
-    const enItem = en.items[ii];
-    assert.equal(item.type, enItem.type);
-    if (item.type !== 'checkpoint') return;
-    assert.equal(item.id, enItem.id);
-    item.questions.forEach((q, qi) => {
-      const e = enItem.questions[qi];
-      assert.equal(q.id, e.id); assert.equal(q.type, e.type);
-      assert.equal(JSON.stringify(q.correct), JSON.stringify(e.correct), `${week.id}/${q.id}: same solution as English`);
-      assert.equal((q.options || q.items).length, (e.options || e.items).length);
-    });
+// Woche 1 spiegelt weiterhin die englische Fassung.
+// Die Wochen 2 bis 4 sind in der deutschen Fassung absichtlich ausführlicher (mehr Folien,
+// zusätzliche Fragen) und werden darum nur eigenständig validiert, nicht gegen ASE1.js gespiegelt.
+assert.equal(subject.weeks.map(week => week.id).join(','), english.weeks.map(week => week.id).join(','), 'same week ids');
+const germanW1 = subject.weeks[0], englishW1 = english.weeks[0];
+assert.equal(germanW1.items.length, englishW1.items.length, 'w1: same structure as English');
+germanW1.items.forEach((item, ii) => {
+  const enItem = englishW1.items[ii];
+  assert.equal(item.type, enItem.type);
+  if (item.type !== 'checkpoint') return;
+  assert.equal(item.id, enItem.id);
+  item.questions.forEach((q, qi) => {
+    const e = enItem.questions[qi];
+    assert.equal(q.id, e.id); assert.equal(q.type, e.type);
+    assert.equal(JSON.stringify(q.correct), JSON.stringify(e.correct), `w1/${q.id}: same solution as English`);
+    assert.equal((q.options || q.items).length, (e.options || e.items).length);
   });
+});
+for (const week of subject.weeks.slice(1)) {
+  const checkpoints = week.items.filter(item => item.type === 'checkpoint');
+  assert.ok(checkpoints.length >= 4, `${week.id}: at least four checkpoints`);
+  assert.ok(week.items.length > english.weeks[subject.weeks.indexOf(week)].items.length,
+    `${week.id}: German version explains more than the English one`);
+  for (const cp of checkpoints) {
+    assert.ok(cp.questions.length >= 4, `${cp.id}: at least four questions`);
+    assert.ok(new Set(cp.questions.map(q => q.type)).size >= 2, `${cp.id}: mixed question types`);
+  }
 }
 const progress = L.emptyProgress();
 for (const week of subject.weeks) {
@@ -68,4 +79,4 @@ for (const week of subject.weeks) {
   assert.equal(L.weekState(subject, subject.weeks.indexOf(week), progress).status, 'passed');
 }
 assert.equal(L.subjectState(subject, L.normaliseProgress(JSON.parse(JSON.stringify(progress)))).passedWeeks, 4);
-console.log('ASE1DE: all four German coaches mirror English structure;, correct/wrong/partial answers, cumulative retry and progress roundtrip passed');
+console.log('ASE1DE: week 1 mirrors English, weeks 2-4 are deeper standalone, correct/wrong/partial answers, cumulative retry and progress roundtrip passed');

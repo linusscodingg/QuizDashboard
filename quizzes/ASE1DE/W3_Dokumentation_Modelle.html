@@ -190,276 +190,291 @@
   {
     "id": "lifespan",
     "topic": "Arbeitsprodukte",
-    "prompt": "Eine Anforderungssammlung wird über Iterationen verfeinert und hat eine verantwortliche Person und eine Versionshistorie. Welche Lebensdauer passt vor der Freigabe?",
+    "prompt": "Eine Skizze vom Miro-Board wird vom Team ab jetzt jede Woche weiterentwickelt und soll den Stand der Kontextsicht festhalten. Was folgt daraus laut Vorlesung?",
     "type": "single",
     "options": [
-      "Temporär",
-      "Sich entwickelnd",
-      "Zwingend dauerhaft ab dem ersten Wort",
-      "Kein Arbeitsprodukt"
+      "Nichts, die Lebensdauer eines Arbeitsprodukts steht beim Erstellen fest",
+      "Sie wird zu einem sich entwickelnden Arbeitsprodukt und braucht damit Metadaten und Änderungssteuerung",
+      "Sie wird zu einem dauerhaften Arbeitsprodukt, weil sie laufend gebraucht wird",
+      "Sie verliert den Status eines Arbeitsprodukts, weil sie nie fertig wird"
     ],
     "correct": 1,
     "optionExplanations": [
-      "Sie wird über einen vorübergehenden Gebrauch hinaus aufbewahrt und weiterentwickelt.",
-      "Ihr Inhalt entwickelt sich über die Iterationen weiter.",
-      "Dauerhaft bezieht sich auf ein freigegebenes oder als Baseline festgelegtes Arbeitsprodukt.",
-      "Sie ist ein festgehaltenes Ergebnis und damit ein Arbeitsprodukt."
+      "Die Folien sagen ausdrücklich, dass temporäre Arbeitsprodukte zu sich entwickelnden werden können, wenn das Team so entscheidet.",
+      "Für temporäre Produkte werden laut Folien keine Metadaten geführt; für sich entwickelnde werden Metadaten und Änderungskontrolle nötig.",
+      "Dauerhaft meint freigegeben oder als Baseline festgelegt. Eine laufend verfeinerte Skizze ist das noch nicht.",
+      "Festgehalten ist festgehalten. Der Status hängt nicht davon ab, ob etwas abgeschlossen ist."
     ],
-    "reference": "CPRE FL Handbuch v1.2.0, Abschnitt 3.1.1 (Glinz et al., © IREB)",
+    "reference": "Activities - Week 03.pdf, Folie 5",
     "concepts": [
-      "Arbeitsprodukte"
+      "Arbeitsprodukte",
+      "Lebensdauer"
     ],
-    "solution": "Ihr Inhalt entwickelt sich über die Iterationen weiter.",
+    "solution": "Sie wird sich entwickelnd und braucht Metadaten sowie Änderungssteuerung.",
     "points": 6
   },
   {
     "id": "natural",
     "topic": "Natürliche Sprache",
-    "prompt": "Was ist das Hauptproblem bei «Der Bericht wird genehmigt und umgehend versendet»?",
+    "prompt": "«Nach der Freigabe werden die Gebotsdaten zeitnah an das Buchhaltungssystem übermittelt.» Welcher Mangel ist der schwerwiegendste für die Weiterverarbeitung dieser Anforderung?",
     "type": "single",
     "options": [
-      "Passivformulierung und vage Zeitangabe lassen Verantwortlichkeiten und Kriterien offen",
-      "Jeder Passivsatz ist automatisch falsch",
-      "Die Aussage muss ein Datenbankmodell sein",
-      "Sie kann sich nicht auf ein System beziehen"
+      "Der Satz ist zu lang und sollte geteilt werden",
+      "Mehrere Angaben fehlen zugleich: wer freigibt, was «zeitnah» bedeutet und wodurch die Übermittlung ausgelöst wird",
+      "Es fehlt die Angabe der Programmiersprache",
+      "Es handelt sich um eine Qualitätsanforderung und nicht um eine funktionale"
     ],
-    "correct": 0,
+    "correct": 1,
     "optionExplanations": [
-      "Wer genehmigt und versendet, und welcher Zeitrahmen verlangt ist, muss geklärt werden.",
-      "Passivformulierung ist ein zu prüfendes Risiko, kein Beweis für Falschheit.",
-      "Ein Datenbankmodell würde die fehlende Verantwortlichkeit allein nicht klären.",
-      "Der Satz kann Systemverhalten betreffen, lässt es aber unklar."
+      "Länge ist hier nicht das Problem. Der Satz ist kurz und trotzdem unbrauchbar.",
+      "Das Passiv versteckt zwei Akteure, die Nominalisierung «Freigabe» versteckt einen Prozess, und «zeitnah» ist nicht prüfbar. Erst die Kombination macht die Anforderung wertlos.",
+      "Technologien gehören als Randbedingung dokumentiert, sind aber kein Mangel dieser Anforderung.",
+      "Die Einordnung als Qualitätsanforderung ist kein Mangel. Auch Qualitätsanforderungen müssen prüfbar sein."
     ],
     "reference": "CPRE FL Handbuch v1.2.0, Abschnitt 3.2 (Glinz et al., © IREB)",
     "concepts": [
-      "Natürliche Sprache"
+      "Natürliche Sprache",
+      "Prüfbarkeit"
     ],
-    "solution": "Wer genehmigt und versendet, und welcher Zeitrahmen verlangt ist, muss geklärt werden.",
+    "solution": "Verstecktes Subjekt durch Passiv, verdeckter Prozess durch Nominalisierung und ein nicht prüfbares «zeitnah».",
     "points": 6
   },
   {
     "id": "documentation-k",
     "type": "categorize",
     "topic": "Dokumentationsqualität",
-    "prompt": "Übung im K-Format: Beurteile jede Aussage.",
+    "prompt": "Übung im K-Format: wahr oder falsch? Hier geht es um die Trennung von Kriterien für eine einzelne Anforderung und für die Sammlung.",
     "options": [
       "Wahr",
       "Falsch"
     ],
     "statements": [
-      "Eine Satzschablone kann auf fehlende Informationen hinweisen.",
-      "Ein syntaktisch korrektes Modell muss den Stakeholder-Bedürfnissen entsprechen.",
-      "Zwei für sich klare Anforderungen können sich widersprechen.",
-      "Ein Glossar kann helfen, eine gemeinsame Terminologie zu verwenden."
+      "Konsistenz ist ein Qualitätskriterium der Anforderungssammlung, nicht der einzelnen Anforderung.",
+      "Eine Sammlung aus durchweg eindeutigen und prüfbaren Anforderungen ist damit auch konsistent.",
+      "Verfolgbarkeit gehört zu den Kriterien, die man erst an einer Menge von Anforderungen beurteilen kann.",
+      "Die im Lehrplan empfohlenen Qualitätskriterien sind eine abschliessende Liste, die nicht ergänzt werden darf."
     ],
     "correct": [
       0,
       1,
       0,
-      0
+      1
     ],
     "explanations": [
-      "Ein strukturierter Satz macht Informationslücken sichtbar.",
-      "Syntax und Angemessenheit sind getrennte Prüfungen.",
-      "Konsistenz ist auch eine Eigenschaft der Sammlung.",
-      "Ein gepflegtes Glossar unterstützt vereinbarte Bedeutungen."
+      "Wahr. Konsistenz, angemessene Vollständigkeit, Änderbarkeit und Verfolgbarkeit betreffen die Sammlung.",
+      "Falsch. Das klassische Gegenbeispiel: R1 nimmt Gebote bis einschliesslich 12:00 an, R2 lehnt jedes Gebot um 12:00 ab. Beide Sätze sind einzeln einwandfrei.",
+      "Wahr. Verfolgbarkeit beschreibt Beziehungen zwischen Anforderungen, Quellen und nachgelagerten Artefakten.",
+      "Falsch. Der aktuelle Lehrplan stellt ausdrücklich klar, dass die Kriterien nicht abschliessend sind und vom Kontext abhängen."
     ],
-    "reference": "CPRE FL Handbuch v1.2.0, Abschnitt 3.2–3.5, 3.8 (Glinz et al., © IREB)",
+    "reference": "CPRE FL Handbuch v1.2.0, Abschnitt 3.8 (Glinz et al., © IREB)",
     "concepts": [
       "Dokumentationsqualität"
     ],
-    "solution": "Ein strukturierter Satz macht Informationslücken sichtbar. Syntax und Angemessenheit sind getrennte Prüfungen. Konsistenz ist auch eine Eigenschaft der Sammlung. Ein gepflegtes Glossar unterstützt vereinbarte Bedeutungen.",
+    "solution": "Wahr, falsch, wahr, falsch.",
     "points": 8
   },
   {
     "id": "detail",
     "topic": "Detaillierungsgrad",
-    "prompt": "Wähle ZWEI Gründe, in ausdrücklichere Details der Anforderungen zu investieren.",
+    "prompt": "Ein Teil der Plattform wird von einem externen Zulieferer in einem anderen Zeitraum umgesetzt; Rückfragen brauchen etwa zwei Wochen. Welche ZWEI Faktoren aus der Vorlesung sprechen hier für mehr Detail?",
     "type": "multi",
     "options": [
-      "Langsames Feedback eines externen Zulieferers, der die Domäne nicht kennt",
-      "Hohe Kosten einer missverstandenen sicherheitskritischen Bedingung",
-      "Die Überzeugung, dass alle Skizzen Vertragsdokumente sein müssen",
-      "Das Vorhandensein irgendeines agilen Boards"
+      "Fehlende Verfügbarkeit von schnellem Stakeholder-Feedback während der Umsetzung",
+      "Geringer Grad des gemeinsamen Verständnisses des Problems",
+      "Der Umstand, dass es sich um eine Webanwendung handelt",
+      "Die Vorgabe, dass alle Dokumente dieselbe Länge haben sollen"
     ],
     "correct": [
       0,
       1
     ],
     "optionExplanations": [
-      "Wenig gemeinsames Verständnis und langsame Korrektur rechtfertigen mehr Ausdrücklichkeit.",
-      "Schwere Folgen rechtfertigen sorgfältige Spezifikation und Validierung.",
-      "Zweck und Risiko eines Arbeitsprodukts bestimmen den Umgang damit.",
-      "Ein agiles Board allein bestimmt weder das nötige Detail noch das Risiko."
+      "Steht wörtlich in der Faktorenliste: «Availability of rapid stakeholder feedback during design and implementation.»",
+      "Steht ebenfalls in der Liste. Ein externer Zulieferer ohne Domänenwissen teilt das Verständnis nicht.",
+      "Die Art der Anwendung ist kein Faktor der Liste.",
+      "Eine formale Längenregel ist kein fachlicher Faktor, sondern Bürokratie."
     ],
-    "reference": "CPRE FL Handbuch v1.2.0, Abschnitt 3.1.3 (Glinz et al., © IREB)",
+    "reference": "Activities - Week 03.pdf, Folie 7",
     "concepts": [
       "Detaillierungsgrad"
     ],
-    "solution": "Wenig gemeinsames Verständnis und langsame Korrektur rechtfertigen mehr Ausdrücklichkeit. Schwere Folgen rechtfertigen sorgfältige Spezifikation und Validierung.",
+    "solution": "Fehlendes schnelles Feedback und geringes gemeinsames Problemverständnis.",
     "points": 8
   },
   {
     "id": "multiplicity",
     "topic": "Struktur und Daten",
-    "prompt": "Eigenes Modell: Customer 1 — 0..* Booking. Was sagt es aus?",
+    "prompt": "Im Domänenmodell der Fallstudie gilt: «Auction 1 — 0..* Bid» und «Auction 1 — 1 Auction Item». Welche Aussage folgt korrekt aus diesen zwei Angaben?",
     "type": "single",
     "options": [
-      "Jeder Kunde hat mindestens eine Buchung",
-      "Jede Buchung gehört zu genau einem Kunden; ein Kunde kann keine haben",
-      "Jede Buchung gehört zu vielen Kunden",
-      "Buchungen können nicht existieren"
+      "Jede Auktion hat mindestens ein Gebot und genau einen Artikel",
+      "Eine Auktion kann ohne Gebot existieren, hat aber immer genau einen Artikel",
+      "Ein Gebot kann zu mehreren Auktionen gehören, solange der Artikel derselbe ist",
+      "Ein Artikel kann in beliebig vielen Auktionen gleichzeitig angeboten werden"
     ],
     "correct": 1,
     "optionExplanations": [
-      "Die Untergrenze bei Booking ist null.",
-      "Die Multiplizitäten drücken genau diese Einschränkungen aus.",
-      "Am Ende von Customer steht eins.",
-      "Null Buchungen für einen Kunden verbieten Buchungen nicht grundsätzlich."
+      "Die Untergrenze bei Bid ist null. Genau deshalb hat der Use Case «Close Auction» einen Alternativablauf für «no bids».",
+      "0..* erlaubt null Gebote, und die 1 bei Auction Item erzwingt genau einen Artikel je Auktion.",
+      "Die 1 auf der Auction-Seite legt fest, dass ein Gebot zu genau einer Auktion gehört.",
+      "Das Modell gibt auf der Auction-Item-Seite der Beziehung eine 1 an, also nicht beliebig viele."
     ],
-    "reference": "CPRE FL Handbuch v1.2.0, Abschnitt 3.4.3 (Glinz et al., © IREB)",
+    "reference": "ASE1-Fallstudie Online-Auktionsplattform, LE05 Domänenmodell erstellen (Musterlösung)",
     "concepts": [
-      "Struktur und Daten"
+      "Struktur und Daten",
+      "Multiplizitäten"
     ],
-    "solution": "Die Multiplizitäten drücken genau diese Einschränkungen aus.",
+    "solution": "Null oder viele Gebote, genau ein Artikel je Auktion.",
     "points": 8
   },
   {
     "id": "model-selection",
     "topic": "Blickwinkel von Modellen",
-    "prompt": "Wähle ZWEI passende Modellentscheidungen.",
+    "prompt": "Offene Frage im Projekt: «Darf der Verkäufer eine Auktion abbrechen, nachdem bereits geboten wurde?» Welche ZWEI Arbeitsprodukte beantworten diese Frage am direktesten?",
     "type": "multi",
     "options": [
-      "Klassenmodell für Entitäten und Assoziationen",
-      "Zustandsmodell für Reaktionen auf Ereignisse, die vom aktuellen Zustand abhängen",
-      "Use-Case-Diagramm als vollständige zeitliche Ausführungsspur",
-      "Kontextmodell als Beweis für die Korrektheit interner Algorithmen"
+      "Ein Zustandsmodell der Klasse Auction mit Auslösern und Bedingungen",
+      "Eine Use-Case-Beschreibung «Cancel Auction» mit Vor- und Nachbedingungen",
+      "Ein Use-Case-Diagramm mit allen Akteuren",
+      "Ein Klassendiagramm mit den Attributen von Bid"
     ],
     "correct": [
       0,
       1
     ],
     "optionExplanations": [
-      "Statische Struktur passt zu einem Klassenmodell.",
-      "Zustand und Verhalten passen zu einem Zustandsmodell.",
-      "Use-Case-Diagramme legen keine Schrittfolge fest.",
-      "Kontextdiagramme zeigen Einbettung und Schnittstellen, keine Algorithmusbeweise."
+      "Das Zustandsmodell der Fallstudie enthält genau diese Regel als Bedingung [auction time < 30 min.].",
+      "Die Use-Case-Beschreibung hält Vorbedingungen fest, zum Beispiel den erlaubten Status der Auktion.",
+      "Ein Use-Case-Diagramm zeigt, welche Funktionen es gibt, aber keine Bedingungen und keine Reihenfolge.",
+      "Attribute beschreiben Eigenschaften, nicht erlaubte Zustandsübergänge."
     ],
-    "reference": "CPRE FL Handbuch v1.2.0, Abschnitt 3.4.2–3.4.5 (Glinz et al., © IREB)",
+    "reference": "ASE1-Fallstudie Online-Auktionsplattform, LE05 und LE06 (Musterlösungen); CPRE FL Handbuch v1.2.0, Abschnitt 3.4 (Glinz et al., © IREB)",
     "concepts": [
-      "Blickwinkel von Modellen"
+      "Blickwinkel von Modellen",
+      "Zustand und Verhalten"
     ],
-    "solution": "Statische Struktur passt zu einem Klassenmodell. Zustand und Verhalten passen zu einem Zustandsmodell.",
+    "solution": "Zustandsmodell mit Bedingungen und Use-Case-Beschreibung mit Vorbedingungen.",
     "points": 8
   },
   {
     "id": "parallel",
     "topic": "Funktion und Ablauf",
-    "prompt": "Eine Gabelung (fork) startet Lager- und Zahlungsprüfung. Vor der Bestätigung steht eine Synchronisation (join). Die Zahlung ist zuerst fertig. Darf die Bestätigung erfolgen, während die Lagerprüfung noch läuft?",
+    "prompt": "Im Aktivitätsmodell zu «Close Auction» laufen nach dem Schliessen mehrere Pfade parallel: Zahlungsanfrage, Gutschrift und Benachrichtigungen. Danach soll erst weitergearbeitet werden, wenn die Antwort der Zahlungsorganisation verarbeitet ist. Ein Teammitglied setzt an dieser Stelle einen Merge ein. Was ist die Folge?",
     "type": "single",
     "options": [
-      "Ja, ein Join verhält sich wie ein Merge",
-      "Nein, der Join wartet auf die benötigten parallelen Pfade",
-      "Ja, weil die Zahlung wertvoller ist",
-      "Das Diagramm verlangt von Anfang an serielle Ausführung"
+      "Keine, Merge und Join sind in UML gleichwertig",
+      "Der Ablauf läuft weiter, sobald ein einziger Pfad eintrifft, also möglicherweise bevor die Zahlung bestätigt ist",
+      "Der Ablauf blockiert für immer, weil ein Merge auf alle Pfade wartet",
+      "Nur die Darstellung ist falsch, das Verhalten bleibt identisch"
     ],
     "correct": 1,
     "optionExplanations": [
-      "Ein Merge vereint Alternativen; ein Join synchronisiert.",
-      "Die benötigten nebenläufigen Pfade müssen den Join erreichen.",
-      "Geschäftliche Wichtigkeit setzt die Semantik des Diagramms nicht ausser Kraft.",
-      "Die Gabelung drückt parallele Pfade aus."
+      "Ein Merge vereint Alternativen, ein Join synchronisiert Parallelität. Das ist ein inhaltlicher Unterschied.",
+      "Ein Merge wartet nicht. Damit kann die Folgeaktion starten, obwohl die Zahlungsantwort noch fehlt, und das ist ein fachlicher Fehler.",
+      "Das Warten auf alle Pfade ist genau das Verhalten des Join, nicht des Merge.",
+      "Das Verhalten ändert sich, denn die Synchronisation fehlt."
     ],
-    "reference": "CPRE FL Handbuch v1.2.0, Abschnitt 3.4.4 (Glinz et al., © IREB)",
+    "reference": "ASE1-Fallstudie Online-Auktionsplattform, LE06 modellbasiert dokumentieren (Musterlösung); CPRE FL Handbuch v1.2.0, Abschnitt 3.4.4 (Glinz et al., © IREB)",
     "concepts": [
       "Funktion und Ablauf"
     ],
-    "solution": "Die benötigten nebenläufigen Pfade müssen den Join erreichen.",
+    "solution": "Der Ablauf läuft weiter, sobald ein Pfad eintrifft, statt auf alle parallelen Pfade zu warten.",
     "points": 8
   },
   {
     "id": "quality",
     "topic": "Dokumentationsqualität",
-    "prompt": "Wähle ZWEI echte Mängel in einer Anforderungssammlung.",
+    "prompt": "Die Fallstudie nennt die Anforderung R14 «Die Online-Auktionsplattform soll moderne Sicherheitsstandards implementieren.» Welche ZWEI Feststellungen sind fachlich korrekt?",
     "type": "multi",
     "options": [
-      "Zwei Aussagen verlangen für dasselbe Ereignis unter denselben Bedingungen entgegengesetzte Ergebnisse",
-      "Ein zentraler Fachbegriff wird mit zwei unvereinbaren Bedeutungen verwendet",
-      "Jede Anforderung hat eine stabile Kennung",
-      "Auf eine gemeinsame Tatsache wird verwiesen, statt sie zu duplizieren"
+      "Sie ist als Ziel brauchbar, aber in dieser Form nicht prüfbar",
+      "Für die Prüfbarkeit müssen die geltenden Standards und der Nachweis der Erfüllung mit der Quelle geklärt werden",
+      "Sie ist unbrauchbar und muss aus der Spezifikation gestrichen werden",
+      "Du darfst selbst einen konkreten Standard festlegen und ihn als genehmigte Anforderung dokumentieren"
     ],
     "correct": [
       0,
       1
     ],
     "optionExplanations": [
-      "Das ist eine Inkonsistenz.",
-      "Mehrdeutige Terminologie kann zu widersprüchlichen Interpretationen führen.",
-      "Kennungen unterstützen Verwaltung und Verfolgbarkeit.",
-      "Verweise können redundante und inkonsistente Kopien vermeiden."
+      "In der Musterlösung ist R14 bewusst auf der Ebene «Goal» eingeordnet. Als Ziel ist sie legitim, als prüfbare Anforderung nicht.",
+      "Genau das ist der nächste RE-Schritt: konkretisieren, Nachweis vereinbaren, validieren.",
+      "Ziele gehören in die Dokumentation, weil sie Features begründen und Verfolgbarkeit ermöglichen.",
+      "Eine eigene Festlegung als genehmigt darzustellen ist einer der schwersten RE-Fehler."
     ],
-    "reference": "CPRE FL Handbuch v1.2.0, Abschnitt 3.1.5, 3.5, 3.8 (Glinz et al., © IREB)",
+    "reference": "ASE1-Fallstudie Online-Auktionsplattform, LE04 System/Produkt-Features (Musterlösung), R14; CPRE FL Handbuch v1.2.0, Abschnitt 3.8 (Glinz et al., © IREB)",
     "concepts": [
-      "Dokumentationsqualität"
+      "Dokumentationsqualität",
+      "Abstraktionsebenen"
     ],
-    "solution": "Das ist eine Inkonsistenz. Mehrdeutige Terminologie kann zu widersprüchlichen Interpretationen führen.",
+    "solution": "Als Ziel brauchbar, aber nicht prüfbar; Standards und Nachweis müssen mit der Quelle geklärt werden.",
     "points": 8
   },
   {
     "id": "sustainability",
     "topic": "Nachhaltigkeitsworkshop",
-    "prompt": "Wähle ZWEI fundierte Herangehensweisen an den ASE1-Nachhaltigkeitsworkshop.",
+    "prompt": "Der Wochenauftrag zur Nachhaltigkeit stellt konkrete Vorgaben. Welche ZWEI treffen zu?",
     "type": "multi",
     "options": [
-      "Auswirkungen über die fünf Nachhaltigkeitsdimensionen hinweg betrachten",
-      "Vorgeschlagene Zielwerte als Kandidaten behandeln, die mit Stakeholdern zu vereinbaren sind",
-      "Annehmen, dass nachhaltig nur weniger Stromverbrauch bedeutet",
-      "Behaupten, jede Nachhaltigkeitsverbesserung sei frei von Zielkonflikten"
+      "Es sind fünf Kriterien auszuwählen, die alle fünf Dimensionen der Nachhaltigkeit abdecken",
+      "Die Präsentation dauert maximal fünf Minuten und darf ohne Folien gehalten werden",
+      "Die fünf Kriterien dürfen frei gewählt werden, auch wenn sie nur eine Dimension betreffen",
+      "Das Ergebnis ist eine mindestens fünfseitige Ausarbeitung"
     ],
     "correct": [
       0,
       1
     ],
     "optionExplanations": [
-      "Die Aufgabe umfasst ausdrücklich ökologische, soziale, individuelle, ökonomische und technische Anliegen.",
-      "Zielwerte brauchen Relevanz und Validierung statt einer erfundenen Einigung.",
-      "Der Workshop umfasst breitere Dimensionen.",
-      "Auswirkungen können sich widersprechen und sollten untersucht werden."
+      "Das Aufgabenblatt verlangt ausdrücklich fünf Kriterien, die alle fünf Dimensionen abdecken.",
+      "Die Folien sagen: Präsentationen können ohne PowerPoint gehalten werden, kürzer ist erlaubt, länger nicht.",
+      "Die Abdeckung aller fünf Dimensionen ist Pflicht und ausdrücklich hervorgehoben.",
+      "Verlangt ist eine Zusammenfassung von rund einer A4-Seite für die Projektdokumentation."
     ],
-    "reference": "Activities week 3 Tasks.pdf, S. 1",
+    "reference": "Activities week 3 Tasks.pdf; Activities - Week 03 - interdisciplinary.pdf, Folien 5–7",
     "concepts": [
       "Nachhaltigkeitsworkshop"
     ],
-    "solution": "Die Aufgabe umfasst ausdrücklich ökologische, soziale, individuelle, ökonomische und technische Anliegen. Zielwerte brauchen Relevanz und Validierung statt einer erfundenen Einigung.",
+    "solution": "Fünf Kriterien über alle fünf Dimensionen, und eine Präsentation von maximal fünf Minuten ohne Folienzwang.",
     "points": 8
   },
   {
     "id": "writing",
     "type": "order",
     "topic": "Natürliche Sprache",
-    "prompt": "Bringe diesen lokalen Verbesserungsablauf für eine mehrdeutige Anforderung in die richtige Reihenfolge.",
+    "prompt": "Vom vagen Wunsch zur prüfbaren, verfolgbaren Anforderung. Bringe die Schritte in die richtige Reihenfolge.",
     "items": [
-      "Die Mehrdeutigkeit und fehlende Bedingungen bestimmen",
-      "Das beabsichtigte Verhalten mit einer geeigneten Quelle klären",
-      "Einen strukturierten Kandidaten mit vereinbarter Terminologie formulieren",
-      "Beispiele und Konsistenz mit verwandten Anforderungen validieren"
+      "Vage Aussage aufnehmen und ihre offenen Fragen auflisten",
+      "Fehlende Fakten bei der zuständigen Quelle klären",
+      "Anforderung mit Satzschablone und Verbindlichkeit formulieren",
+      "Schablonentyp und Art bestimmen, zum Beispiel funktional oder Randbedingung",
+      "Prüfbares Akzeptanzkriterium ergänzen, inklusive Negativfall",
+      "Verfolgbarkeit herstellen: Quelle und zugehöriges Ziel verknüpfen",
+      "Ergebnis mit der Quelle validieren"
     ],
     "correct": [
       0,
       1,
       2,
-      3
+      3,
+      4,
+      5,
+      6
     ],
     "initial": [
       2,
+      5,
       0,
-      3,
-      1
+      6,
+      1,
+      4,
+      3
     ],
-    "solution": "Die Klärung kommt vor der präzisen Formulierung; die Validierung prüft den Kandidaten an den tatsächlichen Bedürfnissen und an anderen Anforderungen.",
-    "reference": "CPRE FL Handbuch v1.2.0, Abschnitt 3.2–3.3, 3.8 (Glinz et al., © IREB)",
+    "solution": "Erst die Lücken benennen, dann die Fakten klären, dann formulieren und einordnen, dann prüfbar machen, dann verknüpfen, und zuletzt validieren. Wer zuerst formuliert, zementiert eigene Annahmen; wer die Validierung weglässt, hat nur eine schön aussehende Vermutung.",
+    "reference": "CPRE FL Handbuch v1.2.0, Abschnitte 3.2, 3.3 und 3.8 (Glinz et al., © IREB); ASE1-Fallstudie, LE06 (Musterlösung)",
     "concepts": [
-      "Natürliche Sprache"
+      "Natürliche Sprache",
+      "Verfolgbarkeit"
     ],
     "points": 10
   },
@@ -467,26 +482,29 @@
     "id": "case-state",
     "type": "text",
     "topic": "Zustand und Verhalten",
-    "prompt": "Eigenes Modell: Pending -- approve [payment valid] / send confirmation --> Confirmed. Ein Ablehnungsereignis führt von Pending nach Rejected. Erkläre, was passiert, wenn approve bei ungültiger Zahlung eintrifft, und nenne eine Frage, die dieses Fragment nicht beantwortet.",
-    "solution": "Bewertungsraster für volle Punktzahl: (1) der gezeigte Genehmigungsübergang schaltet nicht, weil seine Bedingung (guard) falsch ist; (2) das Fragment rechtfertigt daher weder den Wechsel nach Confirmed noch das Senden einer Bestätigung; (3) eine offene Frage nennen, etwa Fehlermeldung, erneuter Zahlungsversuch oder Behandlung von approve in Rejected; (4) erklären, dass fehlendes Verhalten geklärt und nicht erfunden werden muss. Halbe Punktzahl: prüft die Bedingung korrekt, übersieht aber die Lücke in der Spezifikation.",
-    "reference": "CPRE FL Handbuch v1.2.0, Abschnitt 3.4.5 (Glinz et al., © IREB)",
+    "prompt": "Fall: Das Zustandsmodell der Klasse Auction der Fallstudie erlaubt den Übergang von «open» nach «canceled» nur unter der Bedingung [auction time < 30 min.]. Ein Verkäufer bricht nach 45 Minuten ab und beschwert sich, dass nichts passiert. Erkläre (a) warum kein Übergang stattfindet, (b) welche drei Folgen dieses Zustandsmodell laut Musterlösung für die bestehenden Anforderungen hat, und (c) welche Anforderung dennoch fehlt.",
+    "solution": "Bewertungsraster für volle Punktzahl: (1) Ein Auslöser allein genügt nie. Nötig sind der passende Ausgangszustand (open) und eine erfüllte Bedingung. Nach 45 Minuten ist der Guard falsch, also gibt es keinen Übergang; das ist korrektes Verhalten, kein Fehler. (2) Die drei Folgen der Musterlösung: die Domänenklasse braucht ein Attribut status als Enum mit created, open, closed, canceled, archived; es entstehen die neuen Use Cases «Cancel Auction» und «Archive Auctions»; die Use Cases «Create Auction», «Place Bid» und «Close Auction» müssen den Status als Vor- oder Nachbedingung berücksichtigen. (3) Was fehlt: eine Anforderung darüber, was der Benutzer in diesem Fall erfährt. Das Modell beschreibt, dass nichts passiert, aber nicht, dass und wie das System die Ablehnung zurückmeldet. Ohne Rückmeldung ist der Zustand für den Verkäufer nicht nachvollziehbar, und genau das erzeugt die Beschwerde. Gleichwertig: eine Anforderung zur Begründung der Ablehnung oder zu einem alternativen Weg, zum Beispiel Abbruch über den Support. Halbe Punktzahl: erklärt den Guard korrekt, nennt aber die Folgen oder die fehlende Rückmeldung nicht. Null Punkte: behauptet, das System arbeite fehlerhaft.",
+    "reference": "ASE1-Fallstudie Online-Auktionsplattform, LE06 modellbasiert dokumentieren (Musterlösung); CPRE FL Handbuch v1.2.0, Abschnitt 3.4.5 (Glinz et al., © IREB)",
     "concepts": [
-      "Zustand und Verhalten"
+      "Zustand und Verhalten",
+      "Modelle und Anforderungen"
     ],
-    "hint": "Antworte auf Deutsch. Bewerte dich nach dem Prüfen mit dem Raster: volle Punktzahl, wenn alle verlangten Elemente enthalten sind; halbe Punktzahl für eine fundierte, aber unvollständige Antwort; null für eine falsche oder unbegründete Antwort.",
+    "hint": "Antworte auf Deutsch. Drei Teile sind verlangt. Bewerte dich nach dem Prüfen mit dem Raster: volle Punktzahl nur mit allen drei Teilen; halbe Punktzahl für eine fundierte, aber unvollständige Antwort; null für eine falsche oder unbegründete Antwort.",
     "points": 10
   },
   {
     "id": "case-story",
     "type": "text",
     "topic": "Vorlagen und Akzeptanzkriterien",
-    "prompt": "Eigener Entwurf: «Als Reisende möchte ich bequem buchen, damit Reisen einfach ist.» Schlage eine nützlichere Story und zwei Akzeptanzfälle vor. Erkläre, welche Details eine Einigung mit den Stakeholdern brauchen.",
-    "solution": "Bewertungsraster für volle Punktzahl: (1) Rolle und konkreten Nutzen für die Nutzerin beibehalten; (2) die Fähigkeit eingrenzen, z. B. die gewählten Reisedetails vor dem verbindlichen Abschluss überprüfen; (3) beobachtbare Fälle für Bestätigen und Abbrechen bzw. ungültige Eingabe angeben; (4) vorgeschlagenes Verhalten und allfällige Schwellenwerte als zu validierende Kandidaten kennzeichnen. Viele Lösungen sind gültig. Halbe Punktzahl: verbesserte Story oder Akzeptanzfälle, aber kein stimmiges Ganzes mit Hinweis auf die Annahmen.",
-    "reference": "CPRE FL Handbuch v1.2.0, Abschnitt 3.3.1.2, 3.8 (Glinz et al., © IREB)",
+    "prompt": "Boss-Aufgabe. Der Kunde sagt: «Wenn ein Verkäufer zu viele offene Zahlungen hat, soll er nicht mehr versteigern dürfen. Die Grenze soll man pro Kunde einstellen können.» Erarbeite daraus (a) zwei Anforderungen mit Satzschablone und nenne je den Schablonentyp, (b) ein prüfbares Akzeptanzkriterium einschliesslich Negativfall, (c) welche Angabe im Kundensatz noch fehlt und bei wem du sie klärst, und (d) wie du beide Anforderungen auf das zugehörige Ziel verfolgbar machst.",
+    "solution": "Bewertungsraster für volle Punktzahl: (1) Zwei Anforderungen im Sinne der Musterlösung, zum Beispiel: «Wenn ein Verkäufer ausstehende Zahlungen hat, die den für ihn festgelegten Schwellwert überschreiten, muss das System ihn für das Versteigern von Waren sperren, solange bis bezahlt wurde.» (Typ: selbständige Systemaktivität) und «Das System muss dem Service-Mitarbeiter die Möglichkeit bieten, für einen Verkäufer einen Schwellwert für ausstehende Zahlungen festzulegen.» (Typ: Benutzerinteraktion). Die Typen müssen benannt und richtig zugeordnet sein. (2) Akzeptanzkriterium mit Negativfall, zum Beispiel: Liegt die Summe der offenen Zahlungen über dem für diesen Verkäufer gesetzten Wert, lässt sich keine neue Auktion anlegen und es erscheint eine Begründung; liegt sie darunter oder genau auf dem Wert, bleibt das Anlegen möglich. Die Grenzfallbehandlung (genau auf dem Wert) oder eine andere ausdrückliche Festlegung der Grenze zählt. (3) Fehlende Angabe: «zu viele» ist nicht definiert, und es ist offen, ob die Grenze als Betrag, Anzahl oder Alter der Zahlungen gilt, wer sie setzen darf und ob eine Standardgrenze existiert. Zu klären mit dem fachlichen Entscheider, in der Fallstudie dem Kunden beziehungsweise Product Owner, und mit dem Service-Mitarbeiter als betroffenem Benutzer; ausserdem ist die Buchhaltung die Quelle für die Definition einer offenen Zahlung. Eigene Zahlen dürfen nur als Vorschlag markiert werden. (4) Verfolgbarkeit: beide Anforderungen auf das zugehörige Ziel und aufeinander verknüpfen, in der Fallstudie also auf das Goal der Umsatz- und Ausfallsicherung beziehungsweise die Features R02 und R03, und die Verknüpfung in einer Matrix oder als Feldeintrag «Traceability» festhalten, wie es die Musterlösung bei UC01 mit «Traceability: Feature R01» zeigt. Halbe Punktzahl: zwei korrekte Schablonen-Anforderungen mit Typen, aber lückenhaft bei Akzeptanzkriterium, Klärung oder Verfolgbarkeit. Null Punkte: erfindet einen Schwellwert und stellt ihn als vereinbart dar.",
+    "reference": "ASE1-Fallstudie Online-Auktionsplattform, LE04, LE06 und LE07 (Musterlösungen); CPRE FL Handbuch v1.2.0, Abschnitte 3.3 und 3.8 (Glinz et al., © IREB)",
     "concepts": [
-      "Vorlagen und Akzeptanzkriterien"
+      "Vorlagen und Akzeptanzkriterien",
+      "Satzschablonen",
+      "Verfolgbarkeit"
     ],
-    "hint": "Antworte auf Deutsch. Bewerte dich nach dem Prüfen mit dem Raster: volle Punktzahl, wenn alle verlangten Elemente enthalten sind; halbe Punktzahl für eine fundierte, aber unvollständige Antwort; null für eine falsche oder unbegründete Antwort.",
+    "hint": "Antworte auf Deutsch. Vier Teile sind verlangt. Diese Aufgabe gibt die meisten Punkte. Bewerte dich nach dem Prüfen mit dem Raster: volle Punktzahl nur mit allen vier Teilen und ohne erfundene Vereinbarungen; halbe Punktzahl für eine fundierte, aber unvollständige Antwort; null für eine falsche oder unbegründete Antwort.",
     "points": 12
   }
 ];

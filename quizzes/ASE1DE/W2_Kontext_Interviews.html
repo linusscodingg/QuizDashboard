@@ -190,274 +190,290 @@
   {
     "id": "boundary",
     "topic": "Kontext und Grenzen",
-    "prompt": "Ein externer Identitätsanbieter muss Tokens mit einer Buchungsanwendung austauschen. Wohin gehört er in der Kontextsicht der Anwendung?",
+    "prompt": "Im Kontextdiagramm des Kernsystems der Auktionsplattform taucht die Zahlungsorganisation auf, das Buchhaltungssystem des Grosshändlers nicht. Ein Teammitglied schliesst daraus: «Buchhaltung liegt also in der irrelevanten Umgebung.» Wie beurteilst du diesen Schluss?",
     "type": "single",
     "options": [
-      "Automatisch in die Anwendung",
-      "In ihren relevanten Kontext",
-      "Ausserhalb ihres Kontexts, weil er eingekauft ist",
-      "Er darf in keinem RE-Modell vorkommen"
+      "Richtig: Was nicht im Diagramm steht, ist per Definition irrelevante Umgebung",
+      "Falsch: Die Buchhaltung ist für das Kernsystem weggelassen, für das erweiterte System beim Kunden aber eine relevante Schnittstelle",
+      "Falsch: Die Buchhaltung gehört innerhalb der Systemgrenze, weil Provisionen verbucht werden müssen",
+      "Richtig, aber nur weil die Buchhaltung von einer anderen Firma betrieben wird"
     ],
     "correct": 1,
     "optionExplanations": [
-      "Wichtigkeit macht einen externen Dienst nicht zu einem internen.",
-      "Seine Schnittstelle beeinflusst die Anwendung und ihre Anforderungen.",
-      "Eigentumsverhältnisse bestimmen nicht die Relevanz.",
-      "Kontextmodelle enthalten ausdrücklich externe Schnittstellen."
+      "Ein Diagramm hat immer einen Blickwinkel. Weglassen ist eine Entscheidung über diese Sicht, keine Aussage über die Welt.",
+      "Die Musterlösung zeichnet zwei Kontexte: im Kernsystem wird die Buchhaltung bewusst weggelassen und nur als Variationspunkt vorgesehen, im erweiterten System ist sie eine echte Schnittstelle.",
+      "Die Buchhaltung des Grosshändlers ist ein Fremdsystem und wird nicht von euch gebaut. Sie liegt ausserhalb der Systemgrenze.",
+      "Eigentumsverhältnisse entscheiden nicht über Relevanz. Die Zahlungsorganisation ist ebenfalls fremd und trotzdem relevant."
     ],
-    "reference": "CPRE FL Handbuch v1.2.0, Abschnitt 2.2.4, 3.4.2 (Glinz et al., © IREB)",
+    "reference": "ASE1-Fallstudie Online-Auktionsplattform, LE03 System und Systemkontext abgrenzen (Musterlösung)",
     "concepts": [
-      "Kontext und Grenzen"
+      "Kontext und Grenzen",
+      "Kern- und erweitertes System"
     ],
-    "solution": "Seine Schnittstelle beeinflusst die Anwendung und ihre Anforderungen.",
+    "solution": "Die Buchhaltung ist für das Kernsystem bewusst weggelassen, für das erweiterte System aber eine relevante externe Schnittstelle.",
     "points": 6
   },
   {
     "id": "scope",
     "topic": "Scope",
-    "prompt": "Eine eingebettete Komponente muss unverändert wiederverwendet werden. Welche Schlussfolgerung ist gerechtfertigt?",
+    "prompt": "Die Fallstudie gibt vor: Java bleibt für Server-Komponenten verbindlich, und bestehende Frameworks der Online-Shop-Software sollen wiederverwendet werden. Welche Einordnung dieser beiden Vorgaben ist korrekt?",
     "type": "single",
     "options": [
-      "Sie kann im System, aber ausserhalb des Änderungsscopes liegen",
-      "Sie muss in der irrelevanten Umgebung liegen",
-      "Ihre Lage gibt dem Projekt unbegrenzte Gestaltungsfreiheit",
-      "Systemgrenze und Scope müssen zusammenfallen"
+      "Beide liegen innerhalb der Systemgrenze und innerhalb des Scopes, weil sie zur Software gehören",
+      "Beide liegen innerhalb der Systemgrenze, aber ausserhalb des Änderungsscopes, und werden als Randbedingung dokumentiert",
+      "Beide liegen in der irrelevanten Umgebung, weil Technologien keine Anforderungen sind",
+      "Beide liegen ausserhalb der Systemgrenze, weil sie von Dritten stammen"
     ],
-    "correct": 0,
+    "correct": 1,
     "optionExplanations": [
-      "Zugehörigkeit und die Erlaubnis, etwas zu gestalten, sind verschieden.",
-      "Eine benötigte Komponente ist nicht irrelevant, nur weil sie fest vorgegeben ist.",
-      "Die Gestaltungsfreiheit kann eingeschränkt sein.",
-      "Das Handbuch unterscheidet beides ausdrücklich."
+      "Wenn das Projekt die Technologie nicht wählen darf, fehlt genau die Gestaltungsfreiheit, die den Scope definiert.",
+      "Die Komponenten sind Teil der Lösung (innen), aber nicht verhandelbar (ausserhalb des Scopes). Die Musterlösung führt beide in der Spalte «Art» als Randbedingung.",
+      "Technologievorgaben sind sehr wohl Anforderungen, nämlich Randbedingungen, und schränken Entwurfsentscheidungen ein.",
+      "Wiederverwendeter Code liegt innerhalb des Systems. Herkunft und Lage sind zwei verschiedene Fragen."
     ],
-    "reference": "CPRE FL Handbuch v1.2.0, Abschnitt 2.2.4 (Glinz et al., © IREB)",
+    "reference": "ASE1-Fallstudie Online-Auktionsplattform, LE04 System/Produkt-Features dokumentieren (Musterlösung), R12 und R19",
     "concepts": [
-      "Scope"
+      "Scope",
+      "Randbedingungen"
     ],
-    "solution": "Zugehörigkeit und die Erlaubnis, etwas zu gestalten, sind verschieden.",
+    "solution": "Innerhalb der Systemgrenze, ausserhalb des Änderungsscopes, dokumentiert als Randbedingung.",
     "points": 6
   },
   {
     "id": "boundary-truths",
     "type": "categorize",
     "topic": "Kontext und Scope",
-    "prompt": "Übung im K-Format: Entscheide, ob jede Aussage wahr ist.",
+    "prompt": "Übung im K-Format: Entscheide für jede Aussage, ob sie wahr oder falsch ist. Lies besonders genau, zwei Aussagen sind absichtlich umgedreht.",
     "options": [
       "Wahr",
       "Falsch"
     ],
     "statements": [
-      "Die Kontextgrenze trennt relevante von irrelevanter Umgebung.",
-      "Ein Ablauf ausserhalb des Systems kann im Projektscope liegen.",
-      "Eine externe Schnittstelle kann keine Anforderungen erzeugen.",
-      "Eine Kontextannahme wird wahr, sobald sie aufgeschrieben ist."
+      "Ein Element kann innerhalb der Systemgrenze und gleichzeitig ausserhalb des Projektscopes liegen.",
+      "Ein Kontextmodell stellt laut Vorlesung die Anforderungen grafisch dar.",
+      "Die Kontextgrenze kann sich im Projektverlauf verschieben, wenn neue relevante Quellen auftauchen.",
+      "Wird eine Domänenannahme dokumentiert, ist ihre Gültigkeit damit nachgewiesen."
     ],
     "correct": [
       0,
-      0,
       1,
+      0,
       1
     ],
     "explanations": [
-      "Genau das ist der Zweck der Kontextgrenze.",
-      "Ein Projekt kann Abläufe rund um seine Software neu gestalten.",
-      "Schnittstellen können Verhalten und Formate stark einschränken.",
-      "Annahmen müssen an der Realität validiert werden."
+      "Wahr. Das Standardbeispiel ist eine fest vorgegebene Komponente, die unverändert bleiben muss.",
+      "Falsch. Die Folien sagen ausdrücklich das Gegenteil: Das Kontextmodell stellt nicht die Anforderungen dar, sondern deckt deren Quellen auf.",
+      "Wahr. Die Kontextgrenze ist eine Aufwands- und Relevanzentscheidung und wird revidiert, wenn neue Erkenntnisse auftreten.",
+      "Falsch. Aufschreiben macht eine Annahme nicht wahr. Sie muss validiert werden, und für ihr Versagen braucht es einen geplanten Umgang."
     ],
-    "reference": "CPRE FL Handbuch v1.2.0, Abschnitt 2.2.4 (Glinz et al., © IREB)",
+    "reference": "Activities - Week 02.pdf, gedruckte Folie 13; CPRE FL Handbuch v1.2.0, Abschnitt 2.2.4 (Glinz et al., © IREB)",
     "concepts": [
-      "Kontext und Scope"
+      "Kontext und Scope",
+      "Domänenannahmen"
     ],
-    "solution": "Genau das ist der Zweck der Kontextgrenze. Ein Projekt kann Abläufe rund um seine Software neu gestalten. Schnittstellen können Verhalten und Formate stark einschränken. Annahmen müssen an der Realität validiert werden.",
+    "solution": "Wahr, falsch, wahr, falsch. Die beiden falschen Aussagen drehen jeweils eine Kernaussage der Vorlesung um.",
     "points": 8
   },
   {
     "id": "context-content",
     "topic": "Kontextmodellierung",
-    "prompt": "Wähle ZWEI nützliche Elemente in einem Kontextmodell für eine Ticketbuchungs-Anwendung.",
+    "prompt": "Ein Team zeichnet das Kontextdiagramm des Kernsystems. Welche ZWEI Vorgehensweisen verbessern den Nutzen des Diagramms tatsächlich?",
     "type": "multi",
     "options": [
-      "Eine Reisenden-Rolle und ihre Interaktion mit dem System",
-      "Ein externer Zahlungsdienst und die ausgetauschten Informationen",
-      "Jede private Schleifenvariable",
-      "Eine vollständige Liste der Pixelabstände"
+      "Jede Linie mit dem beschriften, was darüber fliesst, zum Beispiel «bid» oder «validation info»",
+      "Für denselben Kontext zusätzlich eine zweite Notation wählen und den Blickwinkel benennen",
+      "Alle Umsysteme des Kunden aufnehmen, damit das Diagramm vollständiger wirkt",
+      "Die geplante Menüstruktur der Oberfläche als eigenes Element eintragen"
     ],
     "correct": [
       0,
       1
     ],
     "optionExplanations": [
-      "Externe Akteure helfen, relevante Interaktionen festzulegen.",
-      "Externe Systeme und Schnittstellen gehören in die Kontextsicht.",
-      "Interne Implementierungsdetails sind nicht der Zweck des Kontextmodells.",
-      "Detailliertes visuelles Design ist ein anderes Anliegen."
+      "Eine unbeschriftete Linie deckt keine Anforderung auf. Die Musterlösung beschriftet jeden Fluss.",
+      "Der Kurs lässt Datenflussdiagramm, UML-Use-Case und Kasten-Linien-Darstellung zu, weil jede Notation einen anderen Blickwinkel zeigt.",
+      "Für das Kernsystem werden die Umsysteme des Kunden bewusst weggelassen. Mehr Kästchen heisst nicht mehr Erkenntnis.",
+      "Funktionale und gestalterische Aspekte der Benutzerschnittstelle werden laut Folien erst später spezifiziert."
     ],
-    "reference": "Activities - Week 02.pdf, gedruckte Folien 13–14",
+    "reference": "Activities - Week 02.pdf, gedruckte Folien 13–14; Activities - Week 03.pdf, Folien 9–12",
     "concepts": [
-      "Kontextmodellierung"
+      "Kontextmodellierung",
+      "Notationen"
     ],
-    "solution": "Externe Akteure helfen, relevante Interaktionen festzulegen. Externe Systeme und Schnittstellen gehören in die Kontextsicht.",
+    "solution": "Flüsse beschriften und mehrere Notationen mit benanntem Blickwinkel verwenden.",
     "points": 8
   },
   {
     "id": "relevant-change",
     "topic": "Kontext und Grenzen",
-    "prompt": "Es stellt sich heraus, dass ein bisher als unbeteiligt betrachteter Dienst einen benötigten Wechselkurs liefert. Was sollte zuerst überdacht werden?",
+    "prompt": "Im Interview stellt sich heraus: Ein Streitfall über ein Gebot wird heute von einer Person im Support entschieden, nicht von der Software. Das Team möchte diese Entscheidung ins System verlagern. Was ändert sich dadurch am Wichtigsten?",
     "type": "single",
     "options": [
-      "Die Kontextgrenze und die relevanten Schnittstellen",
-      "Nur die Schriftart des Glossars",
-      "Die Idee, dass alle externen Dienste intern umgesetzt werden müssen",
-      "Nichts, weil das erste Modell unveränderlich ist"
+      "Nur die Anzahl Kästchen im Kontextdiagramm",
+      "Die Systemgrenze verschiebt sich, und damit ändern sich Verantwortung, Risiko und die Informationen, die das System braucht",
+      "Nichts, weil der Support in beiden Fällen ein Stakeholder bleibt",
+      "Der Scope schrumpft, weil das Team eine Aufgabe abgibt"
     ],
-    "correct": 0,
+    "correct": 1,
     "optionExplanations": [
-      "Neue Erkenntnisse verändern die Relevanz und decken eine Schnittstelle auf.",
-      "Typografie behandelt die Entdeckung nicht.",
-      "Relevanz bedeutet keine interne Umsetzung.",
-      "Modelle können sich mit wachsendem Verständnis weiterentwickeln."
+      "Das Diagramm ändert sich auch, aber das ist die Folge, nicht der Kern.",
+      "Wird eine Entscheidung in die Software verlagert, übernimmt das System Verantwortung. Es braucht dann die Belege und Regeln, die vorher im Kopf der Person lagen.",
+      "Der Support bleibt Stakeholder, aber seine Rolle wechselt von Entscheider zu Informationslieferant. Die Verschiebung der Grenze ist die wesentliche Änderung.",
+      "Der Scope wächst, denn das Projekt muss nun ein Verhalten gestalten, das bisher ausserhalb der Software lag."
     ],
-    "reference": "CPRE FL Handbuch v1.2.0, Abschnitt 2.2.4 (Glinz et al., © IREB)",
+    "reference": "Activities - Week 02.pdf, gedruckte Folie 14; CPRE FL Handbuch v1.2.0, Abschnitt 2.2.4 (Glinz et al., © IREB)",
     "concepts": [
-      "Kontext und Grenzen"
+      "Kontext und Grenzen",
+      "Kern- und erweitertes System"
     ],
-    "solution": "Neue Erkenntnisse verändern die Relevanz und decken eine Schnittstelle auf.",
+    "solution": "Die Systemgrenze verschiebt sich, und mit ihr Verantwortung, Risiko und Informationsbedarf.",
     "points": 8
   },
   {
     "id": "neutral",
     "topic": "Interviewpraxis",
-    "prompt": "Wähle ZWEI neutrale Fragen, die das Erkunden unterstützen.",
+    "prompt": "Vier Fragen für ein exploratives Interview mit dem Grosshändler. Welche ZWEI sind brauchbar formuliert?",
     "type": "multi",
     "options": [
-      "Beschreiben Sie, was beim letzten Mal passiert ist, als eine Buchung fehlschlug",
-      "Welche Information haben Sie in diesem Moment gebraucht?",
-      "Unser verbessertes Design ist ausgezeichnet, nicht wahr?",
-      "Langsame Nutzer sind doch sicher das Hauptproblem?"
+      "«Bitte beschreiben Sie, wie Sie beim letzten Restposten vorgegangen sind, von der Erfassung bis zum Verkauf.»",
+      "«An welcher Stelle in diesem Ablauf wussten Sie nicht weiter, und was haben Sie dann getan?»",
+      "«Wollen Sie den Verkauf per Auktion oder per Fixpreis abwickeln?»",
+      "«Unser Dashboard macht den Status endlich transparent. Wie viel besser ist das für Sie?»"
     ],
     "correct": [
       0,
       1
     ],
     "optionExplanations": [
-      "Eine konkrete vergangene Situation kann echte Arbeit und Ausnahmen aufdecken.",
-      "Das erfragt das Bedürfnis, ohne eine günstige Antwort vorzugeben.",
-      "Das verleitet zu Zustimmung und Lob.",
-      "Darin steckt ein unbelegtes Urteil."
+      "Offene Frage nach dem konkreten letzten Fall. Sie liefert den Ablauf, ohne eine Lösung vorzugeben.",
+      "Fragt nach Schwierigkeit und tatsächlicher Reaktion. Umgehungslösungen werden so sichtbar.",
+      "Eine Auswahlfrage. Die Vorlesung warnt ausdrücklich: «Do you prefer A or B?» wird gern mit «Ja» beantwortet. Ausserdem schlägt sie die Lösung schon vor.",
+      "Behauptet eine Verbesserung, bevor Belege vorliegen, und begünstigt eine sozial erwünschte Antwort."
     ],
-    "reference": "Activities - Week 02.pdf, gedruckte Folien 5–8",
+    "reference": "Activities - Week 02.pdf, gedruckte Folien 5–7",
     "concepts": [
-      "Interviewpraxis"
+      "Interviewpraxis",
+      "Verzerrungen im Interview"
     ],
-    "solution": "Eine konkrete vergangene Situation kann echte Arbeit und Ausnahmen aufdecken. Das erfragt das Bedürfnis, ohne eine günstige Antwort vorzugeben.",
+    "solution": "Die beiden offenen Fragen nach dem konkreten letzten Fall und nach der Stelle der Unsicherheit.",
     "points": 8
   },
   {
     "id": "expectation",
     "topic": "Verzerrungen im Interview",
-    "prompt": "Drei Beobachter hören «Das hat länger gedauert als erwartet», und jeder gibt seiner unbeliebtesten Komponente die Schuld. Was ist das Hauptproblem?",
+    "prompt": "Eine Testperson sagt: «Ich war sogar langsamer.» Drei Beobachtende notieren: Person 1 «Interface ist ablenkend», Person 2 «Backend-Prozesse sind ineffizient», Person 3 notiert nichts. Welche Beurteilung ist fachlich korrekt?",
     "type": "single",
     "options": [
-      "Die Aussage beweist alle drei Ursachen",
-      "Die Deutungen werden von vorgefassten Erwartungen gesteuert",
-      "Offene Fragen sind verboten",
-      "Die Person kann kein Stakeholder sein"
+      "Person 3 hat am saubersten dokumentiert, weil sie keine Deutung eingebracht hat",
+      "Alle drei Notizen sind Deutungen; der Beleg ist allein die Aussage der Person, und auch das Weglassen ist eine Relevanzentscheidung",
+      "Person 1 und 2 widersprechen sich, also ist eine der beiden Notizen falsch und die andere richtig",
+      "Die Notizen zeigen zusammen die Ursache, weil zwei unabhängige Beobachter ein Problem bestätigen"
     ],
     "correct": 1,
     "optionExplanations": [
-      "Die Aussage allein belegt keine Ursache.",
-      "Unterschiedliche, unbelegte Ursachendeutungen zeigen den Erwartungseffekt.",
-      "Offene Fragen können helfen, das Erlebte zu klären.",
-      "Feedback zu geben hebt die Relevanz als Stakeholder nicht auf."
+      "Nichts zu notieren ist keine Neutralität. Im Fallbeispiel hielt Person 3 das Problem für eines der Testperson, also hat sie ebenfalls gedeutet.",
+      "Genau das ist die Lehre des Beispiels: Jede Person deutet im eigenen Fachgebiet, und die fehlende Notiz ist die unauffälligste Deutung von allen.",
+      "Beide können gleichzeitig falsch oder beide teilweise richtig sein. Die Aussage lässt mehrere Erklärungen offen.",
+      "Die beiden Notizen bestätigen nichts, sie nennen verschiedene Ursachen. Ausserdem waren die Beobachter nicht unabhängig von ihrem eigenen Fachgebiet."
     ],
-    "reference": "Activities - Week 02.pdf, gedruckte Folien 6",
+    "reference": "Activities - Week 02.pdf, gedruckte Folien 6–7",
     "concepts": [
-      "Verzerrungen im Interview"
+      "Verzerrungen im Interview",
+      "Beleg und Deutung"
     ],
-    "solution": "Unterschiedliche, unbelegte Ursachendeutungen zeigen den Erwartungseffekt.",
+    "solution": "Alle drei Notizen sind Deutungen, auch die fehlende; Beleg ist nur die Aussage selbst.",
     "points": 8
   },
   {
     "id": "followup",
     "topic": "Interviewpraxis",
-    "prompt": "Wähle ZWEI passende Folgeschritte nach einem explorativen Interview.",
+    "prompt": "Der Kunde antwortet: «Normalerweise prüfen wir das schon vorher.» Welche ZWEI Reaktionen sind nach den Tipps der Vorlesung sinnvoll?",
     "type": "multi",
     "options": [
-      "Die Zusammenfassung und offene Punkte mit der Quelle bestätigen",
-      "Beobachtungen von den Hypothesen des Teams unterscheidbar halten",
-      "Jede vorläufige Bemerkung zu einer genehmigten Anforderung machen",
-      "Abweichende Aussagen löschen, um einen einheitlich wirkenden Bericht zu erhalten"
+      "Die Aussage in eigenen Worten wiederholen und bestätigen lassen",
+      "Rund drei Sekunden schweigen und Blickkontakt halten, bevor die nächste Frage kommt",
+      "Sofort die nächste vorbereitete Frage stellen, um in der Zeit zu bleiben",
+      "«Normalerweise» ungeprüft als «immer» ins Protokoll übernehmen"
     ],
     "correct": [
       0,
       1
     ],
     "optionExplanations": [
-      "Eine Bestätigung kann Missverständnisse aufdecken.",
-      "Die Trennung von Beleg und Deutung vermeidet falsche Gewissheit.",
-      "Vorläufige Aussagen müssen geklärt und validiert werden.",
-      "Uneinigkeit muss verstanden, nicht versteckt werden."
+      "Die Folien nennen das Wiederholen von Aussagen ausdrücklich: Es zeigt Verständnis, klärt Missverständnisse und ermuntert zum Weiterreden.",
+      "Die Folien empfehlen, nach dem gefühlten Ende drei Sekunden zu warten. Das gibt Zeit zum Ergänzen.",
+      "Damit geht genau die Ergänzung verloren, die nach einer Pause oft kommt.",
+      "«Normalerweise» signalisiert Ausnahmen. Daraus «immer» zu machen, erfindet eine Regel, die niemand bestätigt hat."
     ],
-    "reference": "Activities - Week 02.pdf, gedruckte Folien 7–8",
+    "reference": "Activities - Week 02.pdf, gedruckte Folie 7",
     "concepts": [
       "Interviewpraxis"
     ],
-    "solution": "Eine Bestätigung kann Missverständnisse aufdecken. Die Trennung von Beleg und Deutung vermeidet falsche Gewissheit.",
+    "solution": "Aussage wiederholen und bestätigen lassen, danach kurz schweigen.",
     "points": 8
   },
   {
     "id": "work-product",
     "topic": "Arbeitsprodukte",
-    "prompt": "Wähle ZWEI Arbeitsprodukte.",
+    "prompt": "Welche ZWEI Aussagen über Arbeitsprodukte entsprechen der Vorlesung?",
     "type": "multi",
     "options": [
-      "Ein gespeichertes Interviewprotokoll",
-      "Ein gepflegtes Kontextdiagramm",
-      "Das nicht festgehaltene Zuhören",
-      "Ein Bedürfnis, das noch niemand festgehalten hat"
+      "Ein Arbeitsprodukt kann andere Arbeitsprodukte enthalten",
+      "Ein RE-Arbeitsprodukt kann von einem einzigen Satz bis zu einer Spezifikation von hunderten Seiten reichen",
+      "Eine mündlich vereinbarte Annahme ist ein Arbeitsprodukt, sobald sich alle einig sind",
+      "«Artefakt» bezeichnet im Unterschied zum Arbeitsprodukt nur das Endergebnis"
     ],
     "correct": [
       0,
       1
     ],
     "optionExplanations": [
-      "Es ist ein festgehaltenes Zwischenergebnis.",
-      "Es ist ein festgehaltenes Ergebnis, das sich weiterentwickeln kann.",
-      "Eine Tätigkeit ist selbst kein festgehaltenes Ergebnis.",
-      "Eine Anforderung kann ohne Arbeitsprodukt existieren."
+      "Steht wörtlich auf der Folie: «A work product may contain other work products.»",
+      "Steht ebenfalls wörtlich auf der Folie, von einem Satz oder Diagramm bis zu hunderten Seiten.",
+      "Entscheidend ist das Festhalten. Eine nur mündliche Einigung ist kein Arbeitsprodukt.",
+      "Die Folie sagt: «Artifact is a synonym for work product.» Es gibt keinen solchen Unterschied."
     ],
-    "reference": "CPRE FL Handbuch v1.2.0, Abschnitt 3.1.1 (Glinz et al., © IREB)",
+    "reference": "Activities - Week 02.pdf, gedruckte Folien 11–12; Activities - Week 03.pdf, Folie 3",
     "concepts": [
       "Arbeitsprodukte"
     ],
-    "solution": "Es ist ein festgehaltenes Zwischenergebnis. Es ist ein festgehaltenes Ergebnis, das sich weiterentwickeln kann.",
+    "solution": "Ein Arbeitsprodukt kann andere enthalten, und die Spanne reicht von einem Satz bis zu hunderten Seiten.",
     "points": 8
   },
   {
     "id": "interview-order",
     "type": "order",
     "topic": "Interviewpraxis",
-    "prompt": "Bringe diesen konkreten Interviewablauf in die richtige Reihenfolge.",
+    "prompt": "Bringe den Ablauf aus dem Wochenauftrag in die richtige Reihenfolge. Achtung: Zwei Schritte werden in der Praxis gern vertauscht.",
     "items": [
-      "Den Antrag analysieren und Unsicherheiten bestimmen",
-      "Neutrale Fragen vorbereiten und Rollen im Team verteilen",
-      "Das Interview führen und konkrete Beispiele klären",
-      "Ergebnisse und offene Punkte bestätigen und festhalten"
+      "Projektantrag lesen und analysieren",
+      "Untergruppen bilden, zum Beispiel Backend, Frontend, nichtfunktionale Anforderungen",
+      "Wissenslücken je Untergruppe bestimmen",
+      "Fragen aus allen Untergruppen sammeln und gemeinsam abstimmen",
+      "Rollen verteilen: Leitung, Protokoll je Untergruppe, Beobachtung",
+      "Interview führen, nachfragen und Aussagen bestätigen lassen",
+      "Ergebnisse und offene Punkte in den Anhang des Berichts übernehmen"
     ],
     "correct": [
       0,
       1,
       2,
-      3
+      3,
+      4,
+      5,
+      6
     ],
     "initial": [
-      2,
-      0,
       3,
-      1
+      0,
+      5,
+      2,
+      6,
+      1,
+      4
     ],
-    "solution": "Auf Basis von Belegen vorbereiten, mit verteilten Rollen durchführen und ein geprüftes Ergebnis festhalten. Die Nachbereitung kann ein weiteres Interview erfordern.",
-    "reference": "Activities - Week 02.pdf, gedruckte Folien 3–8",
+    "solution": "Erst der Antrag, dann Untergruppen, dann Lücken, dann Fragen, dann Rollen, dann das Gespräch, dann die Dokumentation. Die beiden kritischen Schritte sind «Untergruppen bilden» vor «Fragen sammeln» (sonst fragt nur eine Fraktion) und «Rollen verteilen» vor dem Interview (sonst protokolliert niemand).",
+    "reference": "Activities - Week 02.pdf, gedruckte Folie 8",
     "concepts": [
       "Interviewpraxis"
     ],
@@ -467,26 +483,29 @@
     "id": "case-viewpoints",
     "type": "text",
     "topic": "Scope",
-    "prompt": "Eigener Fall: Der «Buchungsservice» eines Kunden umfasst Mitarbeitende, die Streitfälle lösen, aber das Modell eines Entwicklers deckt nur Software ab. Erkläre, warum beide Sichten nützlich sein können und wie man ein Missverständnis beim Scope verhindert.",
-    "solution": "Bewertungsraster für volle Punktzahl: (1) die unterschiedlichen Systemebenen benennen; (2) Menschen und Abläufe ausdrücklich in der erweiterten Servicesicht verorten; (3) vereinbaren, was das Projekt ändern kann und was extern oder fest bleibt; (4) Verantwortung zuweisen und Schnittstellen für die Streitfallbearbeitung festlegen. Halbe Punktzahl: erkennt den Unterschied, ohne Kontrolle und Verantwortung zu erklären. Erkläre nicht einfach eine der beiden Sichten für falsch.",
-    "reference": "CPRE FL Handbuch v1.2.0, Abschnitt 2.2.4, 3.4.2 (Glinz et al., © IREB)",
+    "prompt": "Fall: Für dieselbe Auktionsplattform liegen zwei Kontextdiagramme vor. Im ersten ist Authentifizierung ein internes Lösungsbestandteil, im zweiten ein externes System. Ein Teammitglied sagt, eines der beiden müsse falsch sein. Erkläre (a) warum beide korrekt sein können, (b) welche konkrete Folge die Wahl für die Anforderungsdokumentation hat, und (c) welchen Schritt das Team durchführen muss, bevor es Anforderungen zuordnet.",
+    "solution": "Bewertungsraster für volle Punktzahl: (1) Die beiden Diagramme zeigen Kernsystem und erweitertes System, also verschiedene Systemebenen mit verschiedenen Grenzen, nicht verschiedene Wahrheiten. (2) Folge für die Dokumentation: Im Kernsystem ist Authentifizierung Lösungsbestandteil und erzeugt keine Schnittstellenanforderung, sondern höchstens einen Variationspunkt; im erweiterten System entsteht eine echte Schnittstellenanforderung mit Formaten, Fehlerfällen und Annahmen, und der Scope-Eintrag wechselt von «Kern-System» zu «Kundenspezifisch». (3) Der Schritt davor: die Systemgrenze mit den Stakeholdern ausdrücklich vereinbaren (Klärungsprozess), weil sonst Anforderungen an Systeme vergeben werden, die das Projekt nicht kontrolliert. Halbe Punktzahl: erkennt die zwei Ebenen, erklärt aber die Folge für die Dokumentation oder die nötige Vereinbarung nicht. Null Punkte: erklärt eines der Diagramme für falsch.",
+    "reference": "ASE1-Fallstudie Online-Auktionsplattform, LE03 und LE04 (Musterlösungen); Activities week 4 Tasks.pdf, Aufgaben 3–4",
     "concepts": [
-      "Scope"
+      "Scope",
+      "Kern- und erweitertes System"
     ],
-    "hint": "Antworte auf Deutsch. Bewerte dich nach dem Prüfen mit dem Raster: volle Punktzahl, wenn alle verlangten Elemente enthalten sind; halbe Punktzahl für eine fundierte, aber unvollständige Antwort; null für eine falsche oder unbegründete Antwort.",
+    "hint": "Antworte auf Deutsch. Drei Teile sind verlangt. Bewerte dich nach dem Prüfen mit dem Raster: volle Punktzahl nur mit allen drei Teilen; halbe Punktzahl für eine fundierte, aber unvollständige Antwort; null für eine falsche oder unbegründete Antwort.",
     "points": 10
   },
   {
     "id": "case-assumption",
     "type": "text",
     "topic": "Domänenannahmen",
-    "prompt": "Eigener Fall: Eine Anzeige verspricht den «aktuellen Lieferstatus», aber der externe Transporteur kann veraltete Ereignisse senden. Erkläre die verborgene Annahme, eine Folge ihres Versagens und zwei nächste RE-Schritte.",
-    "solution": "Bewertungsraster für volle Punktzahl: (1) Aktualität und Korrektheit der Transporteurdaten als Annahme erkennen; (2) erklären, dass veraltete Eingaben die angezeigte Aussage irreführend machen können, auch wenn die Software ihre Regel korrekt umsetzt; (3) die Quelle und die Zusicherungen der Schnittstelle untersuchen; (4) vereinbaren, wie veralteter oder unbekannter Status dargestellt wird, und repräsentative Fehlerfälle validieren. Gleichwertige Lösungen zählen. Halbe Punktzahl: plausible Folge, aber schwacher Umgang mit Validierung oder Quelle.",
-    "reference": "CPRE FL Handbuch v1.2.0, Abschnitt 2.2.4 (Glinz et al., © IREB)",
+    "prompt": "Boss-Aufgabe. Die Plattform soll anzeigen: «Ihr Gebot wurde rechtzeitig angenommen.» Technisch vergleicht das System den Eingangszeitpunkt des Gebots mit dem Auktionsende. Ein Käufer in einer anderen Zeitzone reklamiert, sein Gebot sei fälschlich abgelehnt worden. Erkläre (a) mindestens zwei verborgene Domänenannahmen, (b) warum die Software korrekt arbeiten und das Stakeholder-Ziel trotzdem verfehlen kann, (c) welche Quellen du befragst, und (d) wie du mit dem Versagen der Annahmen umgehst.",
+    "solution": "Bewertungsraster für volle Punktzahl: (1) Mindestens zwei Annahmen, zum Beispiel: die Serverzeit ist die verbindliche Zeitquelle und ist korrekt synchronisiert; die Übertragungs- und Verarbeitungsdauer ist gegenüber der Frist vernachlässigbar; der angezeigte Zeitpunkt entspricht dem Zeitpunkt, den der Benutzer als «Absenden» erlebt. (2) Der Zusammenhang Ziel = Systemverhalten + Domänenannahme: Das System kann seine Regel fehlerfrei anwenden und das Ziel «fair und nachvollziehbar bieten» verfehlen, weil die Annahme über die maßgebliche Zeit nicht geteilt wird. (3) Quellen: Betreiber beziehungsweise Betrieb für die Zeitquelle, Support für die Reklamationen, die Zahlungs- bzw. Infrastrukturseite für Latenzen, und die rechtliche oder geschäftliche Vorgabe, welche Zeit gilt; dazu bestehende Logs als Dokumenten- und Systemquelle. (4) Umgang mit dem Versagen: die geltende Zeitquelle ausdrücklich festlegen und dokumentieren, dem Benutzer die maßgebliche Zeit und die Restzeit sichtbar machen, Grenzfälle definieren (Gebot in der letzten Sekunde, Verbindungsabbruch), ein nachvollziehbares Protokoll für Streitfälle aufbewahren, und die Annahme als Annahme mit Verantwortlichem festhalten. Volle Punktzahl setzt voraus, dass keine Zahl oder Regel erfunden und als vereinbart dargestellt wird. Halbe Punktzahl: nennt Annahmen und eine Folge, bleibt aber bei Quellen oder Fehlerbehandlung vage. Null Punkte: behandelt es als reinen Programmierfehler.",
+    "reference": "CPRE FL Handbuch v1.2.0, Abschnitt 2.2.4 (Glinz et al., © IREB); Activities - Week 02.pdf, gedruckte Folien 13–14",
     "concepts": [
-      "Domänenannahmen"
+      "Domänenannahmen",
+      "Kontext und Grenzen",
+      "Validierung"
     ],
-    "hint": "Antworte auf Deutsch. Bewerte dich nach dem Prüfen mit dem Raster: volle Punktzahl, wenn alle verlangten Elemente enthalten sind; halbe Punktzahl für eine fundierte, aber unvollständige Antwort; null für eine falsche oder unbegründete Antwort.",
+    "hint": "Antworte auf Deutsch. Vier Teile sind verlangt. Diese Aufgabe gibt die meisten Punkte. Bewerte dich nach dem Prüfen mit dem Raster: volle Punktzahl nur mit allen vier Teilen und ohne erfundene Vereinbarungen; halbe Punktzahl für eine fundierte, aber unvollständige Antwort; null für eine falsche oder unbegründete Antwort.",
     "points": 12
   }
 ];

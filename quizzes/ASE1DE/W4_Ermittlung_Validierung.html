@@ -190,67 +190,68 @@
   {
     "id": "source",
     "topic": "Anforderungsquellen",
-    "prompt": "Was ist eine Anforderungsquelle und keine Ermittlungstechnik?",
+    "prompt": "Welche der folgenden Angaben ist nach der Einteilung der Vorlesung KEINE Anforderungsquelle?",
     "type": "single",
     "options": [
-      "Brainstorming",
-      "Apprenticing",
-      "Ein Betriebshandbuch",
-      "Ein Interview"
+      "Marketinginformationen über potenzielle künftige Benutzer",
+      "Firmenspezifische Vorschriften",
+      "Apprenticing bei einer Domänenexpertin",
+      "Ein Altsystem samt seiner Daten"
     ],
     "correct": 2,
     "optionExplanations": [
-      "Brainstorming ist eine Technik.",
-      "Apprenticing ist eine Technik.",
-      "Ein Dokument kann Belege für Anforderungen liefern.",
-      "Ein Interview ist eine Technik, die auf Quellen angewendet wird."
+      "Steht wörtlich in der Kategorie «Documents» der Vorlesungsfolie.",
+      "Steht ebenfalls in der Kategorie «Documents».",
+      "Apprenticing ist eine Technik, also das Mittel, mit dem man aus einer Quelle ermittelt. Die Quelle wäre die Expertin.",
+      "Steht in der Kategorie «Systems»: existierende und Altsysteme."
     ],
-    "reference": "CPRE FL Handbuch v1.2.0, Abschnitt 4.1–4.2 (Glinz et al., © IREB)",
+    "reference": "Activities - Week 04.pdf, Folien 5–6 und 12",
     "concepts": [
-      "Anforderungsquellen"
+      "Anforderungsquellen",
+      "Quelle und Technik"
     ],
-    "solution": "Ein Dokument kann Belege für Anforderungen liefern.",
+    "solution": "Apprenticing ist eine Technik, keine Quelle.",
     "points": 6
   },
   {
     "id": "kano",
     "topic": "Kano-Modell",
-    "prompt": "Eine Funktion eines Services überrascht und begeistert die Nutzer, aber ihr Fehlen hat bisher keine Beschwerden ausgelöst. Welcher Kano-Faktor passt am besten zu diesen Belegen?",
+    "prompt": "Welche Aussage über einen Dissatisfier beziehungsweise Basisfaktor ist FALSCH?",
     "type": "single",
     "options": [
-      "Basisfaktor",
-      "Begeisterungsfaktor",
-      "Eine dauerhaft irrelevante Funktion",
-      "Per Definition eine Randbedingung"
+      "Fehlt er, würde das Endprodukt abgelehnt",
+      "Ist er gut erfüllt, erzeugt er unerwartete Begeisterung",
+      "Ist er vorhanden, wird er als selbstverständlich hingenommen",
+      "Er ist oft ein unterbewusstes Bedürfnis, das niemand von selbst erwähnt"
     ],
     "correct": 1,
     "optionExplanations": [
-      "Ein fehlender Basisfaktor führt eher zu Unzufriedenheit.",
-      "Unerwarteter positiver Nutzen ohne frühere Unzufriedenheit passt zu einem Begeisterungsfaktor.",
-      "Die positive Reaktion zeigt möglichen Nutzen.",
-      "Die Kano-Kategorien der Zufriedenheit bestimmen nicht die Anforderungsart."
+      "Richtig. Die Folie beschreibt Dissatisfier als «obvious features or must-haves. If omitted, the final product would be refused.»",
+      "Falsch, und genau das ist gesucht. Unerwartete Begeisterung ist das Kennzeichen des Delighters, nicht des Basisfaktors.",
+      "Richtig. Erfüllte Basisfaktoren werden nicht bemerkt.",
+      "Richtig. Die Folie nennt Basisfaktoren «subconscious requirements»."
     ],
-    "reference": "CPRE FL Handbuch v1.2.0, Abschnitt 4.2.1 (Glinz et al., © IREB)",
+    "reference": "Activities - Week 04.pdf, Folie 16",
     "concepts": [
       "Kano-Modell"
     ],
-    "solution": "Unerwarteter positiver Nutzen ohne frühere Unzufriedenheit passt zu einem Begeisterungsfaktor.",
+    "solution": "Begeisterung bei guter Erfüllung gehört zum Delighter, nicht zum Basisfaktor.",
     "points": 6
   },
   {
     "id": "elaboration-k",
     "type": "categorize",
     "topic": "Ermittlung und Validierung",
-    "prompt": "Übung im K-Format: Beurteile jede Aussage.",
+    "prompt": "Übung im K-Format: wahr oder falsch? Achte auf die Abbruch- und Zuständigkeitsregeln.",
     "options": [
       "Wahr",
       "Falsch"
     ],
     "statements": [
-      "Eine relevante Quelle kann während der Validierung entdeckt werden.",
-      "Kano-Kategorien sind unveränderliche Eigenschaften von Funktionen.",
-      "Das Ableiten von Beispiel-Testfällen kann fehlende Anforderungen aufdecken.",
-      "Die beste Ermittlungstechnik ist unabhängig vom Zugang zu den Stakeholdern."
+      "Die Stakeholdersuche nach dem Schneeballprinzip endet bei der irrelevanten Umgebung.",
+      "Ein Stakeholder mit geringem Einfluss darf aus der Ermittlung ausgeschlossen werden.",
+      "Beim Walkthrough führt der Autor durch das Arbeitsprodukt, bei der Inspektion arbeiten vorbereitete Gutachter mit festen Rollen.",
+      "Eine unterschriebene Freigabe ist ein ausreichender Nachweis dafür, dass die Anforderungen korrekt sind."
     ],
     "correct": [
       0,
@@ -259,207 +260,218 @@
       1
     ],
     "explanations": [
-      "Die Ausarbeitung ist iterativ, und Entdeckungen können frühere Tätigkeiten wieder öffnen.",
-      "Erwartungen unterscheiden sich zwischen Gruppen und entwickeln sich weiter.",
-      "Beispielentwicklung kann Mehrdeutigkeiten vor der Ausführung aufdecken.",
-      "Zugang und Kontext beeinflussen, welche Technik geeignet ist."
+      "Wahr. Die Folie sagt wörtlich: «Stop at the irrelevant environment.» Kein fester Zähler.",
+      "Falsch. Einfluss steuert die Pflege des Verhältnisses. Die Musterlösung betont, dass gerade motivierte Stakeholder mit geringem Einfluss früh vor Problemen warnen und Detailwissen liefern.",
+      "Wahr. Das ist der Kernunterschied der beiden Reviewformen.",
+      "Falsch. Eine Freigabe dokumentiert Zustimmung, nicht Korrektheit oder Vollständigkeit."
     ],
-    "reference": "CPRE FL Handbuch v1.2.0, Abschnitt 4, 4.2.1, 4.2.2, 4.4.2 (Glinz et al., © IREB)",
+    "reference": "Activities - Week 04.pdf, Folie 7; ASE1-Fallstudie, LE03 Stakeholder (Musterlösung); CPRE FL Handbuch v1.2.0, Abschnitt 4.4 (Glinz et al., © IREB)",
     "concepts": [
-      "Ermittlung und Validierung"
+      "Ermittlung und Validierung",
+      "Stakeholdermanagement"
     ],
-    "solution": "Die Ausarbeitung ist iterativ, und Entdeckungen können frühere Tätigkeiten wieder öffnen. Erwartungen unterscheiden sich zwischen Gruppen und entwickeln sich weiter. Beispielentwicklung kann Mehrdeutigkeiten vor der Ausführung aufdecken. Zugang und Kontext beeinflussen, welche Technik geeignet ist.",
+    "solution": "Wahr, falsch, wahr, falsch.",
     "points": 8
   },
   {
     "id": "methods",
     "topic": "Ermittlungstechniken",
-    "prompt": "Wähle ZWEI geeignete Wege, implizite Umgehungslösungen in einem bestehenden Service zu erkunden.",
+    "prompt": "Beobachtung zeigt: Verkäufer erfassen Restposten zuerst in einer eigenen Excel-Tabelle und übertragen sie erst danach ins System. Welche ZWEI nächsten Schritte sind fachlich richtig?",
     "type": "multi",
     "options": [
-      "Nutzer bei ihrer Arbeit beobachten",
-      "Die Aufgabe lernen, indem man unter Anleitung einer erfahrenen Nutzerin mitarbeitet",
-      "Nur fragen, ob den Nutzern eine vorgeschlagene Farbpalette gefällt",
-      "Annehmen, dass keine schriftliche Beschwerde kein Bedürfnis bedeutet"
+      "Nachfragen, warum sie so vorgehen, weil Beobachtung das Verhalten zeigt und nicht den Grund",
+      "Die Excel-Tabelle als Dokumentenquelle analysieren, um die benötigten Felder und Regeln zu finden",
+      "Das Zwischenschritt-Verhalten im neuen System nachbauen, weil es offensichtlich gebraucht wird",
+      "Einen Fragebogen an alle Käufer senden, um das Vorgehen zu bestätigen"
     ],
     "correct": [
       0,
       1
     ],
     "optionExplanations": [
-      "Feldbeobachtung kann unausgesprochene Routinen aufdecken.",
-      "Apprenticing zeigt Domänenwissen durch Mitarbeit.",
-      "Diese enge Frage untersucht keine Umgehungslösungen.",
-      "Basisbedürfnisse werden womöglich nicht von selbst geäussert."
+      "Beobachtung liefert das Was, Befragung das Warum. Ohne Grund kannst du nicht entscheiden, ob es ein Bedürfnis oder eine Umgehung eines Mangels ist.",
+      "Die Tabelle ist eine vorhandene Quelle und verrät, welche Informationen tatsächlich gebraucht werden.",
+      "Eine Umgehungslösung ist kein Bedürfnis. Vielleicht ist sie der Workaround für einen Mangel, der im neuen System gar nicht mehr existiert.",
+      "Käufer sind für diesen Arbeitsablauf nicht die relevante Quelle; der Ablauf betrifft Verkäufer."
     ],
-    "reference": "CPRE FL Handbuch v1.2.0, Abschnitt 4.2.1–4.2.2 (Glinz et al., © IREB)",
+    "reference": "CPRE FL Handbuch v1.2.0, Abschnitt 4.2.2 (Glinz et al., © IREB); Activities - Week 04.pdf, Folien 5–6",
     "concepts": [
-      "Ermittlungstechniken"
+      "Ermittlungstechniken",
+      "Quelle und Technik"
     ],
-    "solution": "Feldbeobachtung kann unausgesprochene Routinen aufdecken. Apprenticing zeigt Domänenwissen durch Mitarbeit.",
+    "solution": "Nach dem Grund fragen und die vorhandene Tabelle als Dokumentenquelle analysieren.",
     "points": 8
   },
   {
     "id": "conflict-type",
     "topic": "Konfliktanalyse",
-    "prompt": "Zwei Serviceteams lehnen wegen einer Vorgeschichte des Misstrauens wiederholt die Anforderungen des anderen ab, obwohl sie sich über die Fakten einig sind. Welche Ursache sollte untersucht werden?",
+    "prompt": "Zwei Planer streiten über die erwartete Zahl der Auktionen pro Tag. Nachdem eine gemeinsame, bessere Datenquelle vorgeschlagen wird, lehnt eine Seite diese ab. Was schliesst du daraus?",
     "type": "single",
     "options": [
-      "Nur ein Syntaxfehler",
-      "Beziehungskonflikt",
-      "Zwingend kein Konflikt",
-      "Ein garantierter Datenkonflikt"
+      "Es bleibt ein reiner Datenkonflikt, nur mit schwieriger Datenlage",
+      "Hinter dem Datenkonflikt steckt wahrscheinlich ein Interessenkonflikt, weil nicht die Zahl, sondern ihre Folge das Problem ist",
+      "Es ist ein Wertekonflikt, weil es um Grundüberzeugungen geht",
+      "Es ist ein Strukturkonflikt, weil zwei Teams beteiligt sind"
     ],
     "correct": 1,
     "optionExplanations": [
-      "Eine andere Formulierung behebt die Ursache womöglich nicht.",
-      "Vergangenes Misstrauen und persönliche Spannungen passen zu einem Beziehungskonflikt.",
-      "Die Ablehnung behindert trotzdem die Einigung.",
-      "Laut Fall sind sie sich über die Fakten einig; Daten sind nicht die genannte Hauptursache."
+      "Bei einem reinen Datenkonflikt würden beide Seiten eine bessere gemeinsame Datenquelle akzeptieren. Genau das passiert nicht.",
+      "Die Ablehnung der besseren Datenquelle ist das Signal: Die Folge der Zahl bedroht ein Ziel dieser Seite.",
+      "Ein Wertekonflikt betrifft Grundüberzeugungen, zum Beispiel Fairness. Hier geht es um Zielerreichung.",
+      "Ein Strukturkonflikt entsteht durch knappe gemeinsame Ressourcen oder Machtgefälle, nicht durch die Zahl der Beteiligten."
     ],
-    "reference": "CPRE FL Handbuch v1.2.0, Abschnitt 4.3.2 (Glinz et al., © IREB)",
+    "reference": "CPRE FL Handbuch v1.2.0, Abschnitt 4.3.1 (Glinz et al., © IREB)",
     "concepts": [
       "Konfliktanalyse"
     ],
-    "solution": "Vergangenes Misstrauen und persönliche Spannungen passen zu einem Beziehungskonflikt.",
+    "solution": "Die Ablehnung der besseren Datenquelle deutet auf einen Interessenkonflikt hinter dem Datenkonflikt.",
     "points": 8
   },
   {
     "id": "resolution",
     "topic": "Konfliktlösung",
-    "prompt": "Wähle ZWEI berechtigte Vorbehalte, wenn Varianten gewählt werden, um unterschiedliche Bedürfnisse zu lösen.",
+    "prompt": "In der Fallstudie stehen Z5 (einfache Einbettung in die IT-Landschaft des Grosshändlers) und Z6 (Vermarktung als Produkt an andere Kunden) im Konflikt. Welche ZWEI Aussagen zur dokumentierten Lösung sind korrekt?",
     "type": "multi",
     "options": [
-      "Varianten können unterschiedliche Kontexte unterstützen",
-      "Varianten erhöhen die Komplexität von Konfiguration und Validierung",
-      "Varianten beseitigen immer jeden Konflikt ohne Kosten",
-      "Varianten bedeuten, dass keine vereinbarten Regeln nötig sind"
+      "Der Lösungsansatz entspricht Varianten: Variationspunkte werden im Produkt ausdrücklich vorgesehen",
+      "Abweichungen von den Variationspunkten werden mit dem Kunden besprochen und separat entwickelt beziehungsweise verrechnet",
+      "Der Konflikt wird durch Abstimmung unter den Stakeholdern entschieden",
+      "Der Konflikt wird gelöst, indem Z6 gestrichen wird"
     ],
     "correct": [
       0,
       1
     ],
     "optionExplanations": [
-      "Unterschiedliche Konfigurationen können unterschiedliche Bedürfnisse erfüllen.",
-      "Mehr Optionen erzeugen zusätzliche Anforderungen und Testverantwortung.",
-      "Es gibt Kosten und möglicherweise verbleibende Konflikte.",
-      "Für jede unterstützte Variante braucht es weiterhin Regeln."
+      "Genau das schlägt die Musterlösung vor, und es ist der Ansatz «Varianten»: unterschiedliche Bedürfnisse unterschiedlich erfüllen.",
+      "Steht wörtlich in der Musterlösung und hält gleichzeitig die kommerzielle Folge fest.",
+      "Eine Abstimmung ist in der Musterlösung nicht vorgesehen und würde eine Seite überstimmen, obwohl beide Ziele berechtigt sind.",
+      "Beide Ziele sind von unterschiedlichen Stakeholdern getragen. Streichen wäre eine Entscheidung durch Befugte, nicht die dokumentierte Lösung."
     ],
-    "reference": "CPRE FL Handbuch v1.2.0, Abschnitt 4.3.3 (Glinz et al., © IREB)",
+    "reference": "ASE1-Fallstudie Online-Auktionsplattform, LE03 Stakeholder und ihre Ziele (Musterlösung), Zielkonflikt Z5 gegen Z6",
     "concepts": [
-      "Konfliktlösung"
+      "Konfliktlösung",
+      "Varianten"
     ],
-    "solution": "Unterschiedliche Konfigurationen können unterschiedliche Bedürfnisse erfüllen. Mehr Optionen erzeugen zusätzliche Anforderungen und Testverantwortung.",
+    "solution": "Varianten über Variationspunkte, und Abweichungen davon separat besprechen und verrechnen.",
     "points": 8
   },
   {
     "id": "validation-technique",
     "topic": "Validierungstechniken",
-    "prompt": "Ein Gutachter versucht, einen Test zu entwerfen, und stellt fest, dass die Anforderung nicht definiert, was Erfolg ist. Welche Technikfamilie wird hier veranschaulicht?",
+    "prompt": "Es existiert noch keine Software. Beim Versuch, einen Abnahmetest für die Anforderung «Die Plattform muss ausfallsicher sein» zu schreiben, stellt sich heraus, dass weder Ausfallart noch zulässige Dauer definiert sind. Welche Technikfamilie hat den Mangel aufgedeckt?",
     "type": "single",
     "options": [
-      "Beispielentwicklung",
-      "Betatest eines ausgelieferten Releases",
-      "A/B-Test",
-      "Abstimmung über Stakeholder-Prioritäten"
+      "Beispielentwicklung (sample development), statisch",
+      "Exploration durch Prototyp, dynamisch",
+      "Exploration durch Betatest, dynamisch",
+      "Review durch Walkthrough, statisch"
     ],
     "correct": 0,
     "optionExplanations": [
-      "Der Mangel wird durch das Ableiten eines nachgelagerten Arbeitsprodukts aufgedeckt.",
-      "Es wird weder ausgelieferte Software noch ein Versuch mit echten Nutzern beschrieben.",
-      "Es wird kein Vergleich laufender Varianten beschrieben.",
-      "Das Problem ist die Qualität der Spezifikation, keine Abstimmung."
+      "Die Spezifikation wird geprüft, indem man versucht, ein nachgelagertes Arbeitsprodukt daraus abzuleiten, hier einen Testfall. Das geht ohne laufendes System.",
+      "Ein Prototyp lässt Verhalten erleben. Hier wurde kein Verhalten erlebt, sondern ein Testfall geschrieben.",
+      "Ein Betatest braucht ein benutzbares System. Das gibt es noch nicht.",
+      "Beim Walkthrough liest und bespricht man das Dokument. Hier war die aktive Herstellung eines Testfalls das Mittel."
     ],
     "reference": "CPRE FL Handbuch v1.2.0, Abschnitt 4.4.2 (Glinz et al., © IREB)",
     "concepts": [
       "Validierungstechniken"
     ],
-    "solution": "Der Mangel wird durch das Ableiten eines nachgelagerten Arbeitsprodukts aufgedeckt.",
+    "solution": "Beispielentwicklung: Der Versuch, einen Testfall abzuleiten, deckt die fehlenden Angaben auf.",
     "points": 8
   },
   {
     "id": "risk",
     "topic": "Validierungspraktiken",
-    "prompt": "Wähle ZWEI Massnahmen, die geeignet sind, blinde Flecken bei der Validierung riskanter Anforderungen zu verringern.",
+    "prompt": "Ein Prototyp der neuen Gebotsmaske wird von allen Testpersonen gelobt. Gleichzeitig ist unklar, ob die Regel zur Annahme verspäteter Gebote widerspruchsfrei dokumentiert ist. Welche ZWEI Schlüsse sind korrekt?",
     "type": "multi",
     "options": [
-      "Passende unabhängige Expertise einbinden",
-      "Die gesamte zusammenhängende Sammlung aus verschiedenen Perspektiven prüfen",
-      "Den Autor nur die Rechtschreibung prüfen lassen",
-      "Erst nach der Auslieferung validieren, weil frühe Prüfungen unmöglich sind"
+      "Das Lob für den Prototyp sagt nichts über die Widerspruchsfreiheit der Regel aus",
+      "Für die Regel ist eine Inspektion mit vorbereiteten, unabhängigen Gutachtern die passendere Technik",
+      "Da die Benutzer zufrieden sind, kann die Validierung abgeschlossen werden",
+      "Ein zweiter Prototyp mit höherer Darstellungstreue würde den Widerspruch aufdecken"
     ],
     "correct": [
       0,
       1
     ],
     "optionExplanations": [
-      "Unabhängigkeit kann Annahmen aufdecken, die das ursprüngliche Team teilt.",
-      "Prüfungen der ganzen Sammlung und multidisziplinäre Reviews finden unterschiedliche Mängel.",
-      "Eine Rechtschreibprüfung genügt nicht.",
-      "Anforderungen können validiert werden, bevor das System existiert."
+      "Es sind zwei verschiedene Unsicherheiten. Zufriedenheit mit einer Maske belegt keine konsistente Regel.",
+      "Widersprüche findet man durch systematisches Lesen mit unabhängiger Perspektive, nicht durch Erleben.",
+      "Validierung umfasst neben der Einigung auch Qualität und Konsistenz der Sammlung.",
+      "Darstellungstreue betrifft das Aussehen. Ein Widerspruch in der Dokumentation wird dadurch nicht sichtbar."
     ],
-    "reference": "CPRE FL Handbuch v1.2.0, Abschnitt 4.4.1 (Glinz et al., © IREB)",
+    "reference": "CPRE FL Handbuch v1.2.0, Abschnitte 4.4.1 und 4.4.2 (Glinz et al., © IREB); HS26_ASE_UX und UCD.pdf, Folie 33",
     "concepts": [
       "Validierungspraktiken"
     ],
-    "solution": "Unabhängigkeit kann Annahmen aufdecken, die das ursprüngliche Team teilt. Prüfungen der ganzen Sammlung und multidisziplinäre Reviews finden unterschiedliche Mängel.",
+    "solution": "Prototyp-Lob belegt die Konsistenz nicht; dafür ist eine Inspektion die passende Technik.",
     "points": 8
   },
   {
     "id": "ucd",
     "topic": "UX und UCD",
-    "prompt": "Wähle ZWEI zutreffende Aussagen über Usability-Evaluation.",
+    "prompt": "Ein Benutzer gibt im Usability-Test das richtige Gebot ab, braucht aber doppelt so lange wie erwartet und kommentiert, das Formular sei «anstrengend». Welche ZWEI Zuordnungen nach ISO 9241-11 sind korrekt?",
     "type": "multi",
     "options": [
-      "Erfolgreich gelöste Aufgaben können Belege für Effektivität liefern",
-      "Zeit und Aufwand im Verhältnis zum Aufgabenerfolg können Belege für Effizienz liefern",
-      "Ein schönes Mock-up beweist den Durchsatz im Produktivbetrieb",
-      "Ein Expertenreview und ein Test mit repräsentativen Nutzern liefern identische Belege"
+      "Die Effektivität ist erfüllt, weil das Ziel genau und vollständig erreicht wurde",
+      "Die Effizienz ist schlecht, weil der Aufwand im Verhältnis zum Ergebnis hoch ist",
+      "Die Effektivität ist verfehlt, weil es zu lange gedauert hat",
+      "Die Aussage «anstrengend» betrifft die Darstellungstreue des Prototyps"
     ],
     "correct": [
       0,
       1
     ],
     "optionExplanations": [
-      "Effektivität betrifft Genauigkeit und Vollständigkeit beim Erreichen von Zielen.",
-      "Effizienz setzt erreichte Ergebnisse ins Verhältnis zu den eingesetzten Ressourcen.",
-      "Ein UI-Mock-up kann keine Backend-Kapazität nachweisen.",
-      "Wer evaluiert und mit welcher Methode, ist verschieden, also sind es auch die Belege."
+      "Effektivität ist die Genauigkeit und Vollständigkeit der Zielerreichung. Beides war gegeben.",
+      "Effizienz ist der im Verhältnis zur Genauigkeit und Vollständigkeit eingesetzte Aufwand.",
+      "Dauer gehört zur Effizienz. Effektivität fragt nur, ob das Ziel korrekt und vollständig erreicht wurde.",
+      "Darstellungstreue ist eine Dimension des Prototyps. «Anstrengend» betrifft die Zufriedenheit, also Freiheit von Beeinträchtigungen."
     ],
-    "reference": "HS26_ASE_UX und UCD.pdf, Folien 7–9, 32–42",
+    "reference": "HS26_ASE_UX und UCD.pdf, Folien 7–9 und 33",
     "concepts": [
-      "UX und UCD"
+      "UX und UCD",
+      "Usability-Dimensionen"
     ],
-    "solution": "Effektivität betrifft Genauigkeit und Vollständigkeit beim Erreichen von Zielen. Effizienz setzt erreichte Ergebnisse ins Verhältnis zu den eingesetzten Ressourcen.",
+    "solution": "Effektivität erfüllt, Effizienz schlecht. Der Kommentar betrifft die Zufriedenheit.",
     "points": 8
   },
   {
     "id": "conflict-process",
     "type": "order",
     "topic": "Konfliktlösung",
-    "prompt": "Bringe die Tätigkeiten der Konfliktlösung in die richtige Reihenfolge.",
+    "prompt": "Ein Zielkonflikt wird gemeldet. Bringe das Vorgehen in die richtige Reihenfolge. Achtung: Ein Schritt muss vor dem Anwenden der Lösung passieren, der gern vergessen wird.",
     "items": [
-      "Den Konflikt identifizieren",
-      "Ursachen, Positionen und betroffene Anforderungen analysieren",
-      "Eine geeignete Lösungstechnik vereinbaren und anwenden",
-      "Entscheidung und Begründung dokumentieren und kommunizieren"
+      "Konflikt identifizieren und die betroffenen Anforderungen benennen",
+      "Ursachen, Positionen und Konfliktart analysieren",
+      "Entscheidungsverfahren mit den Beteiligten vereinbaren",
+      "Vereinbarten Lösungsansatz anwenden",
+      "Alternativen, Annahmen, Begründung und Beteiligte dokumentieren",
+      "Betroffene Anforderungen anpassen und erneut validieren"
     ],
     "correct": [
       0,
       1,
       2,
-      3
+      3,
+      4,
+      5
     ],
     "initial": [
-      2,
+      4,
+      1,
+      5,
       0,
       3,
-      1
+      2
     ],
-    "solution": "Die Analyse sollte die Wahl der Technik bestimmen. Das Festhalten des Ergebnisses bewahrt Annahmen, Alternativen und Begründung für die spätere Arbeit.",
-    "reference": "CPRE FL Handbuch v1.2.0, Abschnitt 4.3.1 (Glinz et al., © IREB)",
+    "solution": "Identifizieren, analysieren, Verfahren vereinbaren, anwenden, dokumentieren, erneut validieren. Der vergessene Schritt ist das Vereinbaren des Entscheidungsverfahrens: Wer die Regeln erst nach dem Ergebnis diskutiert, erzeugt einen neuen Konflikt. Und weil sich Anforderungen geändert haben, ist eine erneute Validierung fällig.",
+    "reference": "CPRE FL Handbuch v1.2.0, Abschnitte 4.3.1, 4.3.3 und 4.4.1 (Glinz et al., © IREB)",
     "concepts": [
-      "Konfliktlösung"
+      "Konfliktlösung",
+      "Validierung"
     ],
     "points": 10
   },
@@ -467,26 +479,30 @@
     "id": "case-combination",
     "type": "text",
     "topic": "Wahl der Technik",
-    "prompt": "Eigener Fall: Betreiber kennen einen alten Service gut, können aber Ausnahmen kaum erklären. Neue Nutzer brauchen einen einfacheren Ablauf. Schlage drei sich ergänzende Ermittlungstechniken vor und nenne, welche Unsicherheit jede behandelt.",
-    "solution": "Bewertungsraster für volle Punktzahl: (1) Beobachtung oder Apprenticing für implizite Routinen der Betreiber; (2) Systemarchäologie oder Feedbackanalyse für bestehende Ausnahmen und bestehendes Verhalten; (3) einen Prototyp, ein Szenario oder einen Kreativworkshop mit neuen Nutzern, um Alternativen zu erkunden; (4) erklären, dass gefundene Regeln und neue Ideen trotzdem auf Relevanz validiert werden müssen. Gleichwertige, begründete Kombinationen zählen. Halbe Punktzahl: nennt nützliche Techniken, verbindet sie aber kaum mit der Unsicherheit.",
-    "reference": "CPRE FL Handbuch v1.2.0, Abschnitt 4.2.2–4.2.3 (Glinz et al., © IREB)",
+    "prompt": "Fall: Eine Umfrage unter Käufern meldet 88 Prozent Zufriedenheit. Gleichzeitig warnt der Betreiber, dass bei Ausfällen Gebotsereignisse verloren gehen. Das Team will die Ermittlung abschliessen. Erkläre (a) drei unabhängige Gründe, warum das verfrüht ist, (b) welche Quellenkategorien hier je betroffen sind, und (c) welche zwei Techniken du als Nächstes einsetzt und wofür jede.",
+    "solution": "Bewertungsraster für volle Punktzahl: (1) Drei Gründe, zum Beispiel: Stichprobe und Formulierung begrenzen eine Umfrage, es antwortet nur, wer teilnimmt, und gefragt wird nur, was im Fragebogen steht; der Betreiber spricht über ein anderes Anliegen, nämlich Datenverlust, nicht über Zufriedenheit; Verlustfreiheit ist ein Basisfaktor, der bei Erfüllung keine Zufriedenheit erzeugt und deshalb von einer Zufriedenheitsumfrage gar nicht gemessen werden kann. (2) Quellenkategorien: Käufer und Betreiber sind Stakeholder, Tickets, Protokolle und Betriebsdokumentation sind Dokumente, das bestehende System mit seinen Logs und Daten ist eine Systemquelle. (3) Zwei Techniken mit Zweck, zum Beispiel: Interview mit dem Betreiber und dem Support, um Ausfallarten, Häufigkeit und bisherige Behandlung zu verstehen (Grund und Kontext); Systemarchäologie beziehungsweise Analyse vorhandener Logs und Tickets, um die tatsächliche Verlustrate und die betroffenen Ereignisse zu belegen (harte Belege statt Meinungen). Gleichwertige, begründete Techniken zählen, zum Beispiel Feldbeobachtung oder Feedbackanalyse. Halbe Punktzahl: nennt die Grenzen der Umfrage, bleibt aber bei Quellenkategorien oder der Begründung der Techniken vage. Null Punkte: akzeptiert den Abschluss der Ermittlung.",
+    "reference": "Activities - Week 04.pdf, Folien 5–6, 13–16; CPRE FL Handbuch v1.2.0, Abschnitte 4.1 und 4.2 (Glinz et al., © IREB)",
     "concepts": [
-      "Wahl der Technik"
+      "Wahl der Technik",
+      "Anforderungsquellen",
+      "Kano-Modell"
     ],
-    "hint": "Antworte auf Deutsch. Bewerte dich nach dem Prüfen mit dem Raster: volle Punktzahl, wenn alle verlangten Elemente enthalten sind; halbe Punktzahl für eine fundierte, aber unvollständige Antwort; null für eine falsche oder unbegründete Antwort.",
+    "hint": "Antworte auf Deutsch. Drei Teile sind verlangt. Bewerte dich nach dem Prüfen mit dem Raster: volle Punktzahl nur mit allen drei Teilen; halbe Punktzahl für eine fundierte, aber unvollständige Antwort; null für eine falsche oder unbegründete Antwort.",
     "points": 10
   },
   {
     "id": "case-validation",
     "type": "text",
     "topic": "Validierung und UCD",
-    "prompt": "Eigener Fall: Nutzer schliessen eine Buchung ab, übersehen aber wiederholt den Endpreis. Der Prototyp erhält hohe Zufriedenheitswerte, und das Team will alle Anforderungen genehmigen. Erkläre, warum dieser Schluss zu weit geht, und schlage einen nächsten Zyklus vor.",
-    "solution": "Bewertungsraster für volle Punktzahl: (1) positive Einstellungen von erfolgreicher, informierter Aufgabenerledigung unterscheiden; (2) ein unklares oder unerfülltes Informationsbedürfnis erkennen; (3) die Anforderungen mit repräsentativen Nutzern und Stakeholdern klären und den Designkandidaten überarbeiten; (4) realistische Aufgaben erneut evaluieren und verwandte Anforderungen und Annahmen prüfen. Halbe Punktzahl: bemerkt ein Usability-Problem, lässt aber die Validierung der Anforderungen oder die Iteration weg. Behaupte nicht, die Studie beweise, dass jeder Nutzer scheitern wird.",
-    "reference": "HS26_ASE_UX und UCD.pdf, Folien 7–15, 40–44; CPRE FL Handbuch v1.2.0, Abschnitt 4.4 (Glinz et al., © IREB)",
+    "prompt": "Boss-Aufgabe. Lage: Der Verkäufer fordert eine automatische Verlängerung bei Geboten in der letzten Minute. Der Käufer will einen vorhersehbaren Auktionsschluss. Der Support meldet verwirrende Statusmeldungen. Ein Prototyp zeigt, dass Benutzer dasselbe Gebot zwei- bis dreimal absenden. Beschreibe einen vollständigen nächsten RE-Zyklus: (a) Quellen und ob jemand fehlt, (b) was die Mehrfachabsendung wirklich bedeutet und wie du es klärst, (c) Konfliktart und begründete Wahl des Lösungsansatzes, (d) welche Arbeitsprodukte du aktualisierst, und (e) mit welchen zwei Validierungstechniken du prüfst und warum.",
+    "solution": "Bewertungsraster für volle Punktzahl: (1) Quellen: Verkäufer, Käufer und Support sind benannte Stakeholder; über das Zwiebelmodell ist zu prüfen, wer fehlt, zum Beispiel der Betrieb als Quelle für die maßgebliche Zeit und die Zahlungsorganisation für Fehlerfälle; das Abbruchkriterium der Suche ist die irrelevante Umgebung. (2) Die Mehrfachabsendung ist eine Beobachtung, kein Bedürfnis. Plausibel ist eine fehlende oder zu späte Rückmeldung nach dem Absenden, also ein nicht erfüllter Basisfaktor. Geklärt wird das durch Nachfragen bei den Testpersonen (warum, nicht was) und durch Auswertung der Logs auf doppelte Gebote. Es darf kein Mechanismus gebaut werden, bevor der Grund bekannt ist. (3) Verlängerung gegen vorhersehbaren Schluss ist ein Sachkonflikt, weil beide Seiten tatsächlich verschiedene Bedürfnisse in verschiedenen Rollen haben. Ein Kompromiss in der Mitte trifft keine Seite; sinnvoll sind Varianten (zum Beispiel Auktionstyp mit und ohne Verlängerung) oder eine ausdrücklich vereinbarte, transparent angezeigte Regel. Zuerst ist das Entscheidungsverfahren zu vereinbaren, danach werden Alternativen, Annahmen, Begründung und Beteiligte dokumentiert. (4) Aktualisiert werden: die Anforderungen in natürlicher Sprache mit Satzschablone, das Zustandsmodell der Auktion (Übergang open nach closed mit Bedingung für die Verlängerung), die Use-Case-Beschreibung «Close Auction» einschliesslich Alternativabläufen, das Glossar für Begriffe wie «rechtzeitig» und «Auktionsende», sowie die Liste der Annahmen (maßgebliche Zeitquelle). (5) Zwei Validierungstechniken mit Begründung, zum Beispiel: Beispielentwicklung, also Testfälle für Normalfall, letzte Sekunde und Verbindungsabbruch ableiten, weil sich dabei nicht prüfbare Formulierungen sofort zeigen; und ein Usability-Test mit repräsentativen Benutzern und realistischen Aufgaben, weil die Mehrfachabsendung ein Verhaltensproblem ist, das nur im Tun sichtbar wird. Für die riskante Schlussregel ist zusätzlich eine Inspektion mit unabhängigen Gutachtern begründbar. Volle Punktzahl setzt voraus, dass keine Regel oder Zahl erfunden und als vereinbart dargestellt wird und dass die erneute Validierung nach der Änderung erwähnt ist. Halbe Punktzahl: vier der fünf Teile fundiert, einer fehlt oder bleibt unbegründet. Null Punkte: schlägt direkt eine technische Lösung vor, ohne Quellen, Konfliktart und Validierung zu behandeln.",
+    "reference": "CPRE FL Handbuch v1.2.0, Kapitel 4 (Glinz et al., © IREB); Activities - Week 04.pdf, Folien 7–18; HS26_ASE_UX und UCD.pdf, Folien 40–42",
     "concepts": [
-      "Validierung und UCD"
+      "Validierung und UCD",
+      "Konfliktlösung",
+      "Ermittlungstechniken"
     ],
-    "hint": "Antworte auf Deutsch. Bewerte dich nach dem Prüfen mit dem Raster: volle Punktzahl, wenn alle verlangten Elemente enthalten sind; halbe Punktzahl für eine fundierte, aber unvollständige Antwort; null für eine falsche oder unbegründete Antwort.",
+    "hint": "Antworte auf Deutsch. Fünf Teile sind verlangt. Diese Aufgabe gibt die meisten Punkte und deckt die ganze Woche ab. Bewerte dich nach dem Prüfen mit dem Raster: volle Punktzahl nur mit allen fünf Teilen und ohne erfundene Vereinbarungen; halbe Punktzahl für eine fundierte, aber unvollständige Antwort; null für eine falsche oder unbegründete Antwort.",
     "points": 12
   }
 ];
