@@ -84,11 +84,11 @@ window.QUIZ_CATALOG = {
       "maximumScore": 100
     },
     {
-      id: "cns1-w4-routing-rip-eigrp",
+      id: "cns1-w4-routing-rip-exercise",
       subject: "CNS1",
       week: 4,
-      title: "Routing: RIP und EIGRP – Exercise Quiz",
-      source: "CNS1-exr-04a-rip.pdf, CNS1-exr-04c-eigrp.pdf",
+      title: "Routing/RIP Exersice",
+      source: "CNS1-exr-04a-rip.pdf, CNS1-exr-04c-eigrp (1).pdf",
       path: "quizzes/CNS1/W4_Routing_RIP_EIGRP_Exercise.html",
       maximumScore: 100
     },
