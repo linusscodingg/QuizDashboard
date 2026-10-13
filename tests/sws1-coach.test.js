@@ -11,7 +11,11 @@ vm.runInNewContext(fs.readFileSync(path.join(root, 'lerncoach/content/SWS1.js'),
 assert.deepEqual(L.validateSubject(subject), []);
 assert.equal(subject.weeks.length, 5);
 const progress = L.emptyProgress();
-for (const week of subject.weeks.filter(week => ['w1', 'w4', 'w5'].includes(week.id))) {
+// W5 ist online nur ein Platzhalter (Vollinhalt lokal in QuizDashboard_Private); online bleiben W1-W4 echt.
+const w5 = subject.weeks.find(week => week.id === 'w5');
+assert.equal(w5.status, 'local');
+assert.equal(w5.items, undefined, 'Online-Platzhalter hat keinen Inhalt');
+for (const week of subject.weeks.filter(week => ['w1', 'w4'].includes(week.id))) {
   assert.equal(week.status, 'ready');
   for (const cp of week.items.filter(item => item.type === 'checkpoint')) {
     const answers = {};
@@ -43,5 +47,5 @@ for (const week of subject.weeks.filter(week => ['w1', 'w4', 'w5'].includes(week
   }
   assert.equal(L.weekState(subject, subject.weeks.indexOf(week), progress).status, 'passed');
 }
-assert.equal(L.subjectState(subject, L.normaliseProgress(JSON.parse(JSON.stringify(progress)))).passedWeeks, 3);
-console.log('SWS1 coaches: introduction, authentication/sessions/XSS and access control/CSRF/testing tools, model/alternative/wrong answers, cumulative retry and progress roundtrip passed');
+assert.equal(L.subjectState(subject, L.normaliseProgress(JSON.parse(JSON.stringify(progress)))).passedWeeks, 2);
+console.log('SWS1 online coaches: W1-W4 real (W5 is a local-only placeholder), model/alternative/wrong answers, cumulative retry and progress roundtrip passed');
