@@ -129,6 +129,31 @@ let states = L.subjectState(subject, progress).weeks.map(state => state.status);
 assert.deepEqual(states, ["ready", "locked", "soon", "locked", "ready"]);
 assert.equal(L.subjectState(subject, progress).totalWeeks, 4, "Wochen ohne Inhalte zählen nicht zu Y");
 
+/* ---------- Platzhalter "nur lokal verfügbar" ---------- */
+{
+  const withLocal = {
+    id: "LOC",
+    name: "Mit lokaler Woche",
+    weeks: [
+      { id: "w1", title: "Eins", status: "ready", items: [slide, makeCheckpoint("a")] },
+      { id: "w2", title: "Zwei (nur lokal)", status: "local" },
+      { id: "w3", title: "Drei", status: "locked", items: [makeCheckpoint("b")] }
+    ]
+  };
+  assert.deepEqual(L.validateSubject(withLocal), []);
+  const empty = L.emptyProgress();
+  assert.deepEqual(L.subjectState(withLocal, empty).weeks.map(state => state.status), ["ready", "local", "locked"]);
+  const localState = L.subjectState(withLocal, empty);
+  assert.equal(localState.totalWeeks, 2, "Platzhalter zählen nicht zu den Wochen mit Inhalt");
+  assert.equal(localState.localWeeks, 1);
+  assert.equal(localState.soonWeeks, 0);
+  L.markCheckpointPassed(empty, "LOC", "w1", "a");
+  assert.equal(L.weekState(withLocal, 2, empty).status, "ready", "Platzhalter blockiert die Freischaltung nicht");
+  assert.equal(L.weekState(withLocal, 2, empty).previousWeek.id, "w1");
+  const withItems = { ...withLocal, weeks: [{ id: "w1", title: "X", status: "local", items: [slide] }] };
+  assert.match(L.validateSubject(withItems).join(), /Platzhalter/);
+}
+
 assert.equal(L.maxReachableIndex(subject.weeks[0], id => L.isCheckpointPassed(progress, "TEST", "w1", id)), 1);
 assert.equal(L.markCheckpointPassed(progress, "TEST", "w1", "a", new Date("2026-09-01T10:00:00Z")), true);
 assert.equal(L.markCheckpointPassed(progress, "TEST", "w1", "a"), false, "Bestanden bleibt bestanden (keine Doppelzählung)");
@@ -191,7 +216,7 @@ const invalid = {
 const errors = L.validateSubject(invalid).join("\n");
 assert.match(errors, /ohne Inhalte als status "soon"/);
 assert.match(errors, /doppelte id w1/);
-assert.match(errors, /status muss ready, locked oder soon/);
+assert.match(errors, /status muss ready, locked, soon oder local/);
 assert.match(errors, /nicht nur single-Fragen/);
 assert.match(errors, /correct muss eine Liste gültiger Options-Indizes/);
 assert.match(errors, /doppelte Checkpoint-id y/);

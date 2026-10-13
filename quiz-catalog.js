@@ -3,7 +3,6 @@ window.QUIZ_CATALOG = {
   subjects: [
     { id: "ASE1", name: "ASE1 · CPRE", description: "English Requirements Engineering exam preparation", accent: "#4b5bb5" },
     { id: "ASE1DE", name: "ASE1 · CPRE (Deutsch)", description: "Requirements-Engineering-Prüfungsvorbereitung auf Deutsch", accent: "#3f7a5a" },
-    { id: "CNS1", name: "CNS1", description: "Computer Networks and Security", accent: "#0b77a5" },
     { id: "DHEAL", name: "Digital Health", description: "Healthcare data, systems and clinical AI", accent: "#237274" },
     { id: "SWS1", name: "SWS1", description: "Software and System Security 1", accent: "#9a4f24" },
     { id: "ITRECHT", name: "IT-Recht", description: "Rechtliche Grundlagen der Informatik", accent: "#6d4bc3" },
@@ -82,42 +81,6 @@ window.QUIZ_CATALOG = {
       "source": "Activities - Week 04.pdf; CPRE FL Handbuch v1.2.0, Kapitel 4; HS26_ASE_UX und UCD.pdf; ASE1-Fallstudie Online-Auktionsplattform (Musterlösungen LE03–LE07)",
       "path": "quizzes/ASE1DE/W4_Ermittlung_Validierung.html",
       "maximumScore": 100
-    },
-    {
-      id: "cns1-w4-routing-rip-exercise",
-      subject: "CNS1",
-      week: 4,
-      title: "Routing/RIP Exersice",
-      source: "CNS1-exr-04a-rip.pdf, CNS1-exr-04c-eigrp (1).pdf",
-      path: "quizzes/CNS1/W4_Routing_RIP_EIGRP_Exercise.html",
-      maximumScore: 100
-    },
-    {
-      id: "cns1-w5-routing-ospf-isis",
-      subject: "CNS1",
-      week: 5,
-      title: "Routing Part 2: OSPF, OSPFv3, IS-IS",
-      source: "W5_CNS1-sld-05-routing-2.pdf",
-      path: "quizzes/CNS1/W5_Routing_OSPF_ISIS.html",
-      maximumScore: 100
-    },
-    {
-      id: "cns1-w2-ipv6-part2",
-      subject: "CNS1",
-      week: 2,
-      title: "IPv6 – Part 2",
-      source: "W2_CNS1-sld-02-ipv6-2.pdf",
-      path: "quizzes/CNS1/W2_IPv6_Part2.html",
-      maximumScore: 100
-    },
-    {
-      id: "cns1-w1-ipv6-exercise-01a",
-      subject: "CNS1",
-      week: 1,
-      title: "IPv6 – Exercise 01a",
-      source: "CNS1-exr-01a-ipv6 (2).pdf",
-      path: "quizzes/CNS1/W1_IPv6_Exercise_01a.html",
-      maximumScore: 100
     },
     {
       id: "dheal-w1-introduction",

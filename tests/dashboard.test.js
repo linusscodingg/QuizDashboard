@@ -52,7 +52,7 @@ const ids = [
 ];
 const elements = Object.fromEntries(ids.map(id => [id, new FakeElement(id)]));
 const openQuizButton = new FakeElement("openQuiz");
-openQuizButton.dataset.openQuiz = "cns1-w2-ipv6-part2";
+openQuizButton.dataset.openQuiz = "dheal-w2-healthcare-data";
 const storage = new Map();
 const windowListeners = {};
 
@@ -89,18 +89,19 @@ context.window.addEventListener = (type, handler) => { windowListeners[type] = h
 
 vm.runInContext(catalogCode, context, { filename: "quiz-catalog.js" });
 const catalog = context.window.QUIZ_CATALOG;
-assert.equal(catalog.quizzes.length, 29);
+assert.equal(catalog.quizzes.length, 25);
+assert.equal(catalog.quizzes.filter(quiz => quiz.subject === "CNS1").length, 0, "CNS1-Quizzes gibt es nur lokal");
 for (const quiz of catalog.quizzes) {
   assert.ok(fs.existsSync(path.resolve(dashboardDirectory, quiz.path)), `Missing quiz file: ${quiz.path}`);
 }
 
 vm.runInContext(inlineScripts[0], context, { filename: "dashboard-inline.js" });
-assert.equal(elements.completedTotal.textContent, "0 / 29");
+assert.equal(elements.completedTotal.textContent, "0 / 25");
 assert.equal(elements.averageGrade.textContent, "–");
 
 openQuizButton.click();
 assert.equal(elements.player.hidden, false);
-assert.match(elements.quizFrame.src, /quizzes\/CNS1\/W2_IPv6_Part2\.html$/);
+assert.match(elements.quizFrame.src, /quizzes\/DHEAL\/W2_Healthcare_Data\.html$/);
 
 function report(attemptId, score, reviewItems) {
   windowListeners.message({
@@ -109,7 +110,7 @@ function report(attemptId, score, reviewItems) {
       source: "quiz-dashboard",
       version: 1,
       type: "quiz-completed",
-      quizId: "cns1-w2-ipv6-part2",
+      quizId: "dheal-w2-healthcare-data",
       attempt: { attemptId, completedAt: "2026-09-21T12:00:00.000Z", score, maximumScore: 100, ...(reviewItems === undefined ? {} : { reviewItems }) }
     }
   });
@@ -118,7 +119,7 @@ function report(attemptId, score, reviewItems) {
 windowListeners.message({
   source: elements.quizFrame.contentWindow,
   data: {
-    source: "quiz-dashboard", version: 1, type: "quiz-progress", quizId: "cns1-w2-ipv6-part2", manual: true,
+    source: "quiz-dashboard", version: 1, type: "quiz-progress", quizId: "dheal-w2-healthcare-data", manual: true,
     progress: {
       attemptId: "attempt-1", currentTask: 4, completedCount: 3, totalQuestions: 13,
       score: 18, maximumScore: 100, updatedAt: "2026-09-21T11:00:00.000Z",
@@ -132,26 +133,26 @@ windowListeners.message({
   }
 });
 let storedDashboard = JSON.parse(storage.get("quiz-dashboard-v1"));
-assert.equal(storedDashboard.progress["cns1-w2-ipv6-part2"].completedCount, 3);
-assert.deepEqual(storedDashboard.progress["cns1-w2-ipv6-part2"].quizState.answers["icmp-role"], [1, 2]);
+assert.equal(storedDashboard.progress["dheal-w2-healthcare-data"].completedCount, 3);
+assert.deepEqual(storedDashboard.progress["dheal-w2-healthcare-data"].quizState.answers["icmp-role"], [1, 2]);
 assert.match(elements.subjects.innerHTML, /In Bearbeitung/);
 assert.match(elements.subjects.innerHTML, /Quiz fortsetzen/);
 
 windowListeners.message({
   source: elements.quizFrame.contentWindow,
-  data: { source: "quiz-dashboard", version: 1, type: "quiz-ready", quizId: "cns1-w2-ipv6-part2" }
+  data: { source: "quiz-dashboard", version: 1, type: "quiz-ready", quizId: "dheal-w2-healthcare-data" }
 });
 const resumeMessage = elements.quizFrame.contentWindow.postedMessages.at(-1);
 assert.equal(resumeMessage.type, "quiz-resume");
 assert.deepEqual(resumeMessage.progress.quizState.answers["icmp-role"], [1, 2]);
 
 report("attempt-1", 70);
-assert.equal(elements.completedTotal.textContent, "1 / 29");
+assert.equal(elements.completedTotal.textContent, "1 / 25");
 assert.equal(elements.averagePercent.textContent, "70 %");
 assert.equal(elements.averageGrade.textContent, "4.5");
 assert.equal(String(elements.attemptTotal.textContent), "1");
 storedDashboard = JSON.parse(storage.get("quiz-dashboard-v1"));
-assert.equal(storedDashboard.progress["cns1-w2-ipv6-part2"], undefined);
+assert.equal(storedDashboard.progress["dheal-w2-healthcare-data"], undefined);
 
 report("attempt-1", 85);
 assert.equal(String(elements.attemptTotal.textContent), "1", "Same attempt must be updated, not duplicated");

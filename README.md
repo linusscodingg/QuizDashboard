@@ -25,12 +25,13 @@ QuizDashboard/
 │   ├── lerncoach.css
 │   └── content/
 ├── quizzes/
-│   ├── CNS1/
 │   ├── DHEAL/
 │   ├── ITRECHT/
 │   └── SWS1/
 └── tests/
 ```
+
+Hauptversion ist die lokale Variante in `../QuizDashboard_Private`. Hier liegt nur, was unterwegs gebraucht wird. Lerncoach-Wochen, die es nur lokal gibt, stehen hier als Platzhalter mit `status: "local"` (Woche und Titel, kein Inhalt). CNS1-Quizzes gibt es nur lokal.
 
 Neue Quiz werden in `quizzes/<FACH>/` gespeichert und zusätzlich in `quiz-catalog.js` registriert. Der lokale Verlauf und unfertige Zwischenstände werden im Browser gespeichert. Nach **Zwischenstand speichern** wird der vollständige Quiz-Zustand einschliesslich Antworten, Reihenfolgen und Bewertungen unter `users/<uid>/dashboard/state` in Cloud Firestore gespeichert und kann mit demselben GitHub-Konto auf einem anderen Gerät fortgesetzt werden. Lokaler und entfernter Stand werden beim Login zusammengeführt.
 

@@ -13,7 +13,7 @@
   "use strict";
 
   const ID_PATTERN = /^[A-Za-z0-9][A-Za-z0-9_-]{0,63}$/;
-  const WEEK_STATUSES = new Set(["ready", "soon", "locked"]);
+  const WEEK_STATUSES = new Set(["ready", "soon", "locked", "local"]);
   const QUESTION_TYPES = new Set(["type", "multi", "order", "single"]);
   const CALLOUT_TONES = new Set(["def", "exam", "warn", "tip"]);
   const CELL_TONES = new Set(["good", "bad", "warn", "focus"]);
@@ -334,13 +334,14 @@
       if (weekIds.has(week.id)) errors.push(`${where}: doppelte id ${week.id}`);
       weekIds.add(week.id);
       if (!isText(week.title)) errors.push(`${where}: title fehlt`);
-      if (week.status !== undefined && !WEEK_STATUSES.has(week.status)) errors.push(`${where}: status muss ready, locked oder soon sein`);
+      if (week.status !== undefined && !WEEK_STATUSES.has(week.status)) errors.push(`${where}: status muss ready, locked, soon oder local sein`);
       if (week.requiredPoints !== undefined && !(Number.isInteger(week.requiredPoints) && week.requiredPoints >= 0)) {
         errors.push(`${where}: requiredPoints muss eine ganze Zahl ab 0 sein`);
       }
       const items = week.items === undefined ? [] : week.items;
       if (!Array.isArray(items)) return errors.push(`${where}: items muss eine Liste sein`);
-      if (week.status !== "soon" && !items.length) errors.push(`${where}: Woche ohne Inhalte als status "soon" markieren`);
+      if (week.status !== "soon" && week.status !== "local" && !items.length) errors.push(`${where}: Woche ohne Inhalte als status "soon" (folgt) oder "local" (nur lokal verfügbar) markieren`);
+      if (week.status === "local" && items.length) errors.push(`${where}: Platzhalter mit status "local" darf keine Inhalte enthalten`);
 
       const checkpointIds = new Set();
       items.forEach((item, itemIndex) => {
@@ -536,8 +537,13 @@
     return (week.items || []).filter(item => item.type === "checkpoint");
   }
 
+  // status "local" = Platzhalter: die Woche gibt es nur im lokalen Dashboard.
+  function isLocalOnly(week) {
+    return week?.status === "local";
+  }
+
   function hasContent(week) {
-    return week.status !== "soon" && Array.isArray(week.items) && week.items.length > 0;
+    return week.status !== "soon" && !isLocalOnly(week) && Array.isArray(week.items) && week.items.length > 0;
   }
 
   function weekState(subject, weekIndex, progress) {
@@ -554,7 +560,7 @@
       previousWeek: null,
       previousPassed: 0
     };
-    if (!hasContent(week)) return { ...base, status: "soon", percent: 0 };
+    if (!hasContent(week)) return { ...base, status: isLocalOnly(week) ? "local" : "soon", percent: 0 };
 
     // Vorwoche = nächstliegende frühere Woche mit Inhalten
     let previousIndex = weekIndex - 1;
@@ -577,7 +583,7 @@
 
   function subjectState(subject, progress) {
     const weeks = subject.weeks.map((_, index) => weekState(subject, index, progress));
-    const withContent = weeks.filter(state => state.status !== "soon");
+    const withContent = weeks.filter(state => state.status !== "soon" && state.status !== "local");
     const totalCheckpoints = withContent.reduce((sum, state) => sum + state.totalCheckpoints, 0);
     const passedCheckpoints = withContent.reduce((sum, state) => sum + state.passedCheckpoints, 0);
     const passedWeeks = withContent.filter(state => state.status === "passed").length;
@@ -585,7 +591,8 @@
       weeks,
       totalWeeks: withContent.length,
       passedWeeks,
-      soonWeeks: weeks.length - withContent.length,
+      soonWeeks: weeks.filter(state => state.status === "soon").length,
+      localWeeks: weeks.filter(state => state.status === "local").length,
       totalCheckpoints,
       passedCheckpoints,
       percent: withContent.length ? Math.round(passedWeeks / withContent.length * 100) : 0
@@ -633,7 +640,7 @@
     isQuestionLocked, openQuestionCount, prepareRetry,
     emptyProgress, normaliseProgress, weekKey, checkpointKey,
     isCheckpointPassed, markCheckpointPassed, setPosition, mergeProgress,
-    checkpointsOf, hasContent, weekState, subjectState, canEnter, maxReachableIndex,
+    checkpointsOf, hasContent, isLocalOnly, weekState, subjectState, canEnter, maxReachableIndex,
     registerSubject, registeredSubjects, resetRegistry
   };
 });

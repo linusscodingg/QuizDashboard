@@ -659,7 +659,7 @@
         return `
           <article class="quiz-card" style="--status-color:${status.color};--status-bg:${status.background}">
             <div>
-              <div class="quiz-topline"><span class="week">Woche ${escapeHtml(quiz.week)}</span><span class="status">${escapeHtml(status.label)}</span></div>
+              <div class="quiz-topline"><span class="week">Woche ${escapeHtml(quiz.week)}</span><span class="status">${escapeHtml(status.label)}</span><span class="where-chip" title="Gibt es online und im lokalen Dashboard">Online + Lokal</span></div>
               <h3>${escapeHtml(quiz.title)}</h3>
               <p class="source">Quelle: ${escapeHtml(quiz.source)}</p>
               ${progress ? `<p class="saved-progress">Zwischenstand: ${progress.completedCount} / ${progress.totalQuestions} Aufgaben gespeichert · ${formatDate(progress.updatedAt)}</p>` : ""}

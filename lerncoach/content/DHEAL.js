@@ -4475,6 +4475,13 @@ Lerncoach.registerSubject({
           ]
         }
       ]
+    },
+    /* Woche 5 gibt es nur im lokalen Dashboard (QuizDashboard_Private). Hier steht nur der Platzhalter. */
+    {
+      id: "w5",
+      number: 5,
+      title: "Classification: Predicting Categories",
+      status: "local"
     }
   ]
 });

@@ -28,7 +28,8 @@
     ready: { label: "Bereit", color: "var(--blue)", background: "#e5f3fa" },
     locked: { label: "Gesperrt", color: "var(--orange)", background: "var(--orange-bg)" },
     passed: { label: "Bestanden ✓", color: "var(--green)", background: "var(--green-bg)" },
-    soon: { label: "Noch keine Inhalte", color: "var(--grey)", background: "var(--grey-bg)" }
+    soon: { label: "Noch keine Inhalte", color: "var(--grey)", background: "var(--grey-bg)" },
+    local: { label: "Nur lokal verfügbar", color: "var(--grey)", background: "var(--grey-bg)" }
   };
 
   const state = {
@@ -227,6 +228,74 @@
     return `<span class="status" style="--status-color:${info.color};--status-bg:${info.background}">${esc(info.label)}</span>`;
   }
 
+  /*
+   * Wo gibt es eine Woche?
+   *   Online-Version: echte Wochen gibt es auch lokal, status "local" ist ein Platzhalter.
+   *   Lokale Version: availability kommt aus Lerncoach.combineSources ("both" oder "local").
+   */
+  function whereOf(week) {
+    if (week.status === "local") return "local";
+    return week.availability === "local" ? "local" : "both";
+  }
+
+  function whereChip(week) {
+    const local = whereOf(week) === "local";
+    return `<span class="where-chip${local ? " is-local" : ""}" title="${local ? "Gibt es nur im lokalen Dashboard" : "Gibt es online und im lokalen Dashboard"}">${local ? "Nur lokal" : "Online + Lokal"}</span>`;
+  }
+
+  function localCount(subjectState) {
+    return subjectState.weeks.filter(weekState => whereOf(weekState.week) === "local").length;
+  }
+
+  /* ---------- Semesterübersicht: pro Fach jede Woche als Kästchen ---------- */
+
+  const CELL_TEXT = { passed: "Bestanden", ready: "Offen", locked: "Gesperrt", soon: "Inhalte folgen", local: "Nur lokal verfügbar" };
+
+  function renderOverview(states) {
+    if (!states.length) return "";
+    let anyPlaceholder = false;
+    let anyLocalOnly = false;
+    const rows = states.map(({ subject, state: subjectState }) => {
+      const cells = subjectState.weeks.map(weekState => {
+        const { week, weekIndex, status } = weekState;
+        const number = weekNumber(week, weekIndex);
+        const started = status === "ready" && weekState.passedCheckpoints > 0;
+        const localOnly = status !== "local" && whereOf(week) === "local";
+        if (status === "local") anyPlaceholder = true;
+        if (localOnly) anyLocalOnly = true;
+        const detail = status === "ready" && weekState.totalCheckpoints
+          ? `${weekState.passedCheckpoints} / ${weekState.totalCheckpoints} Checkpoints` : CELL_TEXT[status];
+        const label = `Woche ${number} · ${week.title} · ${detail}${localOnly ? " · nur lokal" : ""}`;
+        const classes = `lc-ov-cell ${started ? "is-started" : `is-${status}`}${localOnly ? " has-local" : ""}`;
+        const style = started ? ` style="--fill:${weekState.percent}%"` : "";
+        const inner = `<span>${esc(number)}</span>`;
+        return L.canEnter(weekState)
+          ? `<a class="${classes}"${style} href="${hrefFor({ view: "lecture", subjectId: subject.id, weekId: week.id })}" title="${esc(label)}" aria-label="${esc(label)}">${inner}</a>`
+          : `<span class="${classes}" title="${esc(label)}" aria-label="${esc(label)}">${inner}</span>`;
+      }).join("");
+      const placeholders = subjectState.localWeeks || 0;
+      return `<div class="lc-ov-row" style="--accent:${accentOf(subject)}">
+        <a class="lc-ov-name" href="${hrefFor({ view: "weeks", subjectId: subject.id })}"><span class="subject-mark">${esc(markOf(subject))}</span><span>${esc(subject.name)}</span></a>
+        <div class="lc-ov-cells">${cells || '<span class="lc-muted">Noch keine Wochen</span>'}</div>
+        <span class="lc-ov-count"><strong>${subjectState.passedWeeks} / ${subjectState.totalWeeks}</strong><small>Wochen bestanden${placeholders ? ` · ${placeholders} nur lokal` : ""}</small></span>
+      </div>`;
+    }).join("");
+    const legend = [
+      ["is-passed", "Bestanden"],
+      ["is-started", "Angefangen"],
+      ["is-ready", "Offen"],
+      ["is-locked", "Gesperrt"],
+      ["is-soon", "Inhalte folgen"],
+      ...(anyPlaceholder ? [["is-local", "Nur lokal verfügbar"]] : []),
+      ...(anyLocalOnly ? [["is-ready has-local", "Nur lokal (nicht online)"]] : [])
+    ].map(([cls, text]) => `<span><i class="lc-ov-cell lc-ov-mini ${cls}"${cls === "is-started" ? ' style="--fill:50%"' : ""}></i>${esc(text)}</span>`).join("");
+    return `<section class="lc-overview" aria-label="Semesterübersicht">
+      <div class="lc-ov-head"><h3>Semesterübersicht</h3><p class="lc-muted">Wie viele Wochen pro Fach bestanden sind. Klick auf eine Woche öffnet sie.</p></div>
+      <div class="lc-ov-rows">${rows}</div>
+      <div class="lc-ov-legend">${legend}</div>
+    </section>`;
+  }
+
   function header(eyebrow, title, lead, crumbs = []) {
     const trail = crumbs.length ? `<nav class="lc-crumbs" aria-label="Pfad">${crumbs.map(crumb => crumb.href
       ? `<a href="${crumb.href}">${esc(crumb.label)}</a>` : `<span aria-current="page">${esc(crumb.label)}</span>`).join('<span aria-hidden="true">›</span>')}</nav>` : "";
@@ -255,6 +324,8 @@
     const tiles = states.map(({ subject, state: subjectState }) => {
       const next = subjectState.weeks.find(week => week.status === "ready");
       const soon = subjectState.soonWeeks ? `<span class="lc-muted">${subjectState.soonWeeks} ${subjectState.soonWeeks === 1 ? "Woche folgt" : "Wochen folgen"}</span>` : "";
+      const onlyLocal = localCount(subjectState);
+      const localNote = onlyLocal ? `<span class="lc-muted">${onlyLocal} ${onlyLocal === 1 ? "Woche" : "Wochen"} nur lokal</span>` : "";
       const progressText = subjectState.totalWeeks
         ? `${subjectState.passedWeeks} / ${subjectState.totalWeeks} Wochen bestanden`
         : "Noch keine Wochen mit Inhalten";
@@ -263,7 +334,7 @@
           <span class="subject-mark">${esc(markOf(subject))}</span>
           <span><span class="lc-tile-title">${esc(subject.name)}</span><span class="lc-tile-sub">${esc(subject.description || "")}</span></span>
         </span>
-        <span class="lc-tile-progress"><strong>${esc(progressText)}</strong>${soon}</span>
+        <span class="lc-tile-progress"><strong>${esc(progressText)}</strong>${soon}${localNote}</span>
         ${bar(subjectState.percent, `${subject.name}: ${progressText}`)}
         <span class="lc-tile-foot">${next ? `Als Nächstes: Woche ${weekNumber(next.week, next.weekIndex)} · ${esc(next.week.title)}` : subjectState.totalWeeks && subjectState.passedWeeks === subjectState.totalWeeks ? "Alles bestanden ✓" : "Wochen ansehen"}<span aria-hidden="true">→</span></span>
       </a>`;
@@ -280,6 +351,7 @@
         <div class="summary-card"><span>Checkpoints</span><strong>${totals.passedCheckpoints} / ${totals.checkpoints}</strong><em>mit 100 % bestanden</em></div>
         <div class="summary-card"><span>Fächer</span><strong>${entries.length}</strong><em>im Lerncoach verfügbar</em></div>
       </section>
+      ${renderOverview(states)}
       ${broken}
       ${tiles ? `<div class="lc-grid">${tiles}</div>` : emptyCard("Noch keine Fächer im Lerncoach.", "Ergänze eine Inhaltsdatei in lerncoach/manifest.js.")}`;
   }
@@ -298,7 +370,8 @@
       const { week, weekIndex, status } = weekState;
       const info = STATUS_INFO[status];
       const slides = (week.items || []).filter(item => item.type === "slide").length;
-      const meta = status === "soon" ? "Inhalte werden noch ergänzt." : `${slides} ${slides === 1 ? "Folie" : "Folien"} · ${weekState.totalCheckpoints} ${weekState.totalCheckpoints === 1 ? "Checkpoint" : "Checkpoints"}`;
+      const meta = status === "soon" ? "Inhalte werden noch ergänzt."
+        : status === "local" ? "Diese Woche gibt es nur im lokalen Dashboard. Lernen kannst du sie zuhause am eigenen Rechner." : `${slides} ${slides === 1 ? "Folie" : "Folien"} · ${weekState.totalCheckpoints} ${weekState.totalCheckpoints === 1 ? "Checkpoint" : "Checkpoints"}`;
       const position = weekState.position;
       const lectureLabel = status === "passed" ? "Vorlesung wiederholen" : position && position.index > 0 && !position.finished ? "Vorlesung fortsetzen" : "Vorlesung starten";
       const open = L.canEnter(weekState);
@@ -307,10 +380,10 @@
           ${weekState.totalCheckpoints ? `<a class="button lc-btn-ghost" href="${hrefFor({ view: "quiz", subjectId: subject.id, weekId: week.id })}">Nur Quiz machen</a>` : ""}
         </div>` : "";
       return `<article class="lc-week is-${status}" style="--status-color:${info.color};--status-bg:${info.background}">
-        <div class="quiz-topline"><span class="week">Woche ${esc(weekNumber(week, weekIndex))}</span>${badge(status)}</div>
+        <div class="quiz-topline"><span class="week">Woche ${esc(weekNumber(week, weekIndex))}</span>${badge(status)}${status === "local" ? "" : whereChip(week)}</div>
         <h3>${esc(week.title)}</h3>
         <p class="source">${esc(meta)}</p>
-        ${status !== "soon" ? `<div class="lc-week-progress"><span>${weekState.passedCheckpoints} / ${weekState.totalCheckpoints} Checkpoints</span>${bar(weekState.percent, `Woche ${weekNumber(week, weekIndex)}: ${weekState.percent} %`)}</div>` : ""}
+        ${status !== "soon" && status !== "local" ? `<div class="lc-week-progress"><span>${weekState.passedCheckpoints} / ${weekState.totalCheckpoints} Checkpoints</span>${bar(weekState.percent, `Woche ${weekNumber(week, weekIndex)}: ${weekState.percent} %`)}</div>` : ""}
         ${status === "locked" ? `<p class="lc-lock"><span aria-hidden="true">🔒</span> ${esc(lockText(subject, weekState))}</p>` : ""}
         ${actions}
       </article>`;

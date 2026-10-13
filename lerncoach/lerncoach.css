@@ -453,3 +453,105 @@
 .lc-chart-panel { max-width: 440px; }
 .lc-chart.is-box .lc-chart-single { max-width: 580px; }
 .lc-chart.is-heatmap .lc-chart-single { max-width: 540px; }
+
+/* ---------- Verfügbarkeit: kleines Label "Online + Lokal" / "Nur lokal" ---------- */
+.where-chip {
+  display: inline-flex;
+  align-items: center;
+  padding: 3px 8px;
+  color: var(--muted);
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  background: #fff;
+  font-size: .7rem;
+  font-weight: 800;
+  letter-spacing: .02em;
+  white-space: nowrap;
+}
+.where-chip::before { content: ""; width: 7px; height: 7px; margin-right: 6px; border-radius: 50%; background: var(--green); }
+.where-chip.is-local::before { background: var(--grey); }
+.where-chip.is-local { color: var(--grey); border-style: dashed; }
+.lc-week.is-local { opacity: .8; background: repeating-linear-gradient(135deg, #fff 0 10px, var(--grey-bg) 10px 20px); box-shadow: none; }
+
+/* ---------- Semesterübersicht ---------- */
+.lc-overview {
+  margin: 0 0 22px;
+  padding: 18px 20px;
+  border: 1px solid var(--line);
+  border-radius: 18px;
+  background: #fff;
+  box-shadow: 0 10px 28px rgba(23,32,48,.06);
+}
+.lc-ov-head { display: flex; flex-wrap: wrap; gap: 4px 14px; align-items: baseline; justify-content: space-between; margin-bottom: 12px; }
+.lc-ov-head h3 { margin: 0; font-size: 1.05rem; }
+.lc-ov-head p { margin: 0; }
+.lc-ov-rows { display: grid; gap: 8px; }
+.lc-ov-row {
+  display: grid;
+  grid-template-columns: minmax(170px, 260px) 1fr auto;
+  gap: 14px;
+  align-items: center;
+  padding: 8px 10px;
+  border-radius: 12px;
+  background: var(--wash);
+}
+.lc-ov-name { display: flex; gap: 10px; align-items: center; min-width: 0; color: var(--ink); font-weight: 800; font-size: .9rem; text-decoration: none; }
+.lc-ov-name span:last-child { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.lc-ov-name .subject-mark { flex: none; width: 34px; height: 34px; border-radius: 10px; font-size: .66rem; }
+.lc-ov-name:hover span:last-child { text-decoration: underline; }
+.lc-ov-cells { display: flex; flex-wrap: wrap; gap: 5px; }
+.lc-ov-cell {
+  --fill: 0%;
+  position: relative;
+  display: grid;
+  place-items: center;
+  width: 30px;
+  height: 30px;
+  color: var(--ink);
+  border: 2px solid var(--line);
+  border-radius: 8px;
+  background: #fff;
+  font-size: .76rem;
+  font-weight: 850;
+  text-decoration: none;
+}
+a.lc-ov-cell:hover { transform: translateY(-1px); box-shadow: 0 4px 12px rgba(23,32,48,.16); }
+a.lc-ov-cell:focus-visible { outline: 3px solid var(--accent, var(--blue)); outline-offset: 2px; }
+.lc-ov-cell.is-ready { border-color: var(--accent, var(--blue)); }
+.lc-ov-cell.is-started {
+  border-color: var(--accent, var(--blue));
+  background: linear-gradient(to top, color-mix(in srgb, var(--accent, var(--blue)) 30%, #fff) var(--fill), #fff var(--fill));
+}
+.lc-ov-cell.is-passed { color: #fff; border-color: var(--green); background: var(--green); }
+.lc-ov-cell.is-locked { color: var(--muted); border-color: var(--line); background: var(--grey-bg); }
+.lc-ov-cell.is-soon { color: var(--muted); border-style: dashed; background: transparent; }
+.lc-ov-cell.is-local {
+  color: var(--grey);
+  border-style: dashed;
+  border-color: var(--grey);
+  background: repeating-linear-gradient(135deg, #fff 0 4px, var(--grey-bg) 4px 8px);
+}
+.lc-ov-cell.has-local::after {
+  content: "";
+  position: absolute;
+  top: -4px;
+  right: -4px;
+  width: 9px;
+  height: 9px;
+  border: 2px solid #fff;
+  border-radius: 50%;
+  background: var(--grey);
+}
+.lc-ov-count { display: grid; justify-items: end; text-align: right; line-height: 1.15; }
+.lc-ov-count strong { font-size: 1.05rem; }
+.lc-ov-count small { color: var(--muted); font-size: .72rem; font-weight: 700; }
+.lc-ov-legend { display: flex; flex-wrap: wrap; gap: 6px 16px; margin-top: 12px; color: var(--muted); font-size: .76rem; font-weight: 700; }
+.lc-ov-legend span { display: inline-flex; gap: 6px; align-items: center; }
+.lc-ov-mini { width: 14px; height: 14px; border-radius: 4px; border-width: 2px; }
+.lc-ov-mini.has-local::after { top: -5px; right: -5px; width: 7px; height: 7px; }
+
+@media (max-width: 720px) {
+  .lc-overview { padding: 14px 12px; }
+  .lc-ov-row { grid-template-columns: 1fr auto; gap: 8px 10px; }
+  .lc-ov-cells { grid-column: 1 / -1; grid-row: 2; }
+}

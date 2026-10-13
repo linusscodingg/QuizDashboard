@@ -10,7 +10,8 @@ vm.runInNewContext(fs.readFileSync(path.join(root, "lerncoach/content/DHEAL.js")
   Lerncoach: { registerSubject: value => { subject = value; } }
 });
 assert.deepEqual(L.validateSubject(subject), []);
-assert.equal(subject.weeks.length, 4);
+assert.equal(subject.weeks.length, 5);
+assert.deepEqual(JSON.parse(JSON.stringify(subject.weeks[4])), { id: "w5", number: 5, title: "Classification: Predicting Categories", status: "local" }, "Woche 5 ist online nur ein Platzhalter ohne Inhalt");
 const progress = L.emptyProgress();
 for (const week of subject.weeks.slice(0, 2)) {
   const checkpoints = week.items.filter(item => item.type === "checkpoint");
